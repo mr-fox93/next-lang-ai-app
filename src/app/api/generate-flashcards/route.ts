@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { count } = await req.json();
+    const { count, message } = await req.json();
 
     if (!count || count <= 0) {
       return NextResponse.json(
@@ -18,6 +18,11 @@ export async function POST(req: Request) {
 
     const prompt = `
       Wygeneruj ${count} fiszek do nauki angielskiego w formacie JSON.
+      Fiszki powinny bazować na podanym przez użytkownika zdaniu: ${message}.
+      Zdanie to może być np 'rozmowa rekrutacyjna' co oznacza, że fiszki powinny zawierać słowa związane z rozmową rekrutacyjną. Jej przebiegiem w korporacji. 
+      Jeśli na przykład user wpisze 'zamawianie jedzenia' / 'wizyta w restauracji' to również fiszki powinny być związane z tematyką restauracji, jedzenia, zamawiania jedzenia.
+      Chodzi kontakst, żeby fiszki były związane z tematem zdania.
+        
       Każda fiszka powinna zawierać:
       - "origin_text": słowo lub frazę po angielsku
       - "translate_text": tłumaczenie na język polski
