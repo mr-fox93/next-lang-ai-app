@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 export default function Home() {
   const [flashcards, setFlashcards] = useState<
@@ -9,6 +10,7 @@ export default function Home() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [promptMessage, setPromptMessage] = useState<string>("");
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -18,7 +20,7 @@ export default function Home() {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 5 }),
+        body: JSON.stringify({ count: 5, message: promptMessage }),
       });
 
       if (!response.ok) throw new Error("Błąd pobierania fiszek");
@@ -40,6 +42,7 @@ export default function Home() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold">Generator Fiszek</h1>
+      <Input onChange={(e) => setPromptMessage(e.target.value)} />
       <Button
         onClick={handleGenerate}
         disabled={loading}
