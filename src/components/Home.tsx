@@ -1,16 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Progress } from "./ui/progress";
+import { FlashCard } from "@/lib/flashcard.schema";
 
 export default function Home() {
-  const [flashcards, setFlashcards] = useState<
-    { origin_text: string; translate_text: string; example_using: string }[]
-  >([]);
+  const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [promptMessage, setPromptMessage] = useState<string>("");
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (loading) {
+      setProgress(0); // Resetuj progress
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev < 90) return prev + 10; // Stopniowe zwiększanie postępu
+          return prev; // Utrzymanie wartości przed zakończeniem
+        });
+      }, 300);
+    } else {
+      setProgress(100); // Po zakończeniu ustawia na 100%
+      setTimeout(() => setProgress(0), 500); // Reset po krótkim czasie
+    }
+
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -20,13 +41,13 @@ export default function Home() {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 5, message: promptMessage }),
+        body: JSON.stringify({ count: 10, message: promptMessage }),
       });
 
       if (!response.ok) throw new Error("Błąd pobierania fiszek");
 
       const data = await response.json();
-      setFlashcards(data);
+      setFlashcards(data.flashcards);
       console.log("Wygenerowane fiszki:", data);
     } catch (err) {
       if (err instanceof Error) {
@@ -52,6 +73,12 @@ export default function Home() {
       </Button>
 
       {error && <p className="text-red-500 mt-2">{error}</p>}
+      {loading && (
+        <Progress
+          value={progress}
+          className="w-[60%] mt-4 transition-all duration-300"
+        />
+      )}
 
       <div className="mt-6">
         {flashcards.map((card, index) => (

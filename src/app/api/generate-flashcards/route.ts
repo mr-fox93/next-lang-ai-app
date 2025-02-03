@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { FlashCardSchema } from "@/lib/flashcard.schema";
+import { getFlashcardsPrompt } from "@/lib/prompts";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,32 +19,29 @@ export async function POST(req: Request) {
       );
     }
 
-    const prompt = `
-      Wygeneruj ${count} fiszek do nauki angielskiego w formacie JSON.
-      Fiszki powinny bazować na podanym przez użytkownika zdaniu: ${message}.
-      Zdanie to może być np 'rozmowa rekrutacyjna' co oznacza, że fiszki powinny zawierać słowa związane z rozmową rekrutacyjną. Jej przebiegiem w korporacji. 
-      Jeśli na przykład user wpisze 'zamawianie jedzenia' / 'wizyta w restauracji' to również fiszki powinny być związane z tematyką restauracji, jedzenia, zamawiania jedzenia.
-      Chodzi kontakst, żeby fiszki były związane z tematem zdania.
-        
-      Każda fiszka powinna zawierać:
-      - "origin_text": słowo lub frazę po angielsku
-      - "translate_text": tłumaczenie na język polski
-      - "example_using": przykład użycia w zdaniu
-
-      Format odpowiedzi:
-      [{"origin_text": "...", "translate_text": "...", "example_using": "..."}]
-    `;
+    const prompt = getFlashcardsPrompt(count, message);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "system", content: prompt }],
-      //   response_format: { type: "json_object" },
-      temperature: 0.7,
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      response_format: zodResponseFormat(FlashCardSchema, "flashcardResponse"),
+      temperature: 0.1,
       max_tokens: 500,
     });
 
-    const parsedData = JSON.parse(response.choices[0].message.content || "[]");
-
+    const parsedData = FlashCardSchema.parse(
+      JSON.parse(response.choices[0].message.content || "[]")
+    );
     return NextResponse.json(parsedData);
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
