@@ -41,7 +41,7 @@ export default function Home() {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 5, message: promptMessage }),
+        body: JSON.stringify({ count: 10, message: promptMessage }),
       });
 
       if (!response.ok) throw new Error("Błąd pobierania fiszek");
