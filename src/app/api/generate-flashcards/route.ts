@@ -10,7 +10,7 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { count, message } = await req.json();
+    const { count, message, level } = await req.json();
 
     if (!count || count <= 0) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const prompt = getFlashcardsPrompt(count, message);
+    const prompt = getFlashcardsPrompt(count, message, level);
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

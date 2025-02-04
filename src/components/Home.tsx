@@ -5,6 +5,13 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Progress } from "./ui/progress";
 import { FlashCard } from "@/lib/flashcard.schema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
   const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
@@ -13,6 +20,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [promptMessage, setPromptMessage] = useState<string>("");
   const [progress, setProgress] = useState(0);
+  const [selectValue, setSelectValue] = useState<string>("B2");
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -41,7 +49,11 @@ export default function Home() {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 10, message: promptMessage }),
+        body: JSON.stringify({
+          count: 10,
+          message: promptMessage,
+          level: selectValue,
+        }),
       });
 
       if (!response.ok) throw new Error("Błąd pobierania fiszek");
@@ -64,6 +76,20 @@ export default function Home() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold">Generator Fiszek</h1>
+      <Select
+        value={selectValue}
+        onValueChange={(value) => setSelectValue(value)}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Wybierz poziom" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="A2">A2</SelectItem>
+          <SelectItem value="B2">B2</SelectItem>
+          <SelectItem value="C1">C1</SelectItem>
+        </SelectContent>
+      </Select>
+
       <Input onChange={(e) => setPromptMessage(e.target.value)} />
       <Button
         onClick={handleGenerate}
