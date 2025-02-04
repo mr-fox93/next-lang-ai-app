@@ -15,7 +15,9 @@ export default function Navbar() {
     >
       <Link href="/" className="flex items-center space-x-2">
         <Bot className="w-8 h-8 text-purple-500" />
-        <span className="text-white font-medium text-xl">ResearchAI</span>
+        <p className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-2xl font-bold">
+          Gradient Text
+        </p>
       </Link>
 
       <div className="hidden md:flex items-center space-x-8">

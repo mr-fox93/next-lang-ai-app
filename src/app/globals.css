@@ -58,3 +58,7 @@
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+.bg-gradient-primary {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600;
+}
