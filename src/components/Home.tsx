@@ -48,6 +48,7 @@ export default function Home() {
 
       const data = await response.json();
       setFlashcards(data.flashcards);
+      setLoading(false);
       console.log("Wygenerowane fiszki:", data);
     } catch (err) {
       if (err instanceof Error) {
