@@ -8,17 +8,20 @@ import { AnimatedInput } from "@/components/animated-input";
 import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
-// import { useRouter } from "next/navigation";
-import { FloatingFlashcards } from "./floating.flashcards";
-import { FlashCard } from "@/lib/flashcard.schema";
+import { useRouter } from "next/navigation";
+// import { FloatingFlashcards } from "./floating.flashcards";
+// import { FlashCard } from "@/lib/flashcard.schema";
+import { useFlashcards } from "@/app/context/flashcards-context";
 
 export default function Hero() {
-  const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
+  const { setFlashcards } = useFlashcards();
+
+  // const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
 
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  //   const router = useRouter();
+  const router = useRouter();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -28,7 +31,7 @@ export default function Hero() {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 10, message: userInput }),
+        body: JSON.stringify({ count: 5, message: userInput }),
       });
 
       if (!response.ok) throw new Error("Błąd pobierania fiszek");
@@ -38,7 +41,7 @@ export default function Hero() {
       setUserInput("");
       console.log("Wygenerowane fiszki:", data);
       // Navigate to flashcards page
-      //   router.push("/flashcards");
+      router.push("/flashcards");
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
       setIsLoading(false);
@@ -47,7 +50,7 @@ export default function Hero() {
     }
   };
 
-  console.log(flashcards);
+  // console.log(flashcards);
 
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
@@ -55,9 +58,9 @@ export default function Hero() {
       {isLoading && <Loader />}
 
       {/* Floating flashcards background */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* <div className="absolute inset-0 overflow-hidden">
         <FloatingFlashcards />
-      </div>
+      </div> */}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
