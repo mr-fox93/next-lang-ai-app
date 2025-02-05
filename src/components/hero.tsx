@@ -10,10 +10,13 @@ import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
 // import { FloatingFlashcards } from "./floating.flashcards";
-import { FlashCard } from "@/lib/flashcard.schema";
+// import { FlashCard } from "@/lib/flashcard.schema";
+import { useFlashcards } from "@/app/context/flashcards-context";
 
 export default function Hero() {
-  const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
+  const { setFlashcards } = useFlashcards();
+
+  // const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
 
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
@@ -47,7 +50,7 @@ export default function Hero() {
     }
   };
 
-  console.log(flashcards);
+  // console.log(flashcards);
 
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">

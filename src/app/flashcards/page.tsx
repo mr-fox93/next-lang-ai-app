@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation"
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 
-import { categories, sampleFlashcards } from "@/lib/sample-flashcards";
 import { Button } from "@/components/ui/button";
 import { Menu, Grid, Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
+import { useFlashcards } from "../context/flashcards-context";
 
 export default function FlashcardsPage() {
   //   const router = useRouter()
@@ -19,12 +19,14 @@ export default function FlashcardsPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
 
+  const { flashcards } = useFlashcards();
+
   // Get cards for selected category
   const categoryCards = selectedCategory
-    ? sampleFlashcards.filter((card) => card.category === selectedCategory)
+    ? flashcards.filter((card) => card.category === selectedCategory)
     : [];
 
-  const currentCard = categoryCards[currentCardIndex];
+  const currentCard = categoryCards[currentCardIndex] ?? null;
 
   useEffect(() => {
     setCurrentCardIndex(0);
@@ -32,7 +34,7 @@ export default function FlashcardsPage() {
 
   const handleNext = (known: boolean) => {
     console.log(
-      `Card ${currentCard.id} marked as ${known ? "known" : "unknown"}`
+      `Card ${currentCardIndex} marked as ${known ? "known" : "unknown"}`
     );
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
@@ -63,7 +65,6 @@ export default function FlashcardsPage() {
         `}
         >
           <FlashcardsSidebar
-            categories={categories}
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);

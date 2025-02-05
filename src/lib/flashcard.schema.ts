@@ -4,6 +4,7 @@ export const ResponsStructure = z.object({
   origin_text: z.string(),
   translate_text: z.string(),
   example_using: z.string(),
+  category: z.string(),
 });
 
 export const FlashCardSchema = z.object({

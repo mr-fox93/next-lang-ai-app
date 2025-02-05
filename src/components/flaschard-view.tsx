@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Volume2 } from "lucide-react";
-import type { Flashcard } from "@/lib/sample-flashcards";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useState } from "react";
+import type { FlashCard } from "@/lib/flashcard.schema";
 
 interface FlashcardViewProps {
-  card: Flashcard;
+  card: FlashCard;
   onNext: (known: boolean) => void;
 }
 
@@ -33,26 +33,10 @@ export function FlashcardView({ card, onNext }: FlashcardViewProps) {
             <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-8 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl">
               <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
                 <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80 mb-2">
-                  {card.front.word}
+                  {card.origin_text}
                 </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400 text-lg">
-                    {card.front.phonetic}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Add pronunciation logic here
-                    }}
-                  >
-                    <Volume2 className="h-5 w-5" />
-                  </Button>
-                </div>
                 <div className="text-gray-300 text-center italic text-sm sm:text-base max-w-md">
-                  &quot;{card.front.example}&quot;
+                  &quot;{card.example_using}&quot;
                 </div>
               </div>
             </div>
@@ -63,17 +47,16 @@ export function FlashcardView({ card, onNext }: FlashcardViewProps) {
             <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-8 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl">
               <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
                 <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80 mb-2">
-                  {card.back.translation}
+                  {card.translate_text}
                 </h2>
                 <div className="text-gray-300 text-center italic text-sm sm:text-base max-w-md">
-                  &quot;{card.back.example}&quot;
+                  &quot;{card.example_using}&quot;
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
-
       {/* Action Buttons */}
       <div className="flex gap-4 w-full max-w-md mx-auto">
         <Button
