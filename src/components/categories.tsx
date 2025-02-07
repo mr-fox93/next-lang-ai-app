@@ -39,7 +39,6 @@ export function Categories() {
         >
           <motion.div
             initial={{ scale: 1 }}
-            whileHover={{ scale: 1.05 }}
             className="flex items-center gap-2"
           >
             <category.icon className="w-4 h-4 text-purple-400" />
@@ -47,7 +46,6 @@ export function Categories() {
               {category.label}
             </span>
           </motion.div>
-          {/* Gradient background on hover */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg -z-10 blur-sm" />
         </Button>
       ))}
