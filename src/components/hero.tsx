@@ -13,9 +13,10 @@ import { useRouter } from "next/navigation";
 import { useFlashcards } from "@/app/context/flashcards-context";
 
 export default function Hero() {
-  const { setFlashcards, setUserInput, userInput } = useFlashcards();
+  const { setFlashcards } = useFlashcards();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
