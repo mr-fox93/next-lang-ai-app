@@ -2,9 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Volume2 } from "lucide-react";
 import { useState } from "react";
 import type { FlashCard } from "@/lib/flashcard.schema";
+import { speak } from "@/utils/speak";
 
 interface FlashcardViewProps {
   card: FlashCard;
@@ -32,6 +33,17 @@ export function FlashcardView({ card, onNext }: FlashcardViewProps) {
           <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
             <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-8 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl">
               <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    speak(card.origin_text, "en-US");
+                  }}
+                >
+                  <Volume2 className="h-8 w-8" />
+                </Button>
                 <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80 mb-2">
                   {card.origin_text}
                 </h2>
