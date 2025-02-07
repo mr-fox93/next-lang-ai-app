@@ -50,7 +50,7 @@ export function FlashcardView({ card, onNext }: FlashcardViewProps) {
                   {card.translate_text}
                 </h2>
                 <div className="text-gray-300 text-center italic text-sm sm:text-base max-w-md">
-                  &quot;{card.example_using}&quot;
+                  &quot;{card.translate_example}&quot;
                 </div>
               </div>
             </div>

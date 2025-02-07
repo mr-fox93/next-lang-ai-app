@@ -28,6 +28,7 @@ export const getFlashcardsPrompt = (
      - **"origin_text"**: A word or phrase in English.
      - **"translate_text"**: The Polish translation.
      - **"example_using"**: A sample sentence demonstrating the word/phrase in a real-world context related to the provided topic.
+      - **"translate_example"**: The Polish translation of the example sentence.
      - **"category"**: A short, meaningful category that represents the key theme of the flashcard (e.g., "Job Interview", "Car Rental", "ESG Work"). A single, consistent category that applies to **all** generated flashcards.
   3. **Ensure the following:**
      - Words and phrases are **unique** (no repetitions).
@@ -42,6 +43,7 @@ export const getFlashcardsPrompt = (
         "origin_text": "example word",
         "translate_text": "example translation",
         "example_using": "example sentence using the word in context",
+        "translate_example": "example translation of the sentence (example_using)",
         "category": "example category"
       }
     ]
@@ -64,14 +66,15 @@ export const getFlashcardsPrompt = (
   }
   
   ### **Incorrect Example (for the topic "Job Interview")**
-  - Words should help in **handling** the interview (e.g., "experience", "qualifications"), not **general terms** (e.g., "business etiquette").
+  - Words should help in **handling** the interview (e.g., "experience", "qualifications"), not **general terms** (e.g., "business attire"), because probably such a term may not be used in a conversation with the HR department that will conduct the recruitment. The HR department will want information from us about ourselves, our professional experience, plans for the future, etc. 
   \`\`\`json
   {
     "flashcards": [
       {
-        "origin_text": "business etiquette",
-        "translate_text": "etykieta biznesowa",
-        "example_using": "Proper business etiquette helps maintain professional relationships.",
+        "origin_text": "business attire",
+        "translate_text": "ubiór biznesowy",
+        "example_using": "You have a nice business attire for the interview.",
+        "translate_example": "Masz ładny ubiór biznesowy na rozmowę kwalifikacyjną.",
         "category": "Incorrect"
       }
     ]
@@ -87,7 +90,18 @@ export const getFlashcardsPrompt = (
         "origin_text": "rental agreement",
         "translate_text": "umowa wynajmu",
         "example_using": "Before driving away, make sure to read the rental agreement carefully.",
+        "translate_example": "Przed odjazdem upewnij się, że dokładnie przeczytałeś umowę wynajmu.",
         "category": "Car Rental"
+      }
+    ]
+  }
+        "flashcards": [
+      {
+        "origin_text": "business etiquette",
+        "translate_text": "etykieta biznesowa",
+        "example_using": "Proper business etiquette helps maintain professional relationships.",
+        "translate_example": "Prawidłowa etykieta biznesowa pomaga utrzymać profesjonalne relacje.",
+        "category": "Incorrect"
       }
     ]
   }
