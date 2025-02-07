@@ -5,9 +5,7 @@ import { FlashCard } from "@/lib/flashcard.schema";
 
 interface FlashcardsContextType {
   flashcards: FlashCard[];
-  userInput: string;
   setFlashcards: (flashcards: FlashCard[]) => void;
-  setUserInput: (input: string) => void;
 }
 
 const FlashcardsContext = createContext<FlashcardsContextType | undefined>(
@@ -16,12 +14,9 @@ const FlashcardsContext = createContext<FlashcardsContextType | undefined>(
 
 export const FlashcardsProvider = ({ children }: { children: ReactNode }) => {
   const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
-  const [userInput, setUserInput] = useState("");
 
   return (
-    <FlashcardsContext.Provider
-      value={{ flashcards, setFlashcards, userInput, setUserInput }}
-    >
+    <FlashcardsContext.Provider value={{ flashcards, setFlashcards }}>
       {children}
     </FlashcardsContext.Provider>
   );
