@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
 import type { FlashCard } from "@/lib/flashcard.schema";
+import { speak } from "@/utils/speak";
 
 interface FlashcardGridProps {
   cards: FlashCard[];
@@ -51,7 +52,7 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
                     className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Add pronunciation logic here (TTS API)
+                      speak(card.origin_text, "en-US");
                     }}
                   >
                     <Volume2 className="h-4 w-4" />
