@@ -71,7 +71,7 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
                     {card.translate_text}
                   </h3>
                   <div className="text-gray-300 text-center italic text-sm line-clamp-2">
-                    &quot;{card.example_using}&quot;
+                    &quot;{card.translate_example}&quot;
                   </div>
                 </div>
               </div>
