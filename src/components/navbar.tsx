@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Bot, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import type React from "react"; // Added import for React
+import type React from "react";
 
 export default function Navbar() {
   return (

@@ -9,14 +9,11 @@ import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
-// import { FloatingFlashcards } from "./floating.flashcards";
-// import { FlashCard } from "@/lib/flashcard.schema";
+
 import { useFlashcards } from "@/app/context/flashcards-context";
 
 export default function Hero() {
   const { setFlashcards } = useFlashcards();
-
-  // const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
 
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
@@ -40,7 +37,6 @@ export default function Hero() {
       setFlashcards(data.flashcards);
       setUserInput("");
       console.log("Wygenerowane fiszki:", data);
-      // Navigate to flashcards page
       router.push("/flashcards");
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
@@ -50,17 +46,9 @@ export default function Hero() {
     }
   };
 
-  // console.log(flashcards);
-
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
-      {/* Loading overlay */}
       {isLoading && <Loader />}
-
-      {/* Floating flashcards background */}
-      {/* <div className="absolute inset-0 overflow-hidden">
-        <FloatingFlashcards />
-      </div> */}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
