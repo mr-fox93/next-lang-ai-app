@@ -3,6 +3,9 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -42,7 +45,18 @@ export async function POST(req: Request) {
     const parsedData = FlashCardSchema.parse(
       JSON.parse(response.choices[0].message.content || "[]")
     );
-    return NextResponse.json(parsedData);
+
+    const savedFlashcards = await prisma.flashcard.createMany({
+      data: parsedData.flashcards.map((card) => ({
+        origin_text: card.origin_text,
+        translate_text: card.translate_text,
+        example_using: card.example_using,
+        translate_example: card.translate_example,
+        category: card.category,
+      })),
+    });
+
+    return NextResponse.json(savedFlashcards);
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
     return NextResponse.json(
