@@ -28,3 +28,6 @@ lerna-debug.log*
 *.log
 .vscode/
 .idea/
+
+# Ignore Prisma migration lock file
+prisma/migration_lock.toml
