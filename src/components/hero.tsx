@@ -8,7 +8,7 @@ import { AnimatedInput } from "@/components/animated-input";
 import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 import { useFlashcards } from "@/app/context/flashcards-context";
 
@@ -18,7 +18,7 @@ export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -37,7 +37,7 @@ export default function Hero() {
       setFlashcards(data.flashcards);
       setUserInput("");
       console.log("Wygenerowane fiszki:", data);
-      router.push("/flashcards");
+      // router.push("/flashcards");
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
       setIsLoading(false);
