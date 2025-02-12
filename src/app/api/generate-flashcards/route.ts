@@ -3,10 +3,10 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
+
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
