@@ -29,5 +29,9 @@ lerna-debug.log*
 .vscode/
 .idea/
 
-# Ignore Prisma migration lock file
+# Ignorowanie pliku blokady migracji Prisma
 prisma/migration_lock.toml
+
+# Ignorowanie wygenerowanych plików Prisma Client (jeśli istnieją)
+prisma/generated/
+
