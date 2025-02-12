@@ -14,11 +14,11 @@ datasource db {
 }
 
 model Flashcard {
-  id               Int      @id @default(autoincrement())
-  origin_text      String
-  translate_text   String
-  example_using    String
+  id                Int      @id @default(autoincrement())
+  origin_text       String
+  translate_text    String
+  example_using     String
   translate_example String
-  category         String
-  createdAt        DateTime @default(now())
+  category          String
+  createdAt         DateTime @default(now())
 }
