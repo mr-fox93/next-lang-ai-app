@@ -21,4 +21,5 @@ model Flashcard {
   translate_example String
   category          String
   createdAt         DateTime @default(now())
+  userId            String
 }
