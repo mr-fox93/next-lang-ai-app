@@ -1,18 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation"
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
-
+import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Menu, Grid, Maximize2 } from "lucide-react";
+import { Menu, Grid, Maximize2, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { useFlashcards } from "../context/flashcards-context";
+import { useRouter } from "next/navigation";
 
 export default function FlashcardsPage() {
-  //   const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -20,13 +19,9 @@ export default function FlashcardsPage() {
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
 
   const { flashcards } = useFlashcards();
-
-  // Get cards for selected category
-  const categoryCards = selectedCategory
-    ? flashcards.filter((card) => card.category === selectedCategory)
-    : [];
-
-  const currentCard = categoryCards[currentCardIndex] ?? null;
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
+  const router = useRouter();
 
   useEffect(() => {
     setCurrentCardIndex(0);
@@ -39,10 +34,38 @@ export default function FlashcardsPage() {
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
+
+  const categoryCards = selectedCategory
+    ? flashcards.filter((card) => card.category === selectedCategory)
+    : [];
+
+  const currentCard = categoryCards[currentCardIndex] ?? null;
+
   return (
     <div className="min-h-screen bg-black text-white">
+      <div className="flex justify-between items-center p-4 border-b border-white/10">
+        <div className="flex items-center space-x-4">
+          {isSignedIn && (
+            <>
+              <UserButton />
+              <span className="text-white font-medium">{user?.fullName}</span>
+              <Button
+                variant="ghost"
+                className="text-white"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="flex">
-        {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -51,8 +74,6 @@ export default function FlashcardsPage() {
         >
           <Menu className="h-6 w-6" />
         </Button>
-
-        {/* Sidebar */}
         <div
           className={`
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
@@ -74,8 +95,6 @@ export default function FlashcardsPage() {
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
         </div>
-
-        {/* Backdrop */}
         {isMobileSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
@@ -83,12 +102,10 @@ export default function FlashcardsPage() {
           />
         )}
 
-        {/* Main Content */}
         <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8">
           {selectedCategory ? (
             <>
-              {/* View Toggle */}
-              <div className="flex justify-end mb-6">
+              <div className="flex justify-center mb-6">
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
                   <Button
                     variant="ghost"
@@ -113,7 +130,6 @@ export default function FlashcardsPage() {
                 </div>
               </div>
 
-              {/* Content */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={viewMode}
