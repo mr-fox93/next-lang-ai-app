@@ -102,7 +102,6 @@ export default function Hero() {
                 isInputFocused={isInputFocused}
                 userInput={userInput}
               />
-              {/* Gradient glow effect on focus */}
               <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-pink-500/0 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity -z-10 blur-xl" />
             </div>
             <Button

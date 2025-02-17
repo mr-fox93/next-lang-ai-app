@@ -32,13 +32,11 @@ export default function Navbar() {
       <div className="hidden md:flex items-center space-x-4">
         {isSignedIn ? (
           <>
-            {/* Avatar + Nazwa użytkownika */}
             <div className="flex items-center space-x-2">
               <UserButton />
               <span className="text-white font-medium">{user?.fullName}</span>
             </div>
 
-            {/* Przycisk wylogowania */}
             <SignOutButton>
               <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
                 Log Out
@@ -46,7 +44,6 @@ export default function Navbar() {
             </SignOutButton>
           </>
         ) : (
-          /* Przycisk logowania */
           <Link href="/sign-in">
             <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
               Sign In

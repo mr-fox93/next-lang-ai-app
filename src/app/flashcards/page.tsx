@@ -48,7 +48,6 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="flex justify-between items-center p-4 border-b border-white/10">
-        {/* User Info + Logout (prawy górny róg) */}
         <div className="flex items-center space-x-4">
           {isSignedIn && (
             <>
@@ -67,7 +66,6 @@ export default function FlashcardsPage() {
       </div>
 
       <div className="flex">
-        {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -76,8 +74,6 @@ export default function FlashcardsPage() {
         >
           <Menu className="h-6 w-6" />
         </Button>
-
-        {/* Sidebar */}
         <div
           className={`
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
@@ -99,8 +95,6 @@ export default function FlashcardsPage() {
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
         </div>
-
-        {/* Backdrop */}
         {isMobileSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
@@ -108,11 +102,9 @@ export default function FlashcardsPage() {
           />
         )}
 
-        {/* Main Content */}
         <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8">
           {selectedCategory ? (
             <>
-              {/* Przełączniki widoku (wyśrodkowane nad kartą) */}
               <div className="flex justify-center mb-6">
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
                   <Button
@@ -138,7 +130,6 @@ export default function FlashcardsPage() {
                 </div>
               </div>
 
-              {/* Content */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={viewMode}

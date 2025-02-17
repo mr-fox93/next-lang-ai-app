@@ -3,9 +3,7 @@ import { SignIn } from "@clerk/nextjs";
 export default function SignInPage() {
   return (
     <div className="min-h-screen w-full bg-black antialiased relative overflow-hidden flex items-center justify-center p-4">
-      {/* Grid pattern with very low opacity */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
-      {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />{" "}
       <SignIn
         path="/sign-in"
