@@ -1,5 +1,5 @@
 "use client";
-
+import { useUser, UserButton, SignOutButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Bot, Menu } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,6 +7,8 @@ import Link from "next/link";
 import type React from "react";
 
 export default function Navbar() {
+  const { user, isSignedIn } = useUser();
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -28,12 +30,29 @@ export default function Navbar() {
       </div>
 
       <div className="hidden md:flex items-center space-x-4">
-        <Button variant="ghost" className="text-white hover:text-purple-400">
-          Sign In
-        </Button>
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-          Get Started
-        </Button>
+        {isSignedIn ? (
+          <>
+            {/* Avatar + Nazwa użytkownika */}
+            <div className="flex items-center space-x-2">
+              <UserButton />
+              <span className="text-white font-medium">{user?.fullName}</span>
+            </div>
+
+            {/* Przycisk wylogowania */}
+            <SignOutButton>
+              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
+                Log Out
+              </Button>
+            </SignOutButton>
+          </>
+        ) : (
+          /* Przycisk logowania */
+          <Link href="/sign-in">
+            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
+              Sign In
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Button variant="ghost" size="icon" className="md:hidden text-white">
