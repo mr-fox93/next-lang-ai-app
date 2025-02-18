@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
+import { auth } from "@clerk/nextjs/server";
 
 import { PrismaClient } from "@prisma/client";
 
@@ -13,6 +14,13 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Nie jesteś zalogowany" },
+        { status: 401 }
+      );
+    }
     const { count, message, level } = await req.json();
 
     if (!count || count <= 0) {
@@ -46,21 +54,47 @@ export async function POST(req: Request) {
       JSON.parse(response.choices[0].message.content || "[]")
     );
 
-    const savedFlashcards = await prisma.flashcard.createMany({
-      data: parsedData.flashcards.map((card) => ({
-        origin_text: card.origin_text,
-        translate_text: card.translate_text,
-        example_using: card.example_using,
-        translate_example: card.translate_example,
-        category: card.category,
-      })),
-    });
+    const savedFlashcards = [];
+    for (const card of parsedData.flashcards) {
+      const savedCard = await prisma.flashcard.create({
+        data: {
+          origin_text: card.origin_text,
+          translate_text: card.translate_text,
+          example_using: card.example_using,
+          translate_example: card.translate_example,
+          category: card.category,
+          userId: userId, // Musi być przypisany userId
+        },
+      });
+      savedFlashcards.push(savedCard);
+    }
 
     return NextResponse.json(savedFlashcards);
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
     return NextResponse.json(
       { error: "Wystąpił błąd podczas generowania fiszek" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ flashcards: [] }, { status: 401 });
+    }
+
+    const flashcards = await prisma.flashcard.findMany({
+      where: { userId },
+    });
+
+    return NextResponse.json({ flashcards });
+  } catch (error) {
+    console.error("Błąd pobierania fiszek:", error);
+    return NextResponse.json(
+      { error: "Wystąpił błąd podczas pobierania fiszek" },
       { status: 500 }
     );
   }

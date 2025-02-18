@@ -18,10 +18,32 @@ export default function FlashcardsPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
 
-  const { flashcards } = useFlashcards();
+  const { flashcards, setFlashcards } = useFlashcards();
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      const fetchFlashcards = async () => {
+        try {
+          const response = await fetch("/api/generate-flashcards", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          if (!response.ok) throw new Error("Błąd pobierania fiszek");
+
+          const data = await response.json();
+          setFlashcards(data.flashcards);
+        } catch (error) {
+          console.error("Failed to fetch flashcards:", error);
+        }
+      };
+
+      fetchFlashcards();
+    }
+  }, [isSignedIn, setFlashcards]);
 
   useEffect(() => {
     setCurrentCardIndex(0);

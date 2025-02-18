@@ -8,17 +8,13 @@ import { AnimatedInput } from "@/components/animated-input";
 import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
-// import { useRouter } from "next/navigation";
-
-import { useFlashcards } from "@/app/context/flashcards-context";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
-  const { setFlashcards } = useFlashcards();
-
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // const router = useRouter();
+  const router = useRouter();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -31,16 +27,13 @@ export default function Hero() {
         body: JSON.stringify({ count: 5, message: userInput }),
       });
 
-      if (!response.ok) throw new Error("Błąd pobierania fiszek");
+      if (!response.ok) throw new Error("Błąd generowania fiszek");
 
-      const data = await response.json();
-      setFlashcards(data.flashcards);
       setUserInput("");
-      console.log("Wygenerowane fiszki:", data);
-      // router.push("/flashcards");
+      router.push("/flashcards");
+      console.log("Fiszki zostały wygenerowane i zapisane w bazie!");
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
