@@ -10,52 +10,54 @@ export default function Navbar() {
   const { user, isSignedIn } = useUser();
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="flex items-center justify-between px-6 py-4 backdrop-blur-sm border-b border-white/10"
-    >
-      <Link href="/" className="flex items-center space-x-2">
-        <Bot className="w-8 h-8 text-purple-500" />
-        <p className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-2xl font-bold">
-          Gradient Text
-        </p>
-      </Link>
+    <div className="w-full px-4 pt-4">
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 backdrop-blur-sm border border-white/10 rounded-full bg-black/50"
+      >
+        <Link href="/" className="flex items-center space-x-2">
+          <Bot className="w-8 h-8 text-purple-500" />
+          <p className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-2xl font-bold">
+            Gradient Text
+          </p>
+        </Link>
 
-      <div className="hidden md:flex items-center space-x-8">
-        <NavLink href="/features">Features</NavLink>
-        <NavLink href="/how-it-works">How it Works</NavLink>
-        <NavLink href="/examples">Examples</NavLink>
-        <NavLink href="/pricing">Pricing</NavLink>
-      </div>
+        <div className="hidden md:flex items-center space-x-8">
+          <NavLink href="/features">Features</NavLink>
+          <NavLink href="/how-it-works">How it Works</NavLink>
+          <NavLink href="/examples">Examples</NavLink>
+          <NavLink href="/pricing">Pricing</NavLink>
+        </div>
 
-      <div className="hidden md:flex items-center space-x-4">
-        {isSignedIn ? (
-          <>
-            <div className="flex items-center space-x-2">
-              <UserButton />
-              <span className="text-white font-medium">{user?.fullName}</span>
-            </div>
+        <div className="hidden md:flex items-center space-x-4">
+          {isSignedIn ? (
+            <>
+              <div className="flex items-center space-x-2">
+                <UserButton />
+                <span className="text-white font-medium">{user?.fullName}</span>
+              </div>
 
-            <SignOutButton>
+              <SignOutButton>
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
+                  Log Out
+                </Button>
+              </SignOutButton>
+            </>
+          ) : (
+            <Link href="/sign-in">
               <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
-                Log Out
+                Sign In
               </Button>
-            </SignOutButton>
-          </>
-        ) : (
-          <Link href="/sign-in">
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
-              Sign In
-            </Button>
-          </Link>
-        )}
-      </div>
+            </Link>
+          )}
+        </div>
 
-      <Button variant="ghost" size="icon" className="md:hidden text-white">
-        <Menu className="w-6 h-6" />
-      </Button>
-    </motion.nav>
+        <Button variant="ghost" size="icon" className="md:hidden text-white">
+          <Menu className="w-6 h-6" />
+        </Button>
+      </motion.nav>
+    </div>
   );
 }
 
