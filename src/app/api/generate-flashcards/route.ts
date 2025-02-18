@@ -78,3 +78,24 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ flashcards: [] }, { status: 401 });
+    }
+
+    const flashcards = await prisma.flashcard.findMany({
+      where: { userId },
+    });
+
+    return NextResponse.json({ flashcards });
+  } catch (error) {
+    console.error("Błąd pobierania fiszek:", error);
+    return NextResponse.json(
+      { error: "Wystąpił błąd podczas pobierania fiszek" },
+      { status: 500 }
+    );
+  }
+}
