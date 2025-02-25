@@ -69,7 +69,7 @@ export default function Hero() {
               Transform Your Learning with
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                 {" "}
-                Flashcards
+                Flashcards AI
               </span>
             </h1>
           </motion.div>
