@@ -8,56 +8,55 @@ import { AnimatedInput } from "@/components/animated-input";
 import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
-// import { useRouter } from "next/navigation";
-import { FloatingFlashcards } from "./floating.flashcards";
-import { FlashCard } from "@/lib/flashcard.schema";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Hero() {
-  const [flashcards, setFlashcards] = useState<FlashCard[]>([]);
-
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  //   const router = useRouter();
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
+
+    if (!isSignedIn) {
+      router.push("/sign-in?redirect=/");
+      return;
+    }
 
     setIsLoading(true);
     try {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 10, message: userInput }),
+        body: JSON.stringify({ 
+          count: 5, 
+          message: userInput,
+          level: "beginner"
+        }),
       });
 
-      if (!response.ok) throw new Error("Błąd pobierania fiszek");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Błąd generowania fiszek");
+      }
 
       const data = await response.json();
-      setFlashcards(data.flashcards);
       setUserInput("");
-      console.log("Wygenerowane fiszki:", data);
-      // Navigate to flashcards page
-      //   router.push("/flashcards");
+      router.push("/flashcards");
+      console.log("Fiszki zostały wygenerowane:", data);
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
   };
 
-  console.log(flashcards);
-
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
-      {/* Loading overlay */}
       {isLoading && <Loader />}
-
-      {/* Floating flashcards background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <FloatingFlashcards />
-      </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -70,7 +69,7 @@ export default function Hero() {
               Transform Your Learning with
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                 {" "}
-                Flashcards
+                Flashcards AI
               </span>
             </h1>
           </motion.div>
@@ -111,7 +110,6 @@ export default function Hero() {
                 isInputFocused={isInputFocused}
                 userInput={userInput}
               />
-              {/* Gradient glow effect on focus */}
               <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-pink-500/0 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity -z-10 blur-xl" />
             </div>
             <Button

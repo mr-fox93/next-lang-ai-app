@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String      @id // ID z Clerk
+  email             String      @unique
+  username          String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  flashcards        Flashcard[]
+  progress          Progress[]
+  learningStreak    Int         @default(0)
+  lastActivityDate  DateTime?
+  preferredLanguage String      @default("en")
+  dailyGoal         Int         @default(10) // Liczba fiszek do nauki dziennie
+  level             Int         @default(1)
+  experiencePoints  Int         @default(0)
+}
+
+model Flashcard {
+  id                Int      @id @default(autoincrement())
+  origin_text       String
+  translate_text    String
+  example_using     String
+  translate_example String
+  category          String
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  progress          Progress[]
+}
+
+model Progress {
+  id                Int       @id @default(autoincrement())
+  flashcard         Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  flashcardId       Int
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  correctAnswers    Int       @default(0)
+  incorrectAnswers  Int       @default(0)
+  lastReviewed      DateTime?
+  nextReviewDate    DateTime?
+  masteryLevel      Int       @default(0) // 0-5 poziom opanowania
+  
+  @@unique([flashcardId, userId])
+}
