@@ -9,29 +9,44 @@ import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
+
+    if (!isSignedIn) {
+      router.push("/sign-in?redirect=/");
+      return;
+    }
 
     setIsLoading(true);
     try {
       const response = await fetch("/api/generate-flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: 5, message: userInput }),
+        body: JSON.stringify({ 
+          count: 5, 
+          message: userInput,
+          level: "beginner"
+        }),
       });
 
-      if (!response.ok) throw new Error("Błąd generowania fiszek");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Błąd generowania fiszek");
+      }
 
+      const data = await response.json();
       setUserInput("");
       router.push("/flashcards");
-      console.log("Fiszki zostały wygenerowane i zapisane w bazie!");
+      console.log("Fiszki zostały wygenerowane:", data);
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
     } finally {

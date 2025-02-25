@@ -10,6 +10,7 @@ import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { useFlashcards } from "../context/flashcards-context";
 import { useRouter } from "next/navigation";
+import { Loader } from "@/components/ui/loader";
 
 export default function FlashcardsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -17,6 +18,7 @@ export default function FlashcardsPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
+  const [isLoading, setIsLoading] = useState(true);
 
   const { flashcards, setFlashcards } = useFlashcards();
   const { isSignedIn, user } = useUser();
@@ -26,6 +28,7 @@ export default function FlashcardsPage() {
   useEffect(() => {
     if (isSignedIn) {
       const fetchFlashcards = async () => {
+        setIsLoading(true);
         try {
           const response = await fetch("/api/generate-flashcards", {
             method: "GET",
@@ -36,14 +39,25 @@ export default function FlashcardsPage() {
 
           const data = await response.json();
           setFlashcards(data.flashcards);
+          
+          if (data.flashcards.length > 0 && !selectedCategory) {
+            const categories = [...new Set(data.flashcards.map((card: { category: string }) => card.category))];
+            if (categories.length > 0) {
+              setSelectedCategory(categories[0] as string);
+            }
+          }
         } catch (error) {
           console.error("Failed to fetch flashcards:", error);
+        } finally {
+          setIsLoading(false);
         }
       };
 
       fetchFlashcards();
+    } else {
+      setIsLoading(false);
     }
-  }, [isSignedIn, setFlashcards]);
+  }, [isSignedIn, setFlashcards, selectedCategory]);
 
   useEffect(() => {
     setCurrentCardIndex(0);
@@ -63,7 +77,7 @@ export default function FlashcardsPage() {
 
   const categoryCards = selectedCategory
     ? flashcards.filter((card) => card.category === selectedCategory)
-    : [];
+    : flashcards;
 
   const currentCard = categoryCards[currentCardIndex] ?? null;
 
@@ -124,8 +138,12 @@ export default function FlashcardsPage() {
           />
         )}
 
-        <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8">
-          {selectedCategory ? (
+        <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8 relative">
+          {isLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader />
+            </div>
+          ) : selectedCategory || flashcards.length > 0 ? (
             <>
               <div className="flex justify-center mb-6">
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
@@ -179,7 +197,7 @@ export default function FlashcardsPage() {
           ) : (
             <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
               <p className="text-gray-400">
-                Select a category to start learning.
+                Brak dostępnych fiszek. Utwórz nowe fiszki, aby rozpocząć naukę.
               </p>
             </div>
           )}

@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 import { PrismaClient } from "@prisma/client";
 
@@ -15,12 +15,25 @@ const openai = new OpenAI({
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
+    const user = await currentUser();
     if (!userId) {
       return NextResponse.json(
         { error: "Nie jesteś zalogowany" },
         { status: 401 }
       );
     }
+
+    // Sprawdź czy użytkownik istnieje w bazie, jeśli nie - utwórz go
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {},
+      create: {
+        id: userId,
+        email: user?.primaryEmailAddress?.emailAddress || "",
+        preferredLanguage: "pl"
+      }
+    });
+
     const { count, message, level } = await req.json();
 
     if (!count || count <= 0) {
@@ -54,22 +67,43 @@ export async function POST(req: Request) {
       JSON.parse(response.choices[0].message.content || "[]")
     );
 
-    const savedFlashcards = [];
-    for (const card of parsedData.flashcards) {
-      const savedCard = await prisma.flashcard.create({
-        data: {
-          origin_text: card.origin_text,
-          translate_text: card.translate_text,
-          example_using: card.example_using,
-          translate_example: card.translate_example,
-          category: card.category,
-          userId: userId, // Musi być przypisany userId
-        },
-      });
-      savedFlashcards.push(savedCard);
-    }
+    // Zapisywanie fiszek w bazie danych
+    const savedFlashcards = await Promise.all(
+      parsedData.flashcards.map(async (flashcard) => {
+        return await prisma.flashcard.create({
+          data: {
+            origin_text: flashcard.origin_text,
+            translate_text: flashcard.translate_text,
+            example_using: flashcard.example_using,
+            translate_example: flashcard.translate_example,
+            category: flashcard.category,
+            userId: userId,
+          },
+        });
+      })
+    );
 
-    return NextResponse.json(savedFlashcards);
+    // Tworzenie początkowych rekordów postępu dla każdej fiszki
+    await Promise.all(
+      savedFlashcards.map(async (flashcard: { id: number }) => {
+        await prisma.progress.create({
+          data: {
+            flashcardId: flashcard.id,
+            userId: userId,
+            masteryLevel: 0,
+            correctAnswers: 0,
+            incorrectAnswers: 0,
+            nextReviewDate: new Date(),
+          },
+        });
+      })
+    );
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Fiszki zostały pomyślnie wygenerowane i zapisane", 
+      flashcards: savedFlashcards 
+    });
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
     return NextResponse.json(
