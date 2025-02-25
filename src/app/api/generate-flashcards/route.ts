@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Sprawdź czy użytkownik istnieje w bazie, jeśli nie - utwórz go
-    const dbUser = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { id: userId },
       update: {},
       create: {
