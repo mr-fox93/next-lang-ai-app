@@ -30,24 +30,35 @@ export default function FlashcardsPage() {
       const fetchFlashcards = async () => {
         setIsLoading(true);
         try {
+          console.log("Rozpoczynam pobieranie fiszek...");
           const response = await fetch("/api/generate-flashcards", {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Cache-Control": "no-cache"
+            },
+            cache: 'no-store'
           });
 
-          if (!response.ok) throw new Error("Błąd pobierania fiszek");
+          if (!response.ok) {
+            console.error("Odpowiedź nie jest OK:", response.status, response.statusText);
+            throw new Error(`Błąd pobierania fiszek: ${response.status} ${response.statusText}`);
+          }
 
           const data = await response.json();
+          console.log(`Pobrano ${data.flashcards.length} fiszek`);
+          
           setFlashcards(data.flashcards);
           
           if (data.flashcards.length > 0 && !selectedCategory) {
             const categories = [...new Set(data.flashcards.map((card: { category: string }) => card.category))];
+            console.log("Dostępne kategorie:", categories);
             if (categories.length > 0) {
               setSelectedCategory(categories[0] as string);
             }
           }
         } catch (error) {
-          console.error("Failed to fetch flashcards:", error);
+          console.error("Błąd podczas pobierania fiszek:", error);
         } finally {
           setIsLoading(false);
         }
