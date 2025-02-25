@@ -1,6 +1,15 @@
+"use client";
+
 import { SignIn } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
+  
+  // Ustaw domyślne przekierowanie na /flashcards, chyba że określono inaczej
+  const fallbackRedirectUrl = redirect || "/flashcards";
+
   return (
     <div className="min-h-screen w-full bg-black antialiased relative overflow-hidden flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
@@ -8,8 +17,8 @@ export default function SignInPage() {
       <SignIn
         path="/sign-in"
         routing="path"
-        fallbackRedirectUrl="/flashcards"
-        signUpFallbackRedirectUrl="/flashcards"
+        fallbackRedirectUrl={fallbackRedirectUrl}
+        signUpFallbackRedirectUrl={fallbackRedirectUrl}
         appearance={{
           elements: {
             formButtonPrimary:

@@ -9,15 +9,22 @@ import { Categories } from "@/components/categories";
 import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
+
+    if (!isSignedIn) {
+      router.push("/sign-in?redirect=/");
+      return;
+    }
 
     setIsLoading(true);
     try {
