@@ -116,14 +116,25 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const { userId } = await auth();
+    
+    console.log("Pobieranie fiszek dla użytkownika:", userId);
+    
     if (!userId) {
+      console.warn("Brak zalogowanego użytkownika - zwracam pustą tablicę");
       return NextResponse.json({ flashcards: [] }, { status: 401 });
     }
 
     const flashcards = await prisma.flashcard.findMany({
-      where: { userId },
+      where: { 
+        userId: userId,
+      },
+      orderBy: {
+        id: 'desc'
+      }
     });
-
+    
+    console.log(`Znaleziono ${flashcards.length} fiszek dla użytkownika ${userId}`);
+    
     return NextResponse.json({ flashcards });
   } catch (error) {
     console.error("Błąd pobierania fiszek:", error);
@@ -131,5 +142,7 @@ export async function GET() {
       { error: "Wystąpił błąd podczas pobierania fiszek" },
       { status: 500 }
     );
+  } finally {
+    // await prisma.$disconnect();
   }
 }
