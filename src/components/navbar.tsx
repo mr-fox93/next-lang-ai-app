@@ -6,7 +6,20 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import type React from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
+// Tworzymy komponent wrappera dla SignOutButton, który obsłuży przekierowanie
+function CustomSignOutButton({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  
+  return (
+    <SignOutButton>
+      <div onClick={() => setTimeout(() => router.push("/"), 100)}>
+        {children}
+      </div>
+    </SignOutButton>
+  );
+}
 
 export default function Navbar() {
   const { user, isSignedIn } = useUser();
@@ -48,11 +61,11 @@ export default function Navbar() {
                 <span className="text-white font-medium">{user?.fullName}</span>
               </div>
 
-              <SignOutButton>
+              <CustomSignOutButton>
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity">
                   Log Out
                 </Button>
-              </SignOutButton>
+              </CustomSignOutButton>
             </>
           ) : (
             <Link href="/sign-in">
@@ -105,11 +118,11 @@ export default function Navbar() {
                       <UserButton />
                       <span className="text-white font-medium">{user?.fullName || 'Użytkownik'}</span>
                     </div>
-                    <SignOutButton>
+                    <CustomSignOutButton>
                       <Button className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-300">
                         Wyloguj się
                       </Button>
-                    </SignOutButton>
+                    </CustomSignOutButton>
                   </>
                 ) : (
                   <Link href="/sign-in" className="w-full">

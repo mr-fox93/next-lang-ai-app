@@ -5,9 +5,9 @@ import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
-import { PrismaClient } from "@prisma/client";
+// Importujemy instancję Prisma z naszego modułu zamiast tworzyć nową
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -16,6 +16,10 @@ export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     const user = await currentUser();
+    
+    console.log("POST request - userId:", userId ? "dostępny" : "brak");
+    console.log("POST request - user info:", user ? "dostępny" : "brak");
+    
     if (!userId) {
       return NextResponse.json(
         { error: "Nie jesteś zalogowany" },
@@ -106,23 +110,50 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
+    // Rozszerzone logowanie błędu
+    if (error instanceof Error) {
+      console.error("Szczegóły błędu:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      return NextResponse.json(
+        { error: `Wystąpił błąd podczas generowania fiszek: ${error.message}` },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: "Wystąpił błąd podczas generowania fiszek" },
       { status: 500 }
     );
+  } finally {
+    // Odłączenie od bazy danych aby zapewnić, że każde nowe wywołanie otrzyma "świeże" połączenie
+    await prisma.$disconnect();
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const { userId } = await auth();
+    const { searchParams } = new URL(req.url);
+    const urlUserId = searchParams.get('userId');
     
-    console.log("Pobieranie fiszek dla użytkownika:", userId);
+    console.log("GET request - userId z auth:", userId ? "dostępny" : "brak");
+    console.log("GET request - userId z URL:", urlUserId);
     
+    // Sprawdzanie czy userId z auth i z URL są zgodne jako dodatkowe zabezpieczenie
     if (!userId) {
       console.warn("Brak zalogowanego użytkownika - zwracam pustą tablicę");
       return NextResponse.json({ flashcards: [] }, { status: 401 });
     }
+    
+    // Upewniamy się, że pobieramy fiszki wyłącznie dla zalogowanego użytkownika
+    if (urlUserId && urlUserId !== userId) {
+      console.warn("Różne identyfikatory użytkownika - urlUserId nie zgadza się z userId z sesji");
+    }
+
+    // Dodaję dodatkowe potwierdzenie, że zapytanie jest dla konkretnego użytkownika
+    console.log(`Wykonuję zapytanie o fiszki dla użytkownika: ${userId}`);
 
     const flashcards = await prisma.flashcard.findMany({
       where: { 
@@ -138,11 +169,20 @@ export async function GET() {
     return NextResponse.json({ flashcards });
   } catch (error) {
     console.error("Błąd pobierania fiszek:", error);
+    // Rozszerzone logowanie błędu
+    if (error instanceof Error) {
+      console.error("Szczegóły błędu:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
     return NextResponse.json(
       { error: "Wystąpił błąd podczas pobierania fiszek" },
       { status: 500 }
     );
   } finally {
-    // await prisma.$disconnect();
+    // Odłączenie od bazy danych aby zapewnić, że każde nowe wywołanie otrzyma "świeże" połączenie
+    await prisma.$disconnect();
   }
 }

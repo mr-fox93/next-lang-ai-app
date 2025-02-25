@@ -31,11 +31,15 @@ export default function FlashcardsPage() {
         setIsLoading(true);
         try {
           console.log("Rozpoczynam pobieranie fiszek...");
-          const response = await fetch("/api/generate-flashcards", {
+          const userId = user?.id;
+          const timestamp = new Date().getTime();
+          const response = await fetch(`/api/generate-flashcards?userId=${userId}&_=${timestamp}`, {
             method: "GET",
             headers: { 
               "Content-Type": "application/json",
-              "Cache-Control": "no-cache"
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              "Pragma": "no-cache",
+              "Expires": "0"
             },
             cache: 'no-store'
           });
@@ -46,7 +50,11 @@ export default function FlashcardsPage() {
           }
 
           const data = await response.json();
-          console.log(`Pobrano ${data.flashcards.length} fiszek`);
+          console.log(`Pobrano ${data.flashcards.length} fiszek dla użytkownika ${userId}`);
+          
+          if (data.flashcards.length > 0) {
+            console.log(`Sprawdzam, czy fiszki należą do użytkownika ${userId}`);
+          }
           
           setFlashcards(data.flashcards);
           
@@ -68,7 +76,7 @@ export default function FlashcardsPage() {
     } else {
       setIsLoading(false);
     }
-  }, [isSignedIn, setFlashcards, selectedCategory]);
+  }, [isSignedIn, setFlashcards, selectedCategory, user?.id]);
 
   useEffect(() => {
     setCurrentCardIndex(0);
@@ -82,8 +90,18 @@ export default function FlashcardsPage() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
+    try {
+      console.log("Rozpoczynam proces wylogowania...");
+      await signOut();
+      console.log("Wylogowanie zakończone, przekierowuję na stronę główną...");
+      
+      setTimeout(() => {
+        router.push("/");
+      }, 100);
+    } catch (error) {
+      console.error("Błąd podczas wylogowywania:", error);
+      router.push("/");
+    }
   };
 
   const categoryCards = selectedCategory

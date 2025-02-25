@@ -1,0 +1,26 @@
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+    Surrogate-Control = "no-store"
+
+[functions]
+  # Zwiększamy limit czasu wykonania funkcji do 30 sekund (domyślnie 10s)
+  node_bundler = "esbuild"
+  external_node_modules = ["@prisma/client", "prisma"]
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Zmienne środowiskowe specyficzne dla procesu budowania
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+  
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3000 

@@ -28,9 +28,15 @@ export default function Hero() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/generate-flashcards", {
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/generate-flashcards?_=${timestamp}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0"
+        },
         body: JSON.stringify({ 
           count: 5, 
           message: userInput,
