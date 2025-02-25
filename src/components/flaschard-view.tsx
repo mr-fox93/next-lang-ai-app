@@ -2,18 +2,30 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Volume2 } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { useState } from "react";
 import type { FlashCard } from "@/lib/flashcard.schema";
 import { speak } from "@/utils/speak";
+import { MultipleChoiceAnswers } from "./multiple-choice-answers";
 
 interface FlashcardViewProps {
   card: FlashCard;
   onNext: (known: boolean) => void;
+  allFlashcards: FlashCard[];
 }
 
-export function FlashcardView({ card, onNext }: FlashcardViewProps) {
+export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+
+  const handleAnswer = (isCorrect: boolean) => {
+    setIsFlipped(false);
+    onNext(isCorrect);
+  };
+
+  // Filtruj karty, aby uzyskać inne karty niż obecna
+  const otherFlashcards = allFlashcards.filter(
+    (c) => c.origin_text !== card.origin_text
+  );
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 p-4 w-full max-w-2xl mx-auto">
@@ -69,29 +81,14 @@ export function FlashcardView({ card, onNext }: FlashcardViewProps) {
           </div>
         </motion.div>
       </div>
-      {/* Action Buttons */}
-      <div className="flex gap-4 w-full max-w-md mx-auto">
-        <Button
-          size="lg"
-          className="flex-1 bg-black/40 backdrop-blur-sm hover:bg-red-500/20 text-white border-2 border-red-500/30 hover:border-red-500 transition-all duration-300 relative group overflow-hidden hover:shadow-lg hover:shadow-red-500/20"
-          onClick={() => onNext(false)}
-        >
-          <span className="relative flex items-center gap-2">
-            <ThumbsDown className="h-5 w-5" />I can&apos;t
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/20 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </Button>
-        <Button
-          size="lg"
-          className="flex-1 bg-black/40 backdrop-blur-sm hover:bg-green-500/20 text-white border-2 border-green-500/30 hover:border-green-500 transition-all duration-300 relative group overflow-hidden hover:shadow-lg hover:shadow-green-500/20"
-          onClick={() => onNext(true)}
-        >
-          <span className="relative flex items-center gap-2">
-            <ThumbsUp className="h-5 w-5" />I can
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/20 to-green-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </Button>
-      </div>
+      
+      {/* Komponent z opcjami wyboru */}
+      <MultipleChoiceAnswers
+        card={card}
+        isFlipped={isFlipped}
+        onAnswer={handleAnswer}
+        otherFlashcards={otherFlashcards}
+      />
     </div>
   );
 }

@@ -191,7 +191,11 @@ export default function FlashcardsPage() {
                 >
                   {viewMode === "single" ? (
                     currentCard ? (
-                      <FlashcardView card={currentCard} onNext={handleNext} />
+                      <FlashcardView 
+                        card={currentCard} 
+                        onNext={handleNext} 
+                        allFlashcards={flashcards} 
+                      />
                     ) : (
                       <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
                         <p className="text-gray-400">
