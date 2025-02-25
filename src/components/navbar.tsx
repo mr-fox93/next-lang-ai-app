@@ -1,11 +1,12 @@
 "use client";
 import { useUser, UserButton, SignOutButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Bot, Menu, Layers, Cpu, X } from "lucide-react";
+import { Menu, Layers, Cpu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type React from "react";
 import { useState } from "react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Navbar() {
   const { user, isSignedIn } = useUser();

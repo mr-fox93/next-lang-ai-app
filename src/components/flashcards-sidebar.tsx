@@ -65,7 +65,7 @@ export function FlashcardsSidebar({
           <Link href="/" className="block w-full">
             <Button 
               variant="outline" 
-              className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group"
+              className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center"
             >
               <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
               {!isCollapsed && <span>Nowe fiszki</span>}

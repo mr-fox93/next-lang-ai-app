@@ -27,11 +27,12 @@ const categories = [
   },
 ];
 
-export function Categories() {
+export function Categories({ className }: CategoryProps) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const handleCategoryClick = async (categoryLabel: string) => {
     if (!isSignedIn) {
@@ -39,7 +40,7 @@ export function Categories() {
       return;
     }
 
-    setLoadingCategory(categoryLabel);
+    setActiveCategory(categoryLabel);
     setIsLoading(true);
     
     try {
@@ -64,7 +65,7 @@ export function Categories() {
       console.error("Nie udało się wygenerować fiszek:", error);
     } finally {
       setIsLoading(false);
-      setLoadingCategory(null);
+      setActiveCategory(null);
     }
   };
 
