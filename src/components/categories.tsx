@@ -1,24 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase, Plane, Utensils, Building2 } from "lucide-react";
+import { GraduationCap, Palmtree, UtensilsCrossed, Hotel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const categories = [
   {
-    icon: Plane,
+    icon: Palmtree,
     label: "Travel",
   },
   {
-    icon: Briefcase,
+    icon: GraduationCap,
     label: "Job Interview",
   },
   {
-    icon: Utensils,
+    icon: UtensilsCrossed,
     label: "Ordering Food",
   },
   {
-    icon: Building2,
+    icon: Hotel,
     label: "Booking Hotel",
   },
 ];
@@ -29,20 +29,20 @@ export function Categories() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="flex flex-wrap gap-2 justify-center mb-6"
+      className="flex flex-wrap gap-2 justify-center mb-6 max-w-2xl mx-auto w-full px-4 md:px-0"
     >
       {categories.map((category) => (
         <Button
           key={category.label}
           variant="ghost"
-          className="h-12 px-6 bg-white/[0.08] hover:bg-white/[0.12] border-2 border-white/10 rounded-lg group transition-all duration-300"
+          className="h-10 sm:h-12 px-3 sm:px-6 bg-white/[0.08] hover:bg-white/[0.12] border-2 border-white/10 rounded-lg group transition-all duration-300 flex-1 min-w-[120px] max-w-[160px] sm:max-w-none"
         >
           <motion.div
             initial={{ scale: 1 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2"
           >
-            <category.icon className="w-4 h-4 text-purple-400" />
-            <span className="text-white group-hover:text-purple-400 transition-colors">
+            <category.icon className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
+            <span className="text-white text-sm sm:text-base group-hover:text-purple-400 transition-colors">
               {category.label}
             </span>
           </motion.div>
