@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Loader } from "@/components/ui/loader";
 
+interface CategoryProps {
+  className?: string;
+}
+
 const categories = [
   {
     icon: Palmtree,
