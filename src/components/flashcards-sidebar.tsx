@@ -2,10 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFlashcards } from "@/app/context/flashcards-context";
+import Link from "next/link";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -29,7 +30,7 @@ export function FlashcardsSidebar({
     <div className="relative h-screen">
       <motion.div
         className={cn(
-          "h-full bg-black/40 backdrop-blur-md border-r border-white/10",
+          "h-full bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col",
           isCollapsed ? "w-[60px]" : "w-[240px]"
         )}
         animate={{ width: isCollapsed ? 60 : 240 }}
@@ -49,7 +50,7 @@ export function FlashcardsSidebar({
             variant="ghost"
             size="icon"
             onClick={onToggleCollapse}
-            className="text-white hover:bg-purple-500/20 transition-all duration-300 hover:text-purple-400 hidden md:flex"
+            className="text-white hover:bg-purple-500/20 transition-all duration-300 hover:text-purple-400 md:flex ml-auto"
           >
             {isCollapsed ? (
               <ChevronRight className="h-5 w-5" />
@@ -59,7 +60,20 @@ export function FlashcardsSidebar({
           </Button>
         </div>
 
-        <ScrollArea className="h-[calc(100vh-4rem)]">
+        {/* Przycisk do generowania nowych fiszek - przeniesiony na górę */}
+        <div className="p-2 border-b border-white/10">
+          <Link href="/" className="block w-full">
+            <Button 
+              variant="outline" 
+              className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center"
+            >
+              <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
+              {!isCollapsed && <span>Nowe fiszki</span>}
+            </Button>
+          </Link>
+        </div>
+
+        <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {categories.length > 0 ? (
               categories.map((category) => (
