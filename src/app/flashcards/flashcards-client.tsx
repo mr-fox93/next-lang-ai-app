@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { useRouter } from "next/navigation";
-import { Loader } from "@/components/ui/loader";
 
 interface FlashcardType {
   id: number;
