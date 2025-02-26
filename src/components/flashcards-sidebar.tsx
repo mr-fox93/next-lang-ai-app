@@ -5,14 +5,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useFlashcards } from "@/app/context/flashcards-context";
 import Link from "next/link";
+import type { FlashCard } from "@/lib/flashcard.schema";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
   onSelectCategory: (category: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  flashcards: FlashCard[];
 }
 
 export function FlashcardsSidebar({
@@ -20,10 +21,8 @@ export function FlashcardsSidebar({
   onSelectCategory,
   isCollapsed,
   onToggleCollapse,
+  flashcards,
 }: FlashcardsSidebarProps) {
-  const { flashcards } = useFlashcards();
-
-  // Pobierz unikalne kategorie z fiszek
   const categories = [...new Set(flashcards.map((card) => card.category))];
 
   return (

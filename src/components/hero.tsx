@@ -10,11 +10,13 @@ import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { generateFlashcards } from "@/app/actions/flashcards";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -27,28 +29,15 @@ export default function Hero() {
     }
 
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const response = await fetch("/api/generate-flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          count: 5, 
-          message: userInput,
-          level: "beginner"
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Błąd generowania fiszek");
-      }
-
-      const data = await response.json();
+      await generateFlashcards(5, userInput, "beginner");
       setUserInput("");
       router.push("/flashcards");
-      console.log("Fiszki zostały wygenerowane:", data);
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
+      setError(error instanceof Error ? error.message : "Wystąpił nieoczekiwany błąd");
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +69,8 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-gray-400 text-lg md:text-xl mb-8 max-w-2xl mx-auto px-4 md:px-0"
           >
-            Enter any text or scenario and let our AI create perfect flashcards
-            for your learning journey.
+            Wpisz dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy
+            idealne fiszki do nauki.
           </motion.p>
 
           <Categories />
@@ -112,6 +101,9 @@ export default function Hero() {
               />
               <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-pink-500/0 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity -z-10 blur-xl" />
             </div>
+            {error && (
+              <div className="text-red-500 text-sm">{error}</div>
+            )}
             <Button
               size="lg"
               className="w-full bg-purple-700 hover:bg-purple-600 text-white px-8 h-16 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
@@ -121,7 +113,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
               <span className="relative flex items-center justify-center gap-2">
                 <LayoutTemplate className="h-6 w-6" />
-                {isLoading ? "Generating..." : "Generate Flashcards"}
+                {isLoading ? "Generowanie..." : "Generuj fiszki"}
               </span>
             </Button>
           </motion.div>
