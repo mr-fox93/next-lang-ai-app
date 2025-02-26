@@ -33,12 +33,34 @@ export function MultipleChoiceAnswers({
     setShowResults(false);
 
     const answerField = isFlipped ? "origin_text" : "translate_text";
+    const currentCategory = card.category;
 
-    const wrongAnswers = otherFlashcards
+    // Filtruj fiszki tylko z tej samej kategorii co aktualna fiszka
+    const sameCategory = otherFlashcards.filter(
+      (otherCard) => otherCard.category === currentCategory
+    );
+
+    // Jeśli mamy zbyt mało fiszek w tej samej kategorii, używamy tylko dostępnych
+    const wrongAnswersPool = sameCategory
       .filter((otherCard) => otherCard[answerField] !== correctAnswer)
       .map((otherCard) => otherCard[answerField])
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
+      .sort(() => Math.random() - 0.5);
+
+    // Pobierz do 3 błędnych odpowiedzi (lub mniej, jeśli nie ma wystarczająco fiszek w kategorii)
+    const wrongAnswers = wrongAnswersPool.slice(0, 3);
+
+    // Jeśli mamy mniej niż 3 błędne odpowiedzi, uzupełnij z innych kategorii
+    if (wrongAnswers.length < 3) {
+      console.log("Nie wystarczająco fiszek w kategorii", currentCategory, "- uzupełniam z innych kategorii");
+      const otherCategoriesAnswers = otherFlashcards
+        .filter((otherCard) => otherCard.category !== currentCategory)
+        .filter((otherCard) => otherCard[answerField] !== correctAnswer)
+        .map((otherCard) => otherCard[answerField])
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3 - wrongAnswers.length);
+      
+      wrongAnswers.push(...otherCategoriesAnswers);
+    }
 
     const allOptions = [correctAnswer, ...wrongAnswers].sort(
       () => Math.random() - 0.5
