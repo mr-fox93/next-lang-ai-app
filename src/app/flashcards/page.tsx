@@ -3,18 +3,14 @@ import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
 
-// Zgodne z Next.js 15 typowanie dla komponentów App Router
+// Next.js 15 automatycznie generuje typy dla komponentów strony
+// Nie definiujemy żadnych własnych typów, aby uniknąć niezgodności
 
-type SearchParams = { [key: string]: string | string[] | undefined };
-
-interface PageProps {
-  params: { [key: string]: string };
-  searchParams: SearchParams;
-}
-
-export default async function FlashcardsPage({
-  searchParams,
-}: PageProps) {
+export default async function FlashcardsPage(props: {
+  params: {};
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const { searchParams } = props;
   const { flashcards, error } = await getFlashcardsForUser();
   
   const categoryParam = searchParams?.category;
