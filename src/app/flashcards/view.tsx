@@ -8,25 +8,26 @@ import { Menu, Grid, Maximize2, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
-import { useRouter } from "next/navigation";
+import { ProgressPreview } from "@/components/progress-preview";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Flashcard } from "@/core/entities/Flashcard";
 
-interface FlashcardType {
-  id: number;
-  category: string;
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  userId: string;
-}
-
-interface FlashcardsClientProps {
-  initialFlashcards: FlashcardType[];
+interface FlashcardsViewProps {
+  initialFlashcards: Flashcard[];
   serverError?: string;
+  initialCategory?: string | null;
 }
 
-export default function FlashcardsClient({ initialFlashcards, serverError }: FlashcardsClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+export default function FlashcardsView({ initialFlashcards, serverError, initialCategory }: FlashcardsViewProps) {
+  // Pobierz parametry z URL
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get('category');
+  
+  // Użyj kategorii z URL lub przekazanej jako prop
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    categoryFromUrl ? decodeURIComponent(categoryFromUrl) : (initialCategory || null)
+  );
+  
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -50,6 +51,16 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
   // Reset indeksu karty przy zmianie kategorii
   useEffect(() => {
     setCurrentCardIndex(0);
+  }, [selectedCategory]);
+
+  // Aktualizacja URL po zmianie kategorii
+  useEffect(() => {
+    if (selectedCategory) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('category', selectedCategory);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+    }
   }, [selectedCategory]);
 
   const handleNext = (known: boolean) => {
@@ -202,6 +213,9 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
           )}
         </main>
       </div>
+      
+      {/* Komponent podglądu postępu */}
+      <ProgressPreview />
     </div>
   );
 } 

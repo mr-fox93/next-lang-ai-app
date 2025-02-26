@@ -1,17 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
-import { useState } from "react";
-import type { FlashCard } from "@/lib/flashcard.schema";
+import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
+import { Flashcard } from "@/core/entities/Flashcard";
 import { speak } from "@/utils/speak";
-import { MultipleChoiceAnswers } from "./multiple-choice-answers";
 
 interface FlashcardViewProps {
-  card: FlashCard;
+  card: Flashcard;
   onNext: (known: boolean) => void;
-  allFlashcards: FlashCard[];
+  allFlashcards: Flashcard[];
 }
 
 export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProps) {

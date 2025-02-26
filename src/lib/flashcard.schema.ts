@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const ResponsStructure = z.object({
+  id: z.number().optional(),
   origin_text: z.string(),
   translate_text: z.string(),
   example_using: z.string(),
