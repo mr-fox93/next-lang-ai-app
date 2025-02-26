@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { auth } from "@clerk/nextjs/server";
 import { getFlashcards } from "../actions/flashcards";
 import { FlashcardsClient } from "@/components/flashcards-client";
