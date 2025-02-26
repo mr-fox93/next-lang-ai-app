@@ -4,8 +4,8 @@ export interface ProgressData {
   masteryLevel: number;
   correctAnswers: number;
   incorrectAnswers: number;
-  nextReviewDate: Date;
-  lastReviewed?: Date;
+  nextReviewDate: Date | null;
+  lastReviewed?: Date | null;
 }
 
 export interface Progress extends ProgressData {
