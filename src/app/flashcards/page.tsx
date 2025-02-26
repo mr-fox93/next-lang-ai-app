@@ -2,19 +2,16 @@ import { Suspense } from 'react';
 import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
-
-type SearchParams = { [key: string]: string | string[] | undefined };
+import { PageProps } from 'next';
 
 export default async function FlashcardsPage({
   searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
+}: PageProps) {
   const { flashcards, error } = await getFlashcardsForUser();
   
   const categoryParam = searchParams?.category;
   const selectedCategory = categoryParam 
-    ? decodeURIComponent(typeof categoryParam === 'string' ? categoryParam : categoryParam[0]) 
+    ? decodeURIComponent(typeof categoryParam === 'string' ? categoryParam : Array.isArray(categoryParam) ? categoryParam[0] : String(categoryParam)) 
     : null;
   
   return (
