@@ -134,20 +134,29 @@ export function ProgressPreview() {
       
       <Button 
         variant="outline" 
-        size="icon" 
         className={`
-          w-10 h-10 rounded-full 
-          bg-black/60 backdrop-blur-md 
+          flex items-center gap-2
+          px-3 py-2 h-auto rounded-full 
+          bg-black/80 backdrop-blur-md 
           border border-white/10 
-          hover:bg-black/80 hover:border-purple-500/50 
+          hover:bg-black/90 hover:border-purple-500/50 
           fixed right-4 top-4 shadow-lg
           ${isLoading ? 'animate-pulse' : ''}
         `}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <Award 
-          className={`h-5 w-5 transition-colors ${isExpanded ? 'text-yellow-500' : 'text-white'}`} 
-        />
+        <Award className={`h-5 w-5 transition-colors ${isExpanded ? 'text-yellow-500' : 'text-yellow-500'}`} />
+        {!isLoading && stats && (
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-semibold text-white">LVL {stats.userLevel}</span>
+            <div className="w-10 h-1 bg-white/20 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-yellow-500 to-amber-500" 
+                style={{ width: `${progressToNextLevel}%` }}
+              />
+            </div>
+          </div>
+        )}
       </Button>
     </div>
   );

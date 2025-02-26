@@ -85,15 +85,6 @@ export function MultipleChoiceAnswers({
             title: "Błąd aktualizacji postępu",
             description: result.error
           });
-        } else {
-          // Opcjonalnie - można wyświetlić powiadomienie o aktualizacji postępu
-          if (isCorrect) {
-            toast({
-              title: "Brawo!",
-              description: "Twój postęp został zaktualizowany",
-              variant: "default",
-            });
-          }
         }
       } catch (error) {
         console.error("Błąd podczas aktualizacji postępu:", error);

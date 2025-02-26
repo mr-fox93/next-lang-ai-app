@@ -15,10 +15,11 @@ import { Flashcard } from "@/core/entities/Flashcard";
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
   serverError?: string;
+  initialCategory?: string | null;
 }
 
-export default function FlashcardsView({ initialFlashcards, serverError }: FlashcardsViewProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+export default function FlashcardsView({ initialFlashcards, serverError, initialCategory }: FlashcardsViewProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory || null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
