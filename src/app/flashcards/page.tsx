@@ -3,17 +3,14 @@ import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
 
-// Next.js 15 automatycznie generuje typy dla komponentów strony
-// Nie definiujemy żadnych własnych typów, aby uniknąć niezgodności
-
-export default async function FlashcardsPage(props: {
-  params: {};
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const { searchParams } = props;
+/**
+ * Strona wyświetlająca fiszki z możliwością filtrowania po kategorii
+ */
+export default async function FlashcardsPage({ searchParams = {} }) {
   const { flashcards, error } = await getFlashcardsForUser();
   
-  const categoryParam = searchParams?.category;
+  // Pobierz parametr kategorii z URL jeśli istnieje
+  const categoryParam = searchParams.category;
   const selectedCategory = categoryParam 
     ? decodeURIComponent(typeof categoryParam === 'string' ? categoryParam : Array.isArray(categoryParam) ? categoryParam[0] : String(categoryParam)) 
     : null;
