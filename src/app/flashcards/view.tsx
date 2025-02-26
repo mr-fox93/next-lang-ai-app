@@ -9,23 +9,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { useRouter } from "next/navigation";
+import { Flashcard } from "@/core/entities/Flashcard";
 
-interface FlashcardType {
-  id: number;
-  category: string;
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  userId: string;
-}
-
-interface FlashcardsClientProps {
-  initialFlashcards: FlashcardType[];
+interface FlashcardsViewProps {
+  initialFlashcards: Flashcard[];
   serverError?: string;
 }
 
-export default function FlashcardsClient({ initialFlashcards, serverError }: FlashcardsClientProps) {
+export default function FlashcardsView({ initialFlashcards, serverError }: FlashcardsViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

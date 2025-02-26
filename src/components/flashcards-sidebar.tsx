@@ -1,28 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusCircle, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
-interface FlashcardType {
-  id: number;
-  category: string;
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  userId: string;
-}
+import { Flashcard } from "@/core/entities/Flashcard";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
   onSelectCategory: (category: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  flashcards: FlashcardType[];
+  flashcards: Flashcard[];
 }
 
 export function FlashcardsSidebar({

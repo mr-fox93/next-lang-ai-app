@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
-import type { FlashCard } from "@/lib/flashcard.schema";
 import { speak } from "@/utils/speak";
+import { Card, CardContent } from "@/components/ui/card";
+import { Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Flashcard } from "@/core/entities/Flashcard";
 
 interface FlashcardGridProps {
-  cards: FlashCard[];
+  cards: Flashcard[];
 }
 
 export function FlashcardGrid({ cards }: FlashcardGridProps) {
