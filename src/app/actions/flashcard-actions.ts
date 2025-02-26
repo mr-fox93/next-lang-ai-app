@@ -1,26 +1,41 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import { zodResponseFormat } from "openai/helpers/zod";
-import { FlashCardSchema } from "@/lib/flashcard.schema";
-import { getFlashcardsPrompt } from "@/lib/prompts";
-import { auth, currentUser } from "@clerk/nextjs/server";
+"use server";
 
 import { PrismaClient } from "@prisma/client";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import OpenAI from "openai";
+import { FlashCardSchema } from "@/lib/flashcard.schema";
+import { getFlashcardsPrompt } from "@/lib/prompts";
+import { zodResponseFormat } from "openai/helpers/zod";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(req: Request) {
+interface GenerateFlashcardsParams {
+  count: number;
+  message: string;
+  level: string;
+}
+
+export async function generateFlashcardsAction(params: GenerateFlashcardsParams) {
   try {
+    const { count, message, level } = params;
     const { userId } = await auth();
     const user = await currentUser();
+    
     if (!userId) {
-      return NextResponse.json(
-        { error: "Nie jesteś zalogowany" },
-        { status: 401 }
-      );
+      return {
+        success: false,
+        error: "Nie jesteś zalogowany"
+      };
+    }
+
+    if (!count || count <= 0) {
+      return {
+        success: false,
+        error: "Liczba fiszek musi być większa niż 0"
+      };
     }
 
     // Sprawdź czy użytkownik istnieje w bazie, jeśli nie - utwórz go
@@ -33,15 +48,6 @@ export async function POST(req: Request) {
         preferredLanguage: "pl"
       }
     });
-
-    const { count, message, level } = await req.json();
-
-    if (!count || count <= 0) {
-      return NextResponse.json(
-        { error: "Liczba fiszek musi być większa niż 0" },
-        { status: 400 }
-      );
-    }
 
     const prompt = getFlashcardsPrompt(count, message, level);
 
@@ -99,16 +105,16 @@ export async function POST(req: Request) {
       })
     );
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Fiszki zostały pomyślnie wygenerowane i zapisane", 
-      flashcards: savedFlashcards 
-    });
+    return {
+      success: true,
+      message: "Fiszki zostały pomyślnie wygenerowane i zapisane",
+      flashcards: savedFlashcards
+    };
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
-    return NextResponse.json(
-      { error: "Wystąpił błąd podczas generowania fiszek" },
-      { status: 500 }
-    );
+    return {
+      success: false,
+      error: "Wystąpił błąd podczas generowania fiszek"
+    };
   }
-}
+} 
