@@ -8,9 +8,13 @@ export interface ProgressData {
   lastReviewed?: Date;
 }
 
+export interface Progress extends ProgressData {
+  id?: number;
+}
+
 export interface ProgressRepository {
-  createProgress(data: ProgressData): Promise<any>;
-  getProgressByFlashcardId(flashcardId: number, userId: string): Promise<any>;
-  updateProgress(flashcardId: number, userId: string, data: Partial<ProgressData>): Promise<any>;
-  getUserProgress(userId: string): Promise<any[]>;
+  createProgress(data: ProgressData): Promise<Progress>;
+  getProgressByFlashcardId(flashcardId: number, userId: string): Promise<Progress | null>;
+  updateProgress(flashcardId: number, userId: string, data: Partial<ProgressData>): Promise<Progress>;
+  getUserProgress(userId: string): Promise<Progress[]>;
 } 

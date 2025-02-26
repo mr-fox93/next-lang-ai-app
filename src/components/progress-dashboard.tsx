@@ -6,11 +6,9 @@ import { useUser, UserButton } from "@clerk/nextjs";
 import { 
   BarChart3, 
   Star, 
-  Clock, 
   Award, 
   BookOpen, 
   ArrowUpRight, 
-  LogOut, 
   ChevronRight 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

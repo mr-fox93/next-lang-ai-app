@@ -12,7 +12,7 @@ import { UserRepository } from "@/core/interfaces/repositories/UserRepository";
 // Prosty kontener DI
 class Container {
   private static instance: Container;
-  private services: Map<string, any> = new Map();
+  private services: Map<string, unknown> = new Map();
 
   private constructor() {
     // Inicjalizacja repozytoriów
@@ -62,7 +62,7 @@ class Container {
     if (!this.services.has(serviceName)) {
       throw new Error(`Service ${serviceName} not found in container`);
     }
-    return this.services.get(serviceName);
+    return this.services.get(serviceName) as T;
   }
 }
 

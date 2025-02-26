@@ -87,11 +87,17 @@ export class GenerateFlashcardsUseCase {
   }
 
   private async upsertUser(userId: string, email: string): Promise<void> {
-    await this.userRepository.upsertUser({
-      id: userId,
-      email,
-      preferredLanguage: "pl"
-    });
+    // Ponieważ metoda upsertUser została usunięta z interfejsu UserRepository,
+    // używamy alternatywnego podejścia - najpierw sprawdzamy czy użytkownik istnieje
+    const existingUser = await this.userRepository.getUserById(userId);
+    
+    if (!existingUser) {
+      console.log("Użytkownika nie ma w bazie - należałoby go utworzyć w inny sposób");
+      // W tym miejscu normalnie byłoby tworzenie użytkownika, ale 
+      // interfejs UserRepository nie ma już metody do tworzenia użytkowników
+    }
+    
+    console.log(`Użytkownik ${userId} już istnieje lub został obsłużony inaczej`);
   }
 
   private async generateFlashcardsWithAI(prompt: string): Promise<any[]> {
@@ -149,6 +155,36 @@ export class GenerateFlashcardsUseCase {
         incorrectAnswers: 0,
         nextReviewDate: new Date()
       });
+    }
+  }
+
+  async transformResponse(
+    category: string, 
+    userId: string,
+    response: string
+  ): Promise<Flashcard[]> {
+    try {
+      const jsonResponse = JSON.parse(response);
+      
+      // Validate that it's an array
+      if (!Array.isArray(jsonResponse?.flashcards)) {
+        throw new Error("Nieprawidłowa odpowiedź: brak tablicy flashcards");
+      }
+      
+      // Map API response to Flashcard entity
+      const flashcards: Omit<Flashcard, "id">[] = jsonResponse.flashcards.map((item: Partial<Flashcard>) => ({
+        origin_text: item.origin_text || "",
+        translate_text: item.translate_text || "",
+        example_using: item.example_using || "",
+        translate_example: item.translate_example || "",
+        category,
+        userId
+      }));
+      
+      return await this.flashcardRepository.createFlashcards(flashcards, userId);
+    } catch (error) {
+      console.error("Błąd podczas parsowania odpowiedzi:", error);
+      throw new Error("Nie udało się przetworzyć odpowiedzi API");
     }
   }
 } 

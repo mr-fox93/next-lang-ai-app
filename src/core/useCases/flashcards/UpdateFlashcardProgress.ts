@@ -1,4 +1,4 @@
-import { ProgressRepository, ProgressData } from "@/core/interfaces/repositories/ProgressRepository";
+import { ProgressRepository } from "@/core/interfaces/repositories/ProgressRepository";
 
 export interface UpdateFlashcardProgressParams {
   flashcardId: number;
@@ -6,10 +6,20 @@ export interface UpdateFlashcardProgressParams {
   isCorrect: boolean;
 }
 
+export interface ProgressResult {
+  flashcardId: number;
+  userId: string;
+  masteryLevel: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  nextReviewDate: Date;
+  lastReviewed?: Date;
+}
+
 export class UpdateFlashcardProgressUseCase {
   constructor(private progressRepository: ProgressRepository) {}
 
-  async execute(params: UpdateFlashcardProgressParams): Promise<any> {
+  async execute(params: UpdateFlashcardProgressParams): Promise<ProgressResult> {
     const { flashcardId, userId, isCorrect } = params;
     
     console.log(`UpdateFlashcardProgress: Rozpoczęcie aktualizacji postępu dla fiszki ID=${flashcardId}, użytkownik=${userId}, odpowiedź poprawna=${isCorrect}`);
@@ -42,7 +52,6 @@ export class UpdateFlashcardProgressUseCase {
     // Oblicz nowy poziom opanowania (masteryLevel)
     // Poziom 0-5 w zależności od liczby poprawnych odpowiedzi i proporcji poprawnych do niepoprawnych
     const totalAnswers = correctAnswers + incorrectAnswers;
-    const correctRatio = correctAnswers / Math.max(1, totalAnswers);
     
     let newMasteryLevel = progress.masteryLevel;
     

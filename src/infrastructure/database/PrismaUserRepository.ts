@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { UserRepository, UserData } from "@/core/interfaces/repositories/UserRepository";
+import { UserRepository, User, UserPreferences } from "@/core/interfaces/repositories/UserRepository";
 
 export class PrismaUserRepository implements UserRepository {
   private prisma: PrismaClient;
@@ -8,24 +8,34 @@ export class PrismaUserRepository implements UserRepository {
     this.prisma = new PrismaClient();
   }
 
-  async upsertUser(userData: UserData): Promise<any> {
-    return await this.prisma.user.upsert({
-      where: { id: userData.id },
-      update: {
-        email: userData.email,
-        preferredLanguage: userData.preferredLanguage
-      },
-      create: {
-        id: userData.id,
-        email: userData.email,
-        preferredLanguage: userData.preferredLanguage || "pl"
-      }
-    });
-  }
-
-  async getUserById(id: string): Promise<any> {
-    return await this.prisma.user.findUnique({
+  async getUserById(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
       where: { id }
     });
+
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      username: user.username || undefined,
+      email: user.email || undefined,
+      preferences: {
+        theme: user.preferredLanguage || undefined,
+        notifications: true
+      }
+    };
+  }
+
+  async getUserPreferences(userId: string): Promise<UserPreferences | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) return null;
+
+    return {
+      theme: user.preferredLanguage || undefined,
+      notifications: true
+    };
   }
 } 

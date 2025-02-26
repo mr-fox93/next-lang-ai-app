@@ -30,7 +30,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     });
   }
   
-  async createFlashcards(flashcards: any[], userId: string): Promise<Flashcard[]> {
+  async createFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]> {
     const createdFlashcards = [];
     
     for (const flashcard of flashcards) {

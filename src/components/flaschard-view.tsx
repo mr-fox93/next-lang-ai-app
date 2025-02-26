@@ -1,13 +1,12 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Volume2, Check, X } from "lucide-react";
-import { useState, useEffect } from "react";
-import type { FlashCard } from "@/lib/flashcard.schema";
-import { speak } from "@/utils/speak";
-import { MultipleChoiceAnswers } from "./multiple-choice-answers";
+import { Volume2 } from "lucide-react";
+import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
 import { Flashcard } from "@/core/entities/Flashcard";
+import { speak } from "@/utils/speak";
 
 interface FlashcardViewProps {
   card: Flashcard;
