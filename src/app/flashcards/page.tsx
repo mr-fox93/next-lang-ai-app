@@ -2,7 +2,15 @@ import { Suspense } from 'react';
 import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
-import { PageProps } from 'next';
+
+// Zgodne z Next.js 15 typowanie dla komponentów App Router
+
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+interface PageProps {
+  params: { [key: string]: string };
+  searchParams: SearchParams;
+}
 
 export default async function FlashcardsPage({
   searchParams,
