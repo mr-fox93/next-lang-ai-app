@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Loader } from "@/components/ui/loader";
+import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 const categories = [
   {
@@ -31,6 +32,7 @@ export function Categories() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleCategoryClick = async (categoryLabel: string) => {
     if (!isSignedIn) {
@@ -39,26 +41,23 @@ export function Categories() {
     }
 
     setIsLoading(true);
+    setErrorMessage(null);
     
     try {
-      const response = await fetch("/api/generate-flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          count: 5, 
-          message: `Stwórz fiszki do nauki języka na temat: ${categoryLabel}`,
-          level: "beginner"
-        }),
+      const result = await generateFlashcardsAction({ 
+        count: 5, 
+        message: `Stwórz fiszki do nauki języka na temat: ${categoryLabel}`,
+        level: "beginner"
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Błąd generowania fiszek");
+      
+      if (result.success) {
+        router.push("/flashcards");
+      } else {
+        setErrorMessage(result.error || "Nie udało się wygenerować fiszek");
+        console.error("Błąd generowania fiszek:", result.error);
       }
-
-      await response.json();
-      router.push("/flashcards");
     } catch (error) {
+      setErrorMessage("Wystąpił nieoczekiwany błąd");
       console.error("Nie udało się wygenerować fiszek:", error);
     } finally {
       setIsLoading(false);
@@ -68,6 +67,12 @@ export function Categories() {
   return (
     <>
       {isLoading && <Loader />}
+      
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-center">
+          {errorMessage}
+        </div>
+      )}
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
