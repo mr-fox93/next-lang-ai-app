@@ -39,7 +39,7 @@ export class GenerateFlashcardsUseCase {
 
   async execute(params: GenerateFlashcardsParams): Promise<GenerateFlashcardsResult> {
     try {
-      const { count, message, level, userId, userEmail } = params;
+      const { count, message, level, userId } = params;
 
       if (!userId) {
         return {
