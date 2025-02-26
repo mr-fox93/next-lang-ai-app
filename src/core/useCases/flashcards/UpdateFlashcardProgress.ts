@@ -12,8 +12,8 @@ export interface ProgressResult {
   masteryLevel: number;
   correctAnswers: number;
   incorrectAnswers: number;
-  nextReviewDate: Date;
-  lastReviewed?: Date;
+  nextReviewDate: Date | null;
+  lastReviewed?: Date | null;
 }
 
 export class UpdateFlashcardProgressUseCase {
