@@ -8,7 +8,6 @@ import { Menu, Grid, Maximize2, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
-import { useFlashcards } from "../context/flashcards-context";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/ui/loader";
 
@@ -33,26 +32,23 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
-  const [localFlashcards, setLocalFlashcards] = useState<FlashcardType[]>(initialFlashcards);
 
-  const { setFlashcards } = useFlashcards();
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
 
-  // Aktualizuje kontekst aplikacji danymi z serwera
+  // Inicjalizacja kategorii
   useEffect(() => {
-    setFlashcards(initialFlashcards);
-    
-    // Ustaw pierwszą kategorię jako domyślną
+    // Ustaw pierwszą kategorię jako domyślną jeśli nie wybrano żadnej
     if (initialFlashcards.length > 0 && !selectedCategory) {
       const categories = [...new Set(initialFlashcards.map(card => card.category))];
       if (categories.length > 0) {
         setSelectedCategory(categories[0]);
       }
     }
-  }, [initialFlashcards, setFlashcards, selectedCategory]);
+  }, [initialFlashcards, selectedCategory]);
 
+  // Reset indeksu karty przy zmianie kategorii
   useEffect(() => {
     setCurrentCardIndex(0);
   }, [selectedCategory]);
@@ -69,9 +65,10 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
     router.push("/");
   };
 
+  // Filtrowanie danych według wybranej kategorii
   const categoryCards = selectedCategory
-    ? localFlashcards.filter((card) => card.category === selectedCategory)
-    : localFlashcards;
+    ? initialFlashcards.filter((card) => card.category === selectedCategory)
+    : initialFlashcards;
 
   const currentCard = categoryCards[currentCardIndex] ?? null;
 
@@ -131,6 +128,7 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            flashcards={initialFlashcards}
           />
         </div>
         {isMobileSidebarOpen && (
@@ -141,7 +139,7 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
         )}
 
         <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8 relative">
-          {selectedCategory || localFlashcards.length > 0 ? (
+          {selectedCategory || initialFlashcards.length > 0 ? (
             <>
               <div className="flex justify-center mb-6">
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
@@ -181,7 +179,7 @@ export default function FlashcardsClient({ initialFlashcards, serverError }: Fla
                       <FlashcardView 
                         card={currentCard} 
                         onNext={handleNext} 
-                        allFlashcards={localFlashcards} 
+                        allFlashcards={initialFlashcards} 
                       />
                     ) : (
                       <div className="flex items-center justify-center h-[calc(100vh-12rem)]">

@@ -1,4 +1,3 @@
-import { FlashcardsProvider } from "./context/flashcards-context";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 
@@ -10,9 +9,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
-          <FlashcardsProvider> {children}</FlashcardsProvider>
-        </body>
+        <body>{children}</body>
       </html>
     </ClerkProvider>
   );
