@@ -10,20 +10,41 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
   }
 
   async getFlashcardsByUserId(userId: string): Promise<Flashcard[]> {
-    return await this.prisma.flashcard.findMany({
-      where: { 
-        userId: userId,
-      },
-      orderBy: {
-        id: 'desc'
+    const flashcards = await this.prisma.flashcard.findMany({
+      where: {
+        userId
       }
     });
+
+    return flashcards;
+  }
+  
+  // Metoda getUserFlashcards jest aliasem dla getFlashcardsByUserId dla zachowania spójności API
+  async getUserFlashcards(userId: string): Promise<Flashcard[]> {
+    return this.getFlashcardsByUserId(userId);
   }
 
   async createFlashcard(flashcard: Omit<Flashcard, "id">): Promise<Flashcard> {
     return await this.prisma.flashcard.create({
       data: flashcard
     });
+  }
+  
+  async createFlashcards(flashcards: any[], userId: string): Promise<Flashcard[]> {
+    const createdFlashcards = [];
+    
+    for (const flashcard of flashcards) {
+      const created = await this.prisma.flashcard.create({
+        data: {
+          ...flashcard,
+          userId
+        }
+      });
+      
+      createdFlashcards.push(created);
+    }
+    
+    return createdFlashcards;
   }
 
   async updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard> {
@@ -34,9 +55,13 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
   }
 
   async deleteFlashcard(id: number): Promise<boolean> {
-    await this.prisma.flashcard.delete({
-      where: { id }
-    });
-    return true;
+    try {
+      await this.prisma.flashcard.delete({
+        where: { id }
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 } 

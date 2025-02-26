@@ -8,6 +8,7 @@ import { Menu, Grid, Maximize2, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
+import { ProgressPreview } from "@/components/progress-preview";
 import { useRouter } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 
@@ -193,6 +194,9 @@ export default function FlashcardsView({ initialFlashcards, serverError }: Flash
           )}
         </main>
       </div>
+      
+      {/* Komponent podglądu postępu */}
+      <ProgressPreview />
     </div>
   );
 } 

@@ -34,4 +34,15 @@ export class PrismaProgressRepository implements ProgressRepository {
       data
     });
   }
+
+  async getUserProgress(userId: string): Promise<any[]> {
+    return await this.prisma.progress.findMany({
+      where: {
+        userId
+      },
+      include: {
+        flashcard: true
+      }
+    });
+  }
 } 

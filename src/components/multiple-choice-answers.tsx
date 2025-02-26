@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import type { FlashCard } from "@/lib/flashcard.schema";
+import { updateFlashcardProgressAction } from "@/app/actions/progress-actions";
+import { useToast } from "@/components/ui/use-toast";
+import { Flashcard } from "@/core/entities/Flashcard";
 
 interface MultipleChoiceAnswersProps {
-  card: FlashCard;
+  card: FlashCard | Flashcard;
   isFlipped: boolean;
   onAnswer: (isCorrect: boolean) => void;
-  otherFlashcards: FlashCard[];
+  otherFlashcards: (FlashCard | Flashcard)[];
 }
 
 export function MultipleChoiceAnswers({
@@ -21,6 +24,7 @@ export function MultipleChoiceAnswers({
   const [options, setOptions] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const { toast } = useToast();
 
   const correctAnswer = isFlipped ? card.origin_text : card.translate_text;
 
@@ -43,14 +47,63 @@ export function MultipleChoiceAnswers({
     setOptions(allOptions);
   }, [correctAnswer, otherFlashcards, isFlipped, card]);
 
-  const handleSelectOption = (option: string) => {
-    if (showResults) return; 
+  const handleSelectOption = async (option: string) => {
+    if (showResults) return;
     
     setSelectedOption(option);
     setShowResults(true);
     
+    const isCorrect = option === correctAnswer;
+    
+    // Diagnostyka - wyświetl informacje o fiszce w konsoli
+    console.log("Card details:", card);
+    console.log("Card ID type:", typeof card.id, "value:", card.id);
+    
+    // Sprawdź, czy karta ma identyfikator
+    const flashcardId = 'id' in card ? 
+      (typeof card.id === 'number' ? card.id : 
+       typeof card.id === 'string' ? parseInt(card.id, 10) : null) 
+      : null;
+    
+    console.log("Detected flashcard ID:", flashcardId);
+    
+    if (flashcardId) {
+      // Aktualizuj postęp użytkownika
+      try {
+        console.log("Updating progress for flashcard ID:", flashcardId, "isCorrect:", isCorrect);
+        const result = await updateFlashcardProgressAction({
+          flashcardId,
+          isCorrect
+        });
+        
+        console.log("Progress update result:", result);
+        
+        if (!result.success) {
+          console.error("Błąd aktualizacji postępu:", result.error);
+          toast({
+            variant: "destructive",
+            title: "Błąd aktualizacji postępu",
+            description: result.error
+          });
+        } else {
+          // Opcjonalnie - można wyświetlić powiadomienie o aktualizacji postępu
+          if (isCorrect) {
+            toast({
+              title: "Brawo!",
+              description: "Twój postęp został zaktualizowany",
+              variant: "default",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Błąd podczas aktualizacji postępu:", error);
+      }
+    } else {
+      console.warn("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
+    }
+    
     setTimeout(() => {
-      onAnswer(option === correctAnswer);
+      onAnswer(isCorrect);
     }, 1500);
   };
 

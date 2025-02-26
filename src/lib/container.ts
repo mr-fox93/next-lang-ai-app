@@ -3,6 +3,8 @@ import { PrismaProgressRepository } from "@/infrastructure/database/PrismaProgre
 import { PrismaUserRepository } from "@/infrastructure/database/PrismaUserRepository";
 import { GetUserFlashcardsUseCase } from "@/core/useCases/flashcards/GetUserFlashcards";
 import { GenerateFlashcardsUseCase } from "@/core/useCases/flashcards/GenerateFlashcards";
+import { UpdateFlashcardProgressUseCase } from "@/core/useCases/flashcards/UpdateFlashcardProgress";
+import { GetUserProgressStatsUseCase } from "@/core/useCases/progress/GetUserProgressStats";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
 import { ProgressRepository } from "@/core/interfaces/repositories/ProgressRepository";
 import { UserRepository } from "@/core/interfaces/repositories/UserRepository";
@@ -30,6 +32,21 @@ class Container {
         this.get('FlashcardRepository'),
         this.get('ProgressRepository'),
         this.get('UserRepository')
+      )
+    );
+    
+    this.services.set(
+      'UpdateFlashcardProgressUseCase',
+      new UpdateFlashcardProgressUseCase(
+        this.get('ProgressRepository')
+      )
+    );
+    
+    this.services.set(
+      'GetUserProgressStatsUseCase',
+      new GetUserProgressStatsUseCase(
+        this.get('FlashcardRepository'),
+        this.get('ProgressRepository')
       )
     );
   }
@@ -65,4 +82,10 @@ export const getUserFlashcardsUseCase = (): GetUserFlashcardsUseCase =>
   container.get('GetUserFlashcardsUseCase');
   
 export const getGenerateFlashcardsUseCase = (): GenerateFlashcardsUseCase =>
-  container.get('GenerateFlashcardsUseCase'); 
+  container.get('GenerateFlashcardsUseCase');
+  
+export const getUpdateFlashcardProgressUseCase = (): UpdateFlashcardProgressUseCase =>
+  container.get('UpdateFlashcardProgressUseCase'); 
+  
+export const getUserProgressStatsUseCase = (): GetUserProgressStatsUseCase =>
+  container.get('GetUserProgressStatsUseCase'); 
