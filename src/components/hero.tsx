@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -28,25 +29,19 @@ export default function Hero() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/generate-flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          count: 5, 
-          message: userInput,
-          level: "beginner"
-        }),
+      const result = await generateFlashcardsAction({
+        count: 5,
+        message: userInput,
+        level: "beginner"
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Błąd generowania fiszek");
+      
+      if (result.success) {
+        setUserInput("");
+        router.push("/flashcards");
+        console.log("Fiszki zostały wygenerowane:", result.flashcards);
+      } else {
+        console.error("Błąd generowania fiszek:", result.error);
       }
-
-      const data = await response.json();
-      setUserInput("");
-      router.push("/flashcards");
-      console.log("Fiszki zostały wygenerowane:", data);
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
     } finally {
