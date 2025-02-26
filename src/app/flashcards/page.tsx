@@ -3,14 +3,16 @@ import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
 
-interface PageProps {
-  params: Record<string, string>;
-  searchParams: Record<string, string | string[]>;
-}
+type SearchParams = { [key: string]: string | string[] | undefined };
 
-export default async function FlashcardsPage(props: PageProps) {
+export default async function FlashcardsPage({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
   const { flashcards, error } = await getFlashcardsForUser();
-  const categoryParam = props.searchParams.category;
+  
+  const categoryParam = searchParams?.category;
   const selectedCategory = categoryParam 
     ? decodeURIComponent(typeof categoryParam === 'string' ? categoryParam : categoryParam[0]) 
     : null;
