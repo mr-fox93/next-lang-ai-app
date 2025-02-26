@@ -2,15 +2,17 @@ import { Suspense } from 'react';
 import { getFlashcardsForUser } from './actions';
 import FlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
-import { SearchParams } from 'next/navigation';
 
 export default async function FlashcardsPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
   const { flashcards, error } = await getFlashcardsForUser();
-  const selectedCategory = searchParams.category ? decodeURIComponent(searchParams.category as string) : null;
+  const categoryParam = searchParams.category;
+  const selectedCategory = categoryParam 
+    ? decodeURIComponent(typeof categoryParam === 'string' ? categoryParam : categoryParam[0]) 
+    : null;
   
   return (
     <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader /></div>}>
