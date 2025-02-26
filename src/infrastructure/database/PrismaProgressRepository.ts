@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ProgressRepository, ProgressData } from "@/core/interfaces/repositories/ProgressRepository";
+import { ProgressRepository, ProgressData, Progress } from "@/core/interfaces/repositories/ProgressRepository";
 
 export class PrismaProgressRepository implements ProgressRepository {
   private prisma: PrismaClient;
@@ -8,13 +8,13 @@ export class PrismaProgressRepository implements ProgressRepository {
     this.prisma = new PrismaClient();
   }
 
-  async createProgress(data: ProgressData): Promise<any> {
+  async createProgress(data: ProgressData): Promise<Progress> {
     return await this.prisma.progress.create({
       data
     });
   }
 
-  async getProgressByFlashcardId(flashcardId: number, userId: string): Promise<any> {
+  async getProgressByFlashcardId(flashcardId: number, userId: string): Promise<Progress | null> {
     return await this.prisma.progress.findFirst({
       where: {
         flashcardId,
@@ -23,7 +23,7 @@ export class PrismaProgressRepository implements ProgressRepository {
     });
   }
 
-  async updateProgress(flashcardId: number, userId: string, data: Partial<ProgressData>): Promise<any> {
+  async updateProgress(flashcardId: number, userId: string, data: Partial<ProgressData>): Promise<Progress> {
     return await this.prisma.progress.update({
       where: {
         flashcardId_userId: {
@@ -35,7 +35,7 @@ export class PrismaProgressRepository implements ProgressRepository {
     });
   }
 
-  async getUserProgress(userId: string): Promise<any[]> {
+  async getUserProgress(userId: string): Promise<Progress[]> {
     return await this.prisma.progress.findMany({
       where: {
         userId

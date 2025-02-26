@@ -51,7 +51,6 @@ export class UpdateFlashcardProgressUseCase {
     
     // Oblicz nowy poziom opanowania (masteryLevel)
     // Poziom 0-5 w zależności od liczby poprawnych odpowiedzi i proporcji poprawnych do niepoprawnych
-    const totalAnswers = correctAnswers + incorrectAnswers;
     
     let newMasteryLevel = progress.masteryLevel;
     

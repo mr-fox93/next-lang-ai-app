@@ -57,7 +57,7 @@ export class GenerateFlashcardsUseCase {
 
       // Ta logika mogłaby być w osobnym przypadku użycia UpsertUserUseCase
       // ale dla uproszczenia zostawimy ją tutaj
-      await this.upsertUser(userId, userEmail);
+      await this.upsertUser(userId);
 
       const prompt = getFlashcardsPrompt(count, message, level);
       const flashcards = await this.generateFlashcardsWithAI(prompt);
@@ -86,7 +86,7 @@ export class GenerateFlashcardsUseCase {
     }
   }
 
-  private async upsertUser(userId: string, email: string): Promise<void> {
+  private async upsertUser(userId: string): Promise<void> {
     // Ponieważ metoda upsertUser została usunięta z interfejsu UserRepository,
     // używamy alternatywnego podejścia - najpierw sprawdzamy czy użytkownik istnieje
     const existingUser = await this.userRepository.getUserById(userId);
@@ -100,7 +100,7 @@ export class GenerateFlashcardsUseCase {
     console.log(`Użytkownik ${userId} już istnieje lub został obsłużony inaczej`);
   }
 
-  private async generateFlashcardsWithAI(prompt: string): Promise<any[]> {
+  private async generateFlashcardsWithAI(prompt: string): Promise<Omit<Flashcard, "id" | "userId">[]> {
     const response = await this.openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -126,7 +126,7 @@ export class GenerateFlashcardsUseCase {
     return parsedData.flashcards;
   }
 
-  private async saveFlashcards(flashcards: any[], userId: string): Promise<Flashcard[]> {
+  private async saveFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]> {
     const savedFlashcards: Flashcard[] = [];
     
     for (const flashcard of flashcards) {

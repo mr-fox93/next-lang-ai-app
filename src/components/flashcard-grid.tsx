@@ -3,9 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Volume2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { speak } from "@/utils/speak";
 
