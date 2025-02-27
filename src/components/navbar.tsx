@@ -34,10 +34,8 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
-          <NavLink href="/features">Features</NavLink>
-          <NavLink href="/how-it-works">How it Works</NavLink>
-          <NavLink href="/examples">Examples</NavLink>
-          <NavLink href="/pricing">Pricing</NavLink>
+          <NavLink href="/flashcards">Flashcards</NavLink>
+          <NavLink href="#">How It Works</NavLink>
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -79,16 +77,20 @@ export default function Navbar() {
           <div className="flex flex-col items-center justify-start px-6 py-10">
             <div className="flex flex-col items-center w-full">
               {/* Linki nawigacyjne w menu mobilnym */}
-              {["features", "how-it-works", "examples", "pricing"].map((item) => (
-                <Link 
-                  key={item} 
-                  href={`/${item}`}
-                  className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                </Link>
-              ))}
+              <Link 
+                href="/flashcards"
+                className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Flashcards
+              </Link>
+              <Link 
+                href="#"
+                className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                How It Works
+              </Link>
             </div>
             
             {/* Sekcja konta użytkownika */}

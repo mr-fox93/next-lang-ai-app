@@ -16,6 +16,10 @@ export interface UserProgressStats {
   inProgressFlashcards: number;
   untouchedFlashcards: number;
   categories: CategoryProgress[];
+  userLevel?: number;
+  experiencePoints?: number;
+  nextLevelPoints?: number;
+  dailyGoal?: number;
 }
 
 export class GetUserProgressStatsUseCase {
