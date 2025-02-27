@@ -16,6 +16,7 @@ export interface UserProgressStats {
   userLevel: number;
   experiencePoints: number;
   nextLevelPoints: number;
+  dailyGoal?: number;
 }
 
 export interface ProgressActionResult {
