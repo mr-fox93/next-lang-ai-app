@@ -101,90 +101,63 @@ export class GenerateFlashcardsUseCase {
   }
 
   private async generateFlashcardsWithAI(prompt: string): Promise<Omit<Flashcard, "id" | "userId">[]> {
-    const response = await this.openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      response_format: zodResponseFormat(FlashCardSchema, "flashcardResponse"),
-      temperature: 0.1,
-      max_tokens: 500,
-    });
+    try {
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        response_format: zodResponseFormat(FlashCardSchema, "flashcardResponse"),
+        temperature: 0.1,
+        max_tokens: 500,
+      });
 
-    const parsedData = FlashCardSchema.parse(
-      JSON.parse(response.choices[0].message.content || "[]")
-    );
+      const parsedData = FlashCardSchema.parse(
+        JSON.parse(response.choices[0].message.content || "[]")
+      );
 
-    return parsedData.flashcards;
+      return parsedData.flashcards;
+    } catch (error) {
+      console.error("Błąd podczas generowania fiszek z AI:", error);
+      throw new Error("Nie udało się wygenerować fiszek przy użyciu AI");
+    }
   }
 
   private async saveFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]> {
-    const savedFlashcards: Flashcard[] = [];
-    
-    for (const flashcard of flashcards) {
-      const createdFlashcard = await this.flashcardRepository.createFlashcard({
+    const flashcardPromises = flashcards.map(flashcard => 
+      this.flashcardRepository.createFlashcard({
         origin_text: flashcard.origin_text,
         translate_text: flashcard.translate_text,
         example_using: flashcard.example_using,
         translate_example: flashcard.translate_example,
         category: flashcard.category,
         userId: userId
-      });
-      
-      savedFlashcards.push(createdFlashcard);
-    }
+      })
+    );
     
-    return savedFlashcards;
+    return await Promise.all(flashcardPromises);
   }
 
   private async createProgressRecords(flashcards: Flashcard[], userId: string): Promise<void> {
-    for (const flashcard of flashcards) {
-      await this.progressRepository.createProgress({
+    const progressPromises = flashcards.map(flashcard => 
+      this.progressRepository.createProgress({
         flashcardId: flashcard.id,
         userId: userId,
         masteryLevel: 0,
         correctAnswers: 0,
         incorrectAnswers: 0,
         nextReviewDate: new Date()
-      });
-    }
-  }
-
-  async transformResponse(
-    category: string, 
-    userId: string,
-    response: string
-  ): Promise<Flashcard[]> {
-    try {
-      const jsonResponse = JSON.parse(response);
-      
-      // Validate that it's an array
-      if (!Array.isArray(jsonResponse?.flashcards)) {
-        throw new Error("Nieprawidłowa odpowiedź: brak tablicy flashcards");
-      }
-      
-      // Map API response to Flashcard entity
-      const flashcards: Omit<Flashcard, "id">[] = jsonResponse.flashcards.map((item: Partial<Flashcard>) => ({
-        origin_text: item.origin_text || "",
-        translate_text: item.translate_text || "",
-        example_using: item.example_using || "",
-        translate_example: item.translate_example || "",
-        category,
-        userId
-      }));
-      
-      return await this.flashcardRepository.createFlashcards(flashcards, userId);
-    } catch (error) {
-      console.error("Błąd podczas parsowania odpowiedzi:", error);
-      throw new Error("Nie udało się przetworzyć odpowiedzi API");
-    }
+      })
+    );
+    
+    await Promise.all(progressPromises);
   }
 } 
