@@ -49,19 +49,26 @@ export class UpdateFlashcardProgressUseCase {
     
     console.log(`Nowe statystyki: poprawne=${correctAnswers}, niepoprawne=${incorrectAnswers}`);
     
-    // Oblicz nowy poziom opanowania (masteryLevel)
-    // Poziom 0-5 w zależności od liczby poprawnych odpowiedzi i proporcji poprawnych do niepoprawnych
-    
+    // Zmodyfikowana logika obliczania nowego poziomu opanowania
     let newMasteryLevel = progress.masteryLevel;
     
     if (isCorrect) {
-      // Zwiększ poziom opanowania o 1, jeśli odpowiedź była poprawna
-      // Maksymalnie do poziomu 5
-      newMasteryLevel = Math.min(5, progress.masteryLevel + 1);
+      // Dla nowych fiszek (poziom 0) lub fiszek z niskim poziomem (1) 
+      // - szybszy postęp po pierwszej poprawnej odpowiedzi
+      if (progress.masteryLevel === 0) {
+        // Pierwsza poprawna odpowiedź daje większy skok - od razu poziom 2
+        newMasteryLevel = 2;
+      } else if (progress.masteryLevel === 1) {
+        // Druga poprawna odpowiedź również przyspiesza progres
+        newMasteryLevel = 3;
+      } else {
+        // Dla wyższych poziomów standardowy progres o 1
+        newMasteryLevel = Math.min(5, progress.masteryLevel + 1);
+      }
     } else {
-      // Zmniejsz poziom opanowania o 1, jeśli odpowiedź była niepoprawna
-      // Minimalnie do poziomu 0
-      newMasteryLevel = Math.max(0, progress.masteryLevel - 1);
+      // ZMIANA: Niepoprawna odpowiedź nie zmniejsza poziomu opanowania
+      // Pozostawiamy ten sam poziom, co wcześniej
+      newMasteryLevel = progress.masteryLevel;
     }
     
     console.log(`Nowy poziom opanowania: ${newMasteryLevel} (poprzednio: ${progress.masteryLevel})`);
@@ -94,10 +101,10 @@ export class UpdateFlashcardProgressUseCase {
         nextDate.setHours(nextDate.getHours() + 1); // 1 godzina
         break;
       case 1:
-        nextDate.setHours(nextDate.getHours() + 8); // 8 godzin
+        nextDate.setHours(nextDate.getHours() + 6); // 6 godzin
         break;
       case 2:
-        nextDate.setDate(nextDate.getDate() + 1); // 1 dzień
+        nextDate.setHours(nextDate.getHours() + 24); // 1 dzień
         break;
       case 3:
         nextDate.setDate(nextDate.getDate() + 3); // 3 dni

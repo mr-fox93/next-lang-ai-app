@@ -9,22 +9,38 @@ import {
   Award, 
   BookOpen, 
   ArrowUpRight, 
-  ChevronRight 
+  ChevronRight,
+  Clock,
+  Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getUserProgressStatsAction } from "@/app/actions/progress-actions";
+import { 
+  getUserProgressStatsAction, 
+  getReviewedTodayCountAction,
+  updateDailyGoalAction
+} from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { UserProgressStats } from "@/types/progress";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 export function ProgressDashboard() {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
   const [stats, setStats] = useState<UserProgressStats | null>(null);
+  const [reviewedToday, setReviewedToday] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [dailyGoal, setDailyGoal] = useState(10);
+  const [isSavingGoal, setIsSavingGoal] = useState(false);
   
   useEffect(() => {
     async function fetchStats() {
@@ -33,12 +49,19 @@ export function ProgressDashboard() {
         
         if (result.success && result.data) {
           setStats(result.data);
+          setDailyGoal(result.data.dailyGoal || 10);
         } else {
           toast({
             title: "Błąd",
             description: result.error || "Nie udało się pobrać statystyk",
             variant: "destructive"
           });
+        }
+        
+        // Pobierz liczbę fiszek przejrzanych dzisiaj
+        const todayResult = await getReviewedTodayCountAction();
+        if (todayResult.success) {
+          setReviewedToday(todayResult.data || 0);
         }
       } catch (error) {
         console.error("Błąd pobierania statystyk:", error);
@@ -57,6 +80,44 @@ export function ProgressDashboard() {
     }
   }, [isSignedIn, toast]);
   
+  // Funkcja do aktualizacji dziennego celu
+  const handleDailyGoalChange = async (value: string) => {
+    const newGoal = parseInt(value, 10);
+    setDailyGoal(newGoal);
+    
+    if (isSignedIn) {
+      setIsSavingGoal(true);
+      try {
+        const result = await updateDailyGoalAction(newGoal);
+        if (result.success) {
+          toast({
+            title: "Zapisano",
+            description: "Twój dzienny cel został zaktualizowany",
+          });
+          // Aktualizujemy statystyki, aby uwzględnić nowy cel
+          if (stats) {
+            setStats({...stats, dailyGoal: newGoal});
+          }
+        } else {
+          toast({
+            title: "Błąd",
+            description: result.error || "Nie udało się zaktualizować dziennego celu",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Błąd aktualizacji celu:", error);
+        toast({
+          title: "Błąd",
+          description: "Nie udało się zaktualizować dziennego celu",
+          variant: "destructive"
+        });
+      } finally {
+        setIsSavingGoal(false);
+      }
+    }
+  };
+  
   // Obliczenia dla pasków postępu
   const progressToNextLevel = stats 
     ? (stats.experiencePoints % 500) / 5 
@@ -65,6 +126,9 @@ export function ProgressDashboard() {
   const masteryPercentage = stats && stats.totalFlashcards > 0 
     ? (stats.masteredFlashcards / stats.totalFlashcards) * 100 
     : 0;
+  
+  // Procent wykonania dziennego celu
+  const dailyProgress = (reviewedToday / dailyGoal) * 100;
   
   if (!isSignedIn) {
     router.push("/sign-in");
@@ -75,7 +139,17 @@ export function ProgressDashboard() {
     <div className="min-h-screen bg-black">
       <header className="border-b border-white/10 p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-white">Twój postęp</h1>
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold text-white">Twój postęp</h1>
+            <Link href="/flashcards">
+              <Button 
+                variant="outline" 
+                className="ml-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-pink-600/30"
+              >
+                Wróć do nauki
+              </Button>
+            </Link>
+          </div>
           <div className="flex items-center space-x-4">
             {isSignedIn && (
               <>
@@ -125,7 +199,7 @@ export function ProgressDashboard() {
             
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
-                <CardDescription className="text-gray-400">Biegłość</CardDescription>
+                <CardDescription className="text-gray-400">Biegłość językowa</CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
                   <Star className="text-yellow-500 h-6 w-6" /> {masteryPercentage.toFixed(0)}%
                 </CardTitle>
@@ -136,26 +210,65 @@ export function ProgressDashboard() {
                   className="h-2 bg-white/10" 
                   indicatorClassName="bg-gradient-to-r from-yellow-500 to-amber-500"
                 />
+                <p className="text-sm text-gray-400 mt-2">
+                  {stats.masteredFlashcards} z {stats.totalFlashcards} fiszek opanowanych
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Fiszka jest uznawana za opanowaną po uzyskaniu najwyższego poziomu (5/5). 
+                  Każda poprawna odpowiedź przybliża Cię do osiągnięcia tego poziomu.
+                </p>
               </CardContent>
             </Card>
             
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
-                <CardDescription className="text-gray-400">Kategorie</CardDescription>
+                <CardDescription className="text-gray-400">Aktywność dzienna</CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
-                  <BarChart3 className="text-purple-500 h-6 w-6" /> {stats.categories.length}
+                  <Clock className="text-purple-500 h-6 w-6" /> {reviewedToday} / {dailyGoal}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {stats.categories.length > 0 ? (
-                  <div className="text-sm text-gray-400">
-                    Średnio {(stats.categories.reduce((acc, cat) => acc + cat.averageMasteryLevel, 0) / stats.categories.length).toFixed(1)} poziom opanowania
+                <div className="text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Dzisiejsze fiszki:</span>
+                    <span className="text-white font-medium">
+                      {Math.min(reviewedToday, dailyGoal)} z {dailyGoal}
+                    </span>
                   </div>
-                ) : (
-                  <div className="text-sm text-gray-400">
-                    Brak kategorii
+                  <Progress 
+                    value={Math.min(dailyProgress, 100)} 
+                    className="h-2 bg-white/10 mt-2" 
+                    indicatorClassName="bg-gradient-to-r from-purple-500 to-pink-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-2 mb-3">
+                    Liczba unikalnych fiszek przeglądniętych dzisiaj (liczona tylko raz na fiszkę). Cel resetuje się o północy.
+                  </p>
+                  
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400 text-xs">Twój cel dzienny:</span>
+                    <div className="flex-1">
+                      <Select
+                        value={dailyGoal.toString()}
+                        onValueChange={handleDailyGoalChange}
+                        disabled={isSavingGoal}
+                      >
+                        <SelectTrigger className="h-8 bg-black/40 border-white/10 text-white">
+                          <SelectValue placeholder="Wybierz cel" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-black/90 border-white/10 text-white">
+                          {[5, 10, 15, 20, 25, 30, 40, 50].map(goal => (
+                            <SelectItem key={goal} value={goal.toString()}>
+                              {goal} fiszek
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {isSavingGoal && (
+                      <div className="animate-spin h-4 w-4 border-2 border-purple-500 rounded-full border-t-transparent"></div>
+                    )}
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>
