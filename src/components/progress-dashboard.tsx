@@ -4,17 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { 
-  BarChart3, 
   Star, 
   Award, 
   BookOpen, 
   ArrowUpRight, 
   ChevronRight,
-  Clock,
-  Save
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { 
   getUserProgressStatsAction, 
