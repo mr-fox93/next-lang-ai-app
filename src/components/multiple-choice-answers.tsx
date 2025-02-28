@@ -7,6 +7,7 @@ import type { FlashCard } from "@/lib/flashcard.schema";
 import { updateFlashcardProgressAction } from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
 import { Flashcard } from "@/core/entities/Flashcard";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 interface MultipleChoiceAnswersProps {
   card: FlashCard | Flashcard;
@@ -24,6 +25,7 @@ export function MultipleChoiceAnswers({
   const [options, setOptions] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const correctAnswer = isFlipped ? card.origin_text : card.translate_text;
@@ -31,6 +33,7 @@ export function MultipleChoiceAnswers({
   useEffect(() => {
     setSelectedOption(null);
     setShowResults(false);
+    setErrorMessage(null);
 
     const answerField = isFlipped ? "origin_text" : "translate_text";
     const currentCategory = card.category;
@@ -74,6 +77,7 @@ export function MultipleChoiceAnswers({
     
     setSelectedOption(option);
     setShowResults(true);
+    setErrorMessage(null);
     
     const isCorrect = option === correctAnswer;
     
@@ -102,17 +106,25 @@ export function MultipleChoiceAnswers({
         
         if (!result.success) {
           console.error("Błąd aktualizacji postępu:", result.error);
+          setErrorMessage("Wystąpił błąd podczas zapisywania postępu");
           toast({
             variant: "destructive",
             title: "Błąd aktualizacji postępu",
-            description: result.error
+            description: result.error || "Nie udało się zapisać postępu, ale możesz kontynuować naukę"
           });
         }
       } catch (error) {
         console.error("Błąd podczas aktualizacji postępu:", error);
+        setErrorMessage("Wystąpił nieoczekiwany błąd podczas zapisywania postępu");
+        toast({
+          variant: "destructive",
+          title: "Błąd aktualizacji postępu",
+          description: "Wystąpił problem z połączeniem, ale możesz kontynuować naukę"
+        });
       }
     } else {
       console.warn("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
+      setErrorMessage("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
     }
     
     setTimeout(() => {
@@ -124,6 +136,11 @@ export function MultipleChoiceAnswers({
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
+      <ErrorMessage 
+        message={errorMessage} 
+        onClose={() => setErrorMessage(null)}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {options.map((option, index) => {
           const isCorrect = option === correctAnswer;
@@ -154,6 +171,7 @@ export function MultipleChoiceAnswers({
                 variant="outline"
                 className={`${buttonStyle} rounded-xl shadow-md overflow-hidden`}
                 onClick={() => handleSelectOption(option)}
+                disabled={showResults}
               >
                 <div className="flex items-center w-full">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-bold mr-3 flex-shrink-0">

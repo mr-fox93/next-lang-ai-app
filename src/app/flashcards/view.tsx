@@ -11,6 +11,7 @@ import { FlashcardGrid } from "@/components/flashcard-grid";
 import { ProgressPreview } from "@/components/progress-preview";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -32,6 +33,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
+  const [error, setError] = useState<string | null>(serverError || null);
 
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -71,8 +73,13 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
+    try {
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      setError("Wystąpił błąd podczas wylogowania");
+      console.error("Błąd wylogowania:", error);
+    }
   };
 
   // Filtrowanie danych według wybranej kategorii
@@ -81,14 +88,6 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     : initialFlashcards;
 
   const currentCard = categoryCards[currentCardIndex] ?? null;
-
-  if (serverError) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-red-400">Błąd: {serverError}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -149,6 +148,11 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         )}
 
         <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8 relative">
+          <ErrorMessage 
+            message={error} 
+            onClose={() => setError(null)}
+          />
+
           {selectedCategory || initialFlashcards.length > 0 ? (
             <>
               <div className="flex justify-center mb-6">
