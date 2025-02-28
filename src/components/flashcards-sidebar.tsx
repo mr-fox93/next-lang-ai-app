@@ -225,7 +225,7 @@ export function FlashcardsSidebar({
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Usunąć kategorię "{categoryToDelete}"?</AlertDialogTitle>
+            <AlertDialogTitle>Usunąć kategorię &quot;{categoryToDelete}&quot;?</AlertDialogTitle>
             <AlertDialogDescription>
               Wszystkie fiszki z tej kategorii zostaną trwale usunięte.
               Tej operacji nie można cofnąć.
