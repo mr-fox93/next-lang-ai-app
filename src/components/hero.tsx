@@ -11,11 +11,13 @@ import { Loader } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -28,6 +30,7 @@ export default function Hero() {
     }
 
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const result = await generateFlashcardsAction({
         count: 5,
@@ -40,10 +43,12 @@ export default function Hero() {
         router.push("/flashcards");
         console.log("Fiszki zostały wygenerowane:", result.flashcards);
       } else {
+        setErrorMessage(result.error || "Błąd generowania fiszek");
         console.error("Błąd generowania fiszek:", result.error);
       }
     } catch (error) {
       console.error("Failed to generate flashcards:", error);
+      setErrorMessage("Wystąpił nieoczekiwany błąd podczas generowania fiszek");
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +92,11 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-4 md:px-0"
           >
+            <ErrorMessage 
+              message={errorMessage} 
+              onClose={() => setErrorMessage(null)}
+            />
+            
             <div className="relative w-full group">
               <Textarea
                 className="min-h-[120px] bg-white/[0.08] border-2 border-white/10 text-white resize-none text-lg p-6 focus:border-purple-500/50 focus:bg-white/[0.12] transition-all duration-300"

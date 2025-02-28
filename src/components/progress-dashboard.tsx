@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { 
@@ -14,11 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { 
-  getUserProgressStatsAction, 
-  getReviewedTodayCountAction,
-  updateDailyGoalAction
-} from "@/app/actions/progress-actions";
+import { updateDailyGoalAction } from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { UserProgressStats } from "@/types/progress";
@@ -29,62 +25,30 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
-export function ProgressDashboard() {
+interface ProgressDashboardProps {
+  initialStats: UserProgressStats;
+  initialReviewedToday: number;
+}
+
+export function ProgressDashboard({ initialStats, initialReviewedToday }: ProgressDashboardProps) {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
-  const [stats, setStats] = useState<UserProgressStats | null>(null);
-  const [reviewedToday, setReviewedToday] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [dailyGoal, setDailyGoal] = useState(10);
+  const [stats, setStats] = useState<UserProgressStats>(initialStats);
+  const [reviewedToday] = useState(initialReviewedToday);
+  const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const result = await getUserProgressStatsAction();
-        
-        if (result.success && result.data) {
-          setStats(result.data);
-          setDailyGoal(result.data.dailyGoal || 10);
-        } else {
-          toast({
-            title: "Błąd",
-            description: result.error || "Nie udało się pobrać statystyk",
-            variant: "destructive"
-          });
-        }
-        
-        // Pobierz liczbę fiszek przejrzanych dzisiaj
-        const todayResult = await getReviewedTodayCountAction();
-        if (todayResult.success) {
-          setReviewedToday(todayResult.data || 0);
-        }
-      } catch (error) {
-        console.error("Błąd pobierania statystyk:", error);
-        toast({
-          title: "Błąd",
-          description: "Nie udało się pobrać statystyk postępu",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    if (isSignedIn) {
-      fetchStats();
-    }
-  }, [isSignedIn, toast]);
-  
-  // Funkcja do aktualizacji dziennego celu
   const handleDailyGoalChange = async (value: string) => {
     const newGoal = parseInt(value, 10);
     setDailyGoal(newGoal);
     
     if (isSignedIn) {
       setIsSavingGoal(true);
+      setErrorMessage(null);
       try {
         const result = await updateDailyGoalAction(newGoal);
         if (result.success) {
@@ -92,11 +56,11 @@ export function ProgressDashboard() {
             title: "Zapisano",
             description: "Twój dzienny cel został zaktualizowany",
           });
-          // Aktualizujemy statystyki, aby uwzględnić nowy cel
           if (stats) {
             setStats({...stats, dailyGoal: newGoal});
           }
         } else {
+          setErrorMessage(result.error || "Nie udało się zaktualizować dziennego celu");
           toast({
             title: "Błąd",
             description: result.error || "Nie udało się zaktualizować dziennego celu",
@@ -105,6 +69,7 @@ export function ProgressDashboard() {
         }
       } catch (error) {
         console.error("Błąd aktualizacji celu:", error);
+        setErrorMessage("Nie udało się zaktualizować dziennego celu");
         toast({
           title: "Błąd",
           description: "Nie udało się zaktualizować dziennego celu",
@@ -116,7 +81,6 @@ export function ProgressDashboard() {
     }
   };
   
-  // Obliczenia dla pasków postępu
   const progressToNextLevel = stats 
     ? (stats.experiencePoints % 500) / 5 
     : 0;
@@ -125,7 +89,6 @@ export function ProgressDashboard() {
     ? (stats.masteredFlashcards / stats.totalFlashcards) * 100 
     : 0;
   
-  // Procent wykonania dziennego celu
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
   
   if (!isSignedIn) {
@@ -159,12 +122,17 @@ export function ProgressDashboard() {
         </div>
       </header>
       
-      {isLoading ? (
-        <div className="flex justify-center items-center h-[calc(100vh-80px)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-        </div>
-      ) : stats ? (
-        <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        {errorMessage && (
+          <div className="mb-6">
+            <ErrorMessage 
+              message={errorMessage} 
+              onClose={() => setErrorMessage(null)} 
+            />
+          </div>
+        )}
+        
+        <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
@@ -340,15 +308,8 @@ export function ProgressDashboard() {
               </Button>
             </Link>
           </div>
-        </main>
-      ) : (
-        <div className="flex justify-center items-center h-[calc(100vh-80px)] flex-col p-8">
-          <p className="text-white mb-4">Nie udało się załadować danych postępu.</p>
-          <Button onClick={() => window.location.reload()}>
-            Spróbuj ponownie
-          </Button>
         </div>
-      )}
+      </main>
     </div>
   );
 } 
