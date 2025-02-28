@@ -64,4 +64,20 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       return false;
     }
   }
+  
+  async deleteFlashcardsByCategory(userId: string, category: string): Promise<number> {
+    try {
+      const result = await this.prisma.flashcard.deleteMany({
+        where: {
+          userId,
+          category
+        }
+      });
+      
+      return result.count;
+    } catch (error) {
+      console.error("Błąd podczas usuwania fiszek z kategorii:", error);
+      return 0;
+    }
+  }
 } 
