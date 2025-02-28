@@ -7,7 +7,7 @@ import { LayoutTemplate } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
 import { Categories } from "@/components/categories";
 import { useState } from "react";
-import { Loader } from "@/components/ui/loader";
+import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
@@ -56,7 +56,7 @@ export default function Hero() {
 
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
-      {isLoading && <Loader />}
+      {isLoading && <AIGenerationLoader />}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -126,7 +126,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
               <span className="relative flex items-center justify-center gap-2">
                 <LayoutTemplate className="h-6 w-6" />
-                {isLoading ? "Generating..." : "Generate Flashcards"}
+                {isLoading ? "Generowanie..." : "Generate Flashcards"}
               </span>
             </Button>
           </motion.div>
