@@ -26,6 +26,7 @@ import {
 import { deleteCategoryAction } from "@/app/actions/flashcard-actions";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import { useToast } from "@/components/ui/use-toast";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -49,6 +50,7 @@ export function FlashcardsSidebar({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const router = useRouter();
+  const { toast } = useToast();
   
   // Pobierz unikalne kategorie z fiszek
   const categories = [...new Set(flashcards.map((card) => card.category))];
@@ -81,12 +83,33 @@ export function FlashcardsSidebar({
         closeDeleteDialog();
         // Odśwież stronę, aby zaktualizować listę kategorii
         router.refresh();
+        
+        // Wyświetl komunikat o pomyślnym usunięciu kategorii
+        toast({
+          title: "Kategoria usunięta",
+          description: `Pomyślnie usunięto kategorię "${categoryToDelete}" wraz z ${result.deletedCount} fiszkami.`,
+          variant: "success",
+        });
       } else {
         setErrorMessage(result.error || "Nie udało się usunąć kategorii");
+        
+        // Wyświetl komunikat o błędzie
+        toast({
+          title: "Błąd",
+          description: result.error || "Nie udało się usunąć kategorii",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       setErrorMessage("Wystąpił nieoczekiwany błąd podczas usuwania kategorii");
       console.error("Błąd usuwania kategorii:", error);
+      
+      // Wyświetl komunikat o nieoczekiwanym błędzie
+      toast({
+        title: "Błąd",
+        description: "Wystąpił nieoczekiwany błąd podczas usuwania kategorii",
+        variant: "destructive",
+      });
     } finally {
       setIsDeleting(false);
     }
