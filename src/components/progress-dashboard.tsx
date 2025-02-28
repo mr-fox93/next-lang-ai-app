@@ -37,7 +37,7 @@ export function ProgressDashboard({ initialStats, initialReviewedToday }: Progre
   const router = useRouter();
   const { toast } = useToast();
   const [stats, setStats] = useState<UserProgressStats>(initialStats);
-  const [reviewedToday, setReviewedToday] = useState(initialReviewedToday);
+  const [reviewedToday, _setReviewedToday] = useState(initialReviewedToday);
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
