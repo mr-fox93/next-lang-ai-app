@@ -66,7 +66,7 @@ export function FlashcardsSidebar({
     setCategoryToDelete(null);
   };
   
-  // Funkcja obsługująca potwierdzenie usunięcia
+  // Funkcja obsługująca potwierdzenie usunięcia - to jest akcja klienta, która wywołuje akcję serwera
   const confirmDeleteCategory = async () => {
     if (!categoryToDelete) return;
     
@@ -74,6 +74,7 @@ export function FlashcardsSidebar({
     setErrorMessage(null);
     
     try {
+      // Wywołanie akcji serwera zdefiniowanej w app/actions/flashcard-actions.ts
       const result = await deleteCategoryAction(categoryToDelete);
       
       if (result.success) {
