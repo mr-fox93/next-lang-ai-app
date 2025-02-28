@@ -3,6 +3,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
+import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 
 interface GenerateFlashcardsActionParams {
   count: number;
@@ -37,6 +38,33 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
     return {
       success: false,
       error: "Wystąpił błąd podczas generowania fiszek"
+    };
+  }
+}
+
+export async function deleteCategoryAction(category: string) {
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return {
+        success: false,
+        error: "Nie jesteś zalogowany"
+      };
+    }
+    
+    const flashcardRepository = new PrismaFlashcardRepository();
+    const deletedCount = await flashcardRepository.deleteFlashcardsByCategory(userId, category);
+    
+    return {
+      success: true,
+      deletedCount
+    };
+  } catch (error) {
+    console.error("Błąd usuwania kategorii:", error);
+    return {
+      success: false,
+      error: "Wystąpił błąd podczas usuwania kategorii"
     };
   }
 } 

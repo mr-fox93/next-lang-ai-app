@@ -7,4 +7,5 @@ export interface FlashcardRepository {
   createFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]>;
   updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard>;
   deleteFlashcard(id: number): Promise<boolean>;
+  deleteFlashcardsByCategory(userId: string, category: string): Promise<number>;
 } 

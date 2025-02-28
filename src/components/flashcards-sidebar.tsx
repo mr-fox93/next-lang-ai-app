@@ -2,11 +2,30 @@
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  PlusCircle, 
+  ChevronLeft, 
+  ChevronRight, 
+  Trash2 
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useState } from "react";
 import { Flashcard } from "@/core/entities/Flashcard";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
+import { deleteCategoryAction } from "@/app/actions/flashcard-actions";
+import { useRouter } from "next/navigation";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -23,8 +42,54 @@ export function FlashcardsSidebar({
   onToggleCollapse,
   flashcards,
 }: FlashcardsSidebarProps) {
+  // Stan dialogu usuwania
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const router = useRouter();
+  
   // Pobierz unikalne kategorie z fiszek
   const categories = [...new Set(flashcards.map((card) => card.category))];
+
+  // Funkcja otwierająca dialog usuwania
+  const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Zapobiega kliknięciu przycisku kategorii
+    setCategoryToDelete(category);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Funkcja zamykająca dialog
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setCategoryToDelete(null);
+  };
+  
+  // Funkcja obsługująca potwierdzenie usunięcia
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    
+    setIsDeleting(true);
+    setErrorMessage(null);
+    
+    try {
+      const result = await deleteCategoryAction(categoryToDelete);
+      
+      if (result.success) {
+        closeDeleteDialog();
+        // Odśwież stronę, aby zaktualizować listę kategorii
+        router.refresh();
+      } else {
+        setErrorMessage(result.error || "Nie udało się usunąć kategorii");
+      }
+    } catch (error) {
+      setErrorMessage("Wystąpił nieoczekiwany błąd podczas usuwania kategorii");
+      console.error("Błąd usuwania kategorii:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="relative h-screen">
@@ -73,31 +138,55 @@ export function FlashcardsSidebar({
           </Link>
         </div>
 
+        {/* Pokaż komunikat o błędzie, jeśli wystąpił */}
+        {errorMessage && (
+          <div className="p-2">
+            <ErrorMessage 
+              message={errorMessage} 
+              onClose={() => setErrorMessage(null)} 
+            />
+          </div>
+        )}
+
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {categories.length > 0 ? (
               categories.map((category) => (
-                <Button
-                  key={category}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start mb-1 relative group overflow-hidden transition-all duration-300",
-                    selectedCategory === category
-                      ? "bg-purple-500/20 text-white hover:bg-purple-500/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                <div key={category} className="flex items-center space-x-1">
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "flex-1 justify-start mb-1 relative group overflow-hidden transition-all duration-300",
+                      selectedCategory === category
+                        ? "bg-purple-500/20 text-white hover:bg-purple-500/30"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                    )}
+                    onClick={() => onSelectCategory(category)}
+                  >
+                    <span className="relative z-10">
+                      {isCollapsed ? category.charAt(0) : category}
+                    </span>
+                    {/* Active indicator */}
+                    {selectedCategory === category && (
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
+                    )}
+                    {/* Hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Button>
+                  
+                  {/* Przycisk usuwania kategorii - widoczny tylko gdy sidebar nie jest zwinięty */}
+                  {!isCollapsed && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                      onClick={(e) => handleDeleteCategory(category, e)}
+                      title="Usuń kategorię"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   )}
-                  onClick={() => onSelectCategory(category)}
-                >
-                  <span className="relative z-10">
-                    {isCollapsed ? category.charAt(0) : category}
-                  </span>
-                  {/* Active indicator */}
-                  {selectedCategory === category && (
-                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
-                  )}
-                  {/* Hover effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Button>
+                </div>
               ))
             ) : (
               <p className="text-gray-400 text-center py-4">
@@ -107,6 +196,27 @@ export function FlashcardsSidebar({
           </div>
         </ScrollArea>
       </motion.div>
+      
+      {/* Dialog potwierdzający usunięcie kategorii */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Usunąć kategorię "{categoryToDelete}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Wszystkie fiszki z tej kategorii zostaną trwale usunięte.
+              Tej operacji nie można cofnąć.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={closeDeleteDialog} disabled={isDeleting}>
+              Anuluj
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteCategory} disabled={isDeleting}>
+              {isDeleting ? "Usuwanie..." : "Usuń kategorię"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
