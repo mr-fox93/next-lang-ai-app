@@ -18,8 +18,8 @@ export default function RootLayout({
               {children}
             </LoadingErrorProvider>
           </ErrorBoundary>
+          <Toaster />
         </body>
-        <Toaster />
       </html>
     </ClerkProvider>
   );
