@@ -6,8 +6,8 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
+import { PrismaClient } from "@prisma/client";
 
-// Interfejs dla parametrów generowania fiszek
 export interface GenerateFlashcardsParams {
   count: number;
   message: string;
@@ -16,7 +16,6 @@ export interface GenerateFlashcardsParams {
   userEmail: string;
 }
 
-// Interfejs dla rezultatu generowania fiszek
 export interface GenerateFlashcardsResult {
   success: boolean;
   message?: string;
@@ -26,6 +25,7 @@ export interface GenerateFlashcardsResult {
 
 export class GenerateFlashcardsUseCase {
   private openai: OpenAI;
+  private prisma: PrismaClient;
 
   constructor(
     private flashcardRepository: FlashcardRepository,
@@ -35,11 +35,12 @@ export class GenerateFlashcardsUseCase {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+    this.prisma = new PrismaClient();
   }
 
   async execute(params: GenerateFlashcardsParams): Promise<GenerateFlashcardsResult> {
     try {
-      const { count, message, level, userId } = params;
+      const { count, message, level, userId, userEmail } = params;
 
       if (!userId) {
         return {
@@ -55,9 +56,8 @@ export class GenerateFlashcardsUseCase {
         };
       }
 
-      // Ta logika mogłaby być w osobnym przypadku użycia UpsertUserUseCase
-      // ale dla uproszczenia zostawimy ją tutaj
-      await this.upsertUser(userId);
+
+      await this.upsertUser(userId, userEmail);
 
       const prompt = getFlashcardsPrompt(count, message, level);
       const flashcards = await this.generateFlashcardsWithAI(prompt);
@@ -86,18 +86,28 @@ export class GenerateFlashcardsUseCase {
     }
   }
 
-  private async upsertUser(userId: string): Promise<void> {
-    // Ponieważ metoda upsertUser została usunięta z interfejsu UserRepository,
-    // używamy alternatywnego podejścia - najpierw sprawdzamy czy użytkownik istnieje
+  private async upsertUser(userId: string, userEmail: string): Promise<void> {
+
     const existingUser = await this.userRepository.getUserById(userId);
     
     if (!existingUser) {
-      console.log("Użytkownika nie ma w bazie - należałoby go utworzyć w inny sposób");
-      // W tym miejscu normalnie byłoby tworzenie użytkownika, ale 
-      // interfejs UserRepository nie ma już metody do tworzenia użytkowników
+      try {
+        await this.prisma.user.create({
+          data: {
+            id: userId,
+            email: userEmail,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        });
+        console.log(`Utworzono nowego użytkownika ${userId}`);
+      } catch (error) {
+        console.error(`Błąd podczas tworzenia użytkownika ${userId}:`, error);
+        throw new Error("Nie udało się utworzyć użytkownika");
+      }
     }
     
-    console.log(`Użytkownik ${userId} już istnieje lub został obsłużony inaczej`);
+    console.log(`Użytkownik ${userId} już istnieje lub został pomyślnie utworzony`);
   }
 
   private async generateFlashcardsWithAI(prompt: string): Promise<Omit<Flashcard, "id" | "userId">[]> {

@@ -35,8 +35,12 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
     try {
       const result = await generateFlashcardsAction(params);
       
-      if (result.success) {
-        router.push(redirectUrl);
+      if (result.success && result.flashcards && result.flashcards.length > 0) {
+        // Pobierz kategorię z pierwszej wygenerowanej fiszki
+        const generatedCategory = result.flashcards[0].category;
+        
+        // Przekieruj do strony z fiszkami z parametrem kategorii
+        router.push(`${redirectUrl}?category=${encodeURIComponent(generatedCategory)}`);
         return { success: true };
       } else {
         setErrorMessage(result.error || "Nie udało się wygenerować fiszek");
