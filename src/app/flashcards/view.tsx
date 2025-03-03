@@ -39,16 +39,16 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   const { signOut } = useClerk();
   const router = useRouter();
 
-  // Inicjalizacja kategorii
+  // Inicjalizacja kategorii - tylko jeśli nie ma wybranej kategorii i nie ma kategorii w URL
   useEffect(() => {
     // Ustaw pierwszą kategorię jako domyślną jeśli nie wybrano żadnej
-    if (initialFlashcards.length > 0 && !selectedCategory) {
+    if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
       const categories = [...new Set(initialFlashcards.map(card => card.category))];
       if (categories.length > 0) {
         setSelectedCategory(categories[0]);
       }
     }
-  }, [initialFlashcards, selectedCategory]);
+  }, [initialFlashcards, selectedCategory, categoryFromUrl]);
 
   // Reset indeksu karty przy zmianie kategorii
   useEffect(() => {
