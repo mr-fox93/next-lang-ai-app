@@ -92,15 +92,20 @@ export function MultipleChoiceAnswers({
           toast({
             variant: "destructive",
             title: "Błąd aktualizacji postępu",
-            description: result.error || "Nie udało się zapisać postępu, ale możesz kontynuować naukę"
+            description: result.error || "Failed to save progress, but you can continue learning"
           });
         }
       } catch (error) {
-        setErrorMessage("Wystąpił nieoczekiwany błąd podczas zapisywania postępu");
+        console.error("Progress update error:", error);
+        const errorMessage = error instanceof Error 
+          ? `Progress update failed: ${error.message}` 
+          : "An unexpected error occurred while saving progress";
+          
+        setErrorMessage(errorMessage);
         toast({
           variant: "destructive",
-          title: "Błąd aktualizacji postępu",
-          description: "Wystąpił problem z połączeniem, ale możesz kontynuować naukę"
+          title: "Progress Update Error",
+          description: "Connection issue detected, but you can continue learning"
         });
       }
     } else {

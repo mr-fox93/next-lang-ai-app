@@ -68,10 +68,15 @@ export function ProgressDashboard({ initialStats, initialReviewedToday }: Progre
           });
         }
       } catch (error) {
-        setErrorMessage("Nie udało się zaktualizować dziennego celu");
+        console.error("Daily goal update error:", error);
+        const errorMessage = error instanceof Error 
+          ? `Daily goal update failed: ${error.message}` 
+          : "An unexpected error occurred while updating daily goal";
+        
+        setErrorMessage(errorMessage);
         toast({
-          title: "Błąd",
-          description: "Nie udało się zaktualizować dziennego celu",
+          title: "Error",
+          description: errorMessage,
           variant: "destructive"
         });
       } finally {

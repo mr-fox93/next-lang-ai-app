@@ -93,6 +93,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       
       return result.count;
     } catch (error) {
+      console.error("Category deletion database error:", error);
       return 0;
     }
   }

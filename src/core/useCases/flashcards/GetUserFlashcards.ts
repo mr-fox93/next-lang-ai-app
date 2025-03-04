@@ -14,7 +14,11 @@ export class GetUserFlashcardsUseCase {
       
       return { flashcards };
     } catch (error) {
-      return { flashcards: [], error: "Wystąpił błąd podczas pobierania fiszek" };
+      console.error("Flashcard retrieval error:", error);
+      return { 
+        flashcards: [], 
+        error: `Failed to retrieve flashcards: ${error instanceof Error ? error.message : "Unknown error occurred"}` 
+      };
     }
   }
 } 

@@ -59,7 +59,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     }
   }, [selectedCategory]);
 
-  const handleNext = (known: boolean) => {
+  const handleNext = (_: boolean) => {
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
@@ -68,7 +68,12 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
       await signOut();
       router.push("/");
     } catch (error) {
-      setError("Wystąpił błąd podczas wylogowania");
+      console.error("Sign out error:", error);
+      setError(
+        error instanceof Error 
+          ? `Sign out failed: ${error.message}` 
+          : "An unexpected error occurred during sign out"
+      );
     }
   };
 

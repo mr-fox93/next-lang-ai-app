@@ -88,9 +88,10 @@ export class GenerateFlashcardsUseCase {
         flashcards: savedFlashcards
       };
     } catch (error) {
+      console.error("Flashcard generation error:", error);
       return {
         success: false,
-        error: "Wystąpił błąd podczas generowania fiszek"
+        error: `Flashcard generation failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
       };
     }
   }
@@ -109,7 +110,10 @@ export class GenerateFlashcardsUseCase {
           }
         });
       } catch (error) {
-        throw new Error("Nie udało się utworzyć użytkownika");
+        console.error("User creation error:", error);
+        throw new Error(
+          `Failed to create user: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+        );
       }
     }
   }
@@ -148,7 +152,10 @@ export class GenerateFlashcardsUseCase {
 
       return flashcardsWithDefaultLanguageSettings;
     } catch (error) {
-      throw new Error("Nie udało się wygenerować fiszek przy użyciu AI");
+      console.error("AI flashcard generation error:", error);
+      throw new Error(
+        `Failed to generate flashcards with AI: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+      );
     }
   }
 

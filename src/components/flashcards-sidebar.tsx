@@ -83,20 +83,25 @@ export function FlashcardsSidebar({
           variant: "success",
         });
       } else {
-        setErrorMessage(result.error || "Nie udało się usunąć kategorii");
+        setErrorMessage(result.error || "Failed to delete category");
         
         toast({
-          title: "Błąd",
-          description: result.error || "Nie udało się usunąć kategorii",
+          title: "Error",
+          description: result.error || "Failed to delete category",
           variant: "destructive",
         });
       }
     } catch (error) {
-      setErrorMessage("Wystąpił nieoczekiwany błąd podczas usuwania kategorii");
+      console.error("Category deletion error:", error);
+      const errorMessage = error instanceof Error 
+        ? `Category deletion failed: ${error.message}` 
+        : "An unexpected error occurred while deleting the category";
+      
+      setErrorMessage(errorMessage);
       
       toast({
-        title: "Błąd",
-        description: "Wystąpił nieoczekiwany błąd podczas usuwania kategorii",
+        title: "Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

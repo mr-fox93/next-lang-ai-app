@@ -17,7 +17,7 @@ export async function updateFlashcardProgressAction(params: UpdateProgressAction
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
@@ -34,9 +34,10 @@ export async function updateFlashcardProgressAction(params: UpdateProgressAction
       data: result
     };
   } catch (error) {
+    console.error("Progress update error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas aktualizacji postępu"
+      error: `Progress update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 }
@@ -48,7 +49,7 @@ export async function getUserProgressStatsAction() {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
@@ -74,9 +75,10 @@ export async function getUserProgressStatsAction() {
       }
     };
   } catch (error) {
+    console.error("Progress stats retrieval error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas pobierania statystyk postępu"
+      error: `Failed to retrieve progress statistics: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 }
@@ -88,7 +90,7 @@ export async function getReviewedTodayCountAction() {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany",
+        error: "Authentication required: User is not signed in",
         data: 0
       };
     }
@@ -110,9 +112,10 @@ export async function getReviewedTodayCountAction() {
       data: reviewedToday
     };
   } catch (error) {
+    console.error("Daily review count retrieval error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas pobierania statystyk dziennych",
+      error: `Failed to retrieve daily review count: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
       data: 0
     };
   }
@@ -125,14 +128,14 @@ export async function updateDailyGoalAction(newGoal: number) {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
     if (newGoal < 1 || newGoal > 100) {
       return {
         success: false,
-        error: "Nieprawidłowa wartość celu dziennego (1-100)"
+        error: "Invalid daily goal value: Must be between 1 and 100"
       };
     }
     
@@ -143,12 +146,13 @@ export async function updateDailyGoalAction(newGoal: number) {
     
     return {
       success: true,
-      message: "Dzienny cel został zaktualizowany"
+      message: "Daily goal successfully updated"
     };
   } catch (error) {
+    console.error("Daily goal update error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas aktualizacji dziennego celu"
+      error: `Daily goal update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 } 

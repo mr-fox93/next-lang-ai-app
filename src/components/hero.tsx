@@ -49,10 +49,15 @@ export default function Hero() {
         setUserInput("");
         router.push("/flashcards");
       } else {
-        setErrorMessage(result.error || "Błąd generowania fiszek");
+        setErrorMessage(result.error || "Error generating flashcards");
       }
     } catch (error) {
-      setErrorMessage("Wystąpił nieoczekiwany błąd podczas generowania fiszek");
+      console.error("Flashcard generation client error:", error);
+      setErrorMessage(
+        error instanceof Error 
+          ? `Flashcard generation failed: ${error.message}` 
+          : "An unexpected error occurred during flashcard generation"
+      );
     } finally {
       setIsLoading(false);
     }

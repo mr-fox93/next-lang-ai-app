@@ -49,11 +49,14 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
         router.push(`${redirectUrl}?category=${encodeURIComponent(generatedCategory)}`);
         return { success: true };
       } else {
-        setErrorMessage(result.error || "Nie udało się wygenerować fiszek");
+        setErrorMessage(result.error || "Failed to generate flashcards");
         return { success: false, error: result.error };
       }
     } catch (error) {
-      const errorMsg = "Wystąpił nieoczekiwany błąd";
+      console.error("Flashcard generation hook error:", error);
+      const errorMsg = error instanceof Error 
+        ? `Flashcard generation failed: ${error.message}` 
+        : "An unexpected error occurred during flashcard generation";
       setErrorMessage(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
