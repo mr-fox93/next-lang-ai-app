@@ -28,14 +28,14 @@ export function MultipleChoiceAnswers({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const correctAnswer = isFlipped ? card.origin_text : card.translate_text;
+  const correctAnswer = isFlipped ? card.translate_text : card.origin_text;
 
   useEffect(() => {
     setSelectedOption(null);
     setShowResults(false);
     setErrorMessage(null);
 
-    const answerField = isFlipped ? "origin_text" : "translate_text";
+    const answerField = isFlipped ? "translate_text" : "origin_text";
     const currentCategory = card.category;
 
     // Filtruj fiszki tylko z tej samej kategorii co aktualna fiszka
@@ -135,18 +135,18 @@ export function MultipleChoiceAnswers({
   const letters = ["A", "B", "C", "D"];
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-8">
+    <div className="w-full mx-auto">
       <ErrorMessage 
         message={errorMessage} 
         onClose={() => setErrorMessage(null)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
         {options.map((option, index) => {
           const isCorrect = option === correctAnswer;
           const isSelected = option === selectedOption;
           
-          let buttonStyle = "w-full h-auto py-4 px-6 text-left bg-black/40 backdrop-blur-md border-2";
+          let buttonStyle = "w-full h-auto py-2 sm:py-3 px-3 sm:px-4 text-left bg-black/40 backdrop-blur-md border-2";
           
           if (showResults) {
             if (isCorrect) {
@@ -174,10 +174,10 @@ export function MultipleChoiceAnswers({
                 disabled={showResults}
               >
                 <div className="flex items-center w-full">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-bold mr-3 flex-shrink-0">
+                  <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-500/20 text-purple-400 font-bold mr-2 sm:mr-3 flex-shrink-0 text-xs sm:text-sm">
                     {letters[index]}
                   </div>
-                  <span className="text-white">{option}</span>
+                  <span className="text-white text-sm sm:text-base">{option}</span>
                 </div>
               </Button>
             </motion.div>

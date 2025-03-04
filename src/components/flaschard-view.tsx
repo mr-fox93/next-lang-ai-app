@@ -1,12 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Volume2 } from "lucide-react";
-import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
+import { motion } from "framer-motion";
+import { speak, SupportedTTSLanguage } from "@/utils/speak";
 import { Flashcard } from "@/core/entities/Flashcard";
-import { speak } from "@/utils/speak";
+import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
+
+// Mapowanie kodów języków na kody TTS
+const langToTTSMap: Record<string, SupportedTTSLanguage> = {
+  en: "en-US",
+  pl: "pl-PL",
+  es: "es-ES",
+  it: "it-IT"
+};
 
 interface FlashcardViewProps {
   card: Flashcard;
@@ -21,74 +31,136 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
     setIsFlipped(false);
     onNext(isCorrect);
   };
-
+  
   // Filtruj karty, aby uzyskać inne karty niż obecna
   const otherFlashcards = allFlashcards.filter(
     (c) => c.origin_text !== card.origin_text
   );
 
+  // Określenie odpowiednich kodów TTS dla języków źródłowego i docelowego
+  const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8 p-4 w-full max-w-2xl mx-auto">
-      {/* Card */}
-      <div
-        className="w-full aspect-[3/2] relative cursor-pointer [perspective:1000px] group"
-        onClick={() => setIsFlipped(!isFlipped)}
-      >
-        {/* Card glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500" />
-
-        <motion.div
-          className="w-full h-full relative [transform-style:preserve-3d] transition-transform duration-150"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
+    <div className="flex flex-col items-center justify-start w-full max-w-2xl mx-auto h-[calc(100vh-100px)] overflow-hidden">
+      <div className="w-full flex flex-col items-center justify-start gap-2 flex-1 overflow-auto p-4">
+        {/* Card */}
+        <div
+          className="relative [perspective:1000px] transition-all duration-500 w-full aspect-[4/2] cursor-pointer group max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg shrink-0"
+          onClick={() => setIsFlipped(!isFlipped)}
         >
-          {/* Front */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-            <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-8 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl">
-              <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    speak(card.origin_text, "en-US");
-                  }}
-                >
-                  <Volume2 className="h-8 w-8" />
-                </Button>
-                <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80 mb-2">
-                  {card.origin_text}
-                </h2>
-                <div className="text-gray-300 text-center italic text-sm sm:text-base max-w-md">
-                  &quot;{card.example_using}&quot;
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Glowing gradient effect */}
+          <div
+            className={`absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl opacity-30 blur group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-tilt ${
+              isFlipped ? "animate-none" : ""
+            }`}
+          ></div>
 
-          {/* Back */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-8 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl">
-              <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-                <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80 mb-2">
-                  {card.translate_text}
-                </h2>
-                <div className="text-gray-300 text-center italic text-sm sm:text-base max-w-md">
-                  &quot;{card.translate_example}&quot;
+          <div
+            className="absolute w-full h-full transform-gpu transition-all duration-500 ease-in-out [transform-style:preserve-3d]"
+            style={{
+              transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+            }}
+          >
+            {/* Front - Language Target (to co chcemy się nauczyć) */}
+            <div className="absolute w-full h-full [backface-visibility:hidden]">
+              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/40 backdrop-blur overflow-hidden rounded-xl">
+                <motion.div
+                  className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="mb-1 md:mb-3 flex flex-col items-center">
+                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 md:mb-3">
+                      {card.translate_text}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speak(card.translate_text, targetTTS);
+                      }}
+                    >
+                      <Volume2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-1 w-full">
+                    <div className="text-gray-300 text-center italic text-xs sm:text-sm line-clamp-2 mt-1">
+                      &quot;{card.translate_example}&quot;
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-colors flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speak(card.translate_example, targetTTS);
+                      }}
+                    >
+                      <Volume2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </motion.div>
+
+                <div className="p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
+                  <div>
+                    <Badge variant="outline" className="bg-gray-800/60 text-xs">
+                      {card.category}
+                    </Badge>
+                  </div>
+                  <div className="text-xs">Click to flip</div>
                 </div>
-              </div>
+              </Card>
+            </div>
+
+            {/* Back - Language Source (nasz język ojczysty) */}
+            <div
+              className="absolute w-full h-full [backface-visibility:hidden]"
+              style={{ transform: "rotateY(180deg)" }}
+            >
+              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/40 backdrop-blur overflow-hidden rounded-xl">
+                <motion.div
+                  className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="mb-1 md:mb-3">
+                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+                      {card.origin_text}
+                    </span>
+                  </div>
+                  <div className="text-gray-300 text-center italic text-xs sm:text-sm line-clamp-2 mt-1">
+                    &quot;{card.example_using}&quot;
+                  </div>
+                </motion.div>
+
+                <div className="p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
+                  <div>
+                    <Badge variant="outline" className="bg-gray-800/60 text-xs">
+                      {card.category}
+                    </Badge>
+                  </div>
+                  <div className="text-xs">Click to flip</div>
+                </div>
+              </Card>
             </div>
           </div>
-        </motion.div>
+        </div>
+        
+        {/* Komponent z opcjami wyboru - umieszczony pod kartą */}
+        <div className="w-full flex-shrink-0 mt-4">
+          <MultipleChoiceAnswers
+            card={card}
+            isFlipped={isFlipped}
+            onAnswer={handleAnswer}
+            otherFlashcards={otherFlashcards}
+          />
+        </div>
       </div>
-      
-      {/* Komponent z opcjami wyboru */}
-      <MultipleChoiceAnswers
-        card={card}
-        isFlipped={isFlipped}
-        onAnswer={handleAnswer}
-        otherFlashcards={otherFlashcards}
-      />
     </div>
   );
 }

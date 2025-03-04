@@ -1,6 +1,9 @@
 // src/utils/speak.ts
 
-export const speak = (text: string, lang: "pl-PL" | "en-US" = "en-US") => {
+// Rozszerzamy typy języków
+export type SupportedTTSLanguage = "pl-PL" | "en-US" | "es-ES" | "it-IT";
+
+export const speak = (text: string, lang: SupportedTTSLanguage = "en-US") => {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
   speechSynthesis.speak(utterance);
