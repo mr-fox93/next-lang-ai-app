@@ -36,6 +36,9 @@ model Flashcard {
   example_using     String
   translate_example String
   category          String
+  sourceLanguage    String   @default("en") // Język źródłowy
+  targetLanguage    String   @default("pl") // Język docelowy
+  difficultyLevel   String   @default("easy") // Poziom trudności: easy, advanced, pro
   createdAt         DateTime @default(now())
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String

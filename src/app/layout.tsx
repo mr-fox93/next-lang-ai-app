@@ -1,6 +1,8 @@
-import { FlashcardsProvider } from "./context/flashcards-context";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
+import { LoadingErrorProvider } from "@/shared/ui/loading-error-provider";
+import { ErrorBoundary } from "@/shared/ui/error-boundary";
 
 export default function RootLayout({
   children,
@@ -11,7 +13,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <FlashcardsProvider> {children}</FlashcardsProvider>
+          <ErrorBoundary>
+            <LoadingErrorProvider>
+              {children}
+            </LoadingErrorProvider>
+          </ErrorBoundary>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

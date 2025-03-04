@@ -4,7 +4,9 @@ import path from "path";
 export const getFlashcardsPrompt = (
   count: number,
   message: string,
-  level: string
+  level: string,
+  sourceLanguage: string = "en",
+  targetLanguage: string = "pl"
 ) => {
   const getFlashcardsExamples = () => {
     const filePath = path.join(
@@ -18,17 +20,27 @@ export const getFlashcardsPrompt = (
 
   const previousExamples = getFlashcardsExamples();
 
+  const languageNames: Record<string, string> = {
+    "en": "English",
+    "pl": "Polish",
+    "es": "Spanish",
+    "it": "Italian"
+  };
+
+  const sourceLang = languageNames[sourceLanguage] || sourceLanguage;
+  const targetLang = languageNames[targetLanguage] || targetLanguage;
+
   return `
-  Generate ${count} unique and diverse flashcards for learning English in **valid JSON format** based on the following topic or description:
-  **"${message}".** The difficulty of the flashcards should be appropriate for the **${level}** level of English.
+  Generate ${count} unique and diverse flashcards for learning ${sourceLang} to ${targetLang} in **valid JSON format** based on the following topic or description:
+  **"${message}".** The difficulty of the flashcards should be appropriate for the **${level}** level of language learning.
 
   ### **Guidelines:**
   1. **Flashcards must be strictly relevant** to the given topic or description.
   2. **Each flashcard must include:**
-     - **"origin_text"**: A word or phrase in English.
-     - **"translate_text"**: The Polish translation.
-     - **"example_using"**: A sample sentence demonstrating the word/phrase in a real-world context related to the provided topic.
-      - **"translate_example"**: The Polish translation of the example sentence.
+     - **"origin_text"**: A word or phrase in ${sourceLang}.
+     - **"translate_text"**: The ${targetLang} translation.
+     - **"example_using"**: A sample sentence demonstrating the word/phrase in a real-world context related to the provided topic, in ${sourceLang}.
+      - **"translate_example"**: The ${targetLang} translation of the example sentence.
      - **"category"**: A short, meaningful category that represents the key theme of the flashcard (e.g., "Job Interview", "Car Rental", "ESG Work"). A single, consistent category that applies to **all** generated flashcards.
   3. **Ensure the following:**
      - Words and phrases are **unique** (no repetitions).
@@ -95,7 +107,12 @@ export const getFlashcardsPrompt = (
       }
     ]
   }
-        "flashcards": [
+  \`\`\`
+  
+  ### **Incorrect Example (for the topic "Business Meeting")**
+  \`\`\`json
+  {
+    "flashcards": [
       {
         "origin_text": "business etiquette",
         "translate_text": "etykieta biznesowa",

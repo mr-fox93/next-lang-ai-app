@@ -5,16 +5,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import { LayoutTemplate } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
-import { Categories } from "@/components/categories";
+import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from "@/components/language-settings";
 import { useState } from "react";
-import { Loader } from "@/components/ui/loader";
+import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [languageSettings, setLanguageSettings] = useState<LanguageSettingsType>({
+    sourceLanguage: "en",
+    targetLanguage: "pl",
+    difficultyLevel: "easy"
+  });
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -27,28 +35,29 @@ export default function Hero() {
     }
 
     setIsLoading(true);
+    setErrorMessage(null);
     try {
-      const response = await fetch("/api/generate-flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          count: 5, 
-          message: userInput,
-          level: "beginner"
-        }),
+      const result = await generateFlashcardsAction({
+        count: 5,
+        message: userInput,
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Błąd generowania fiszek");
+      
+      if (result.success) {
+        setUserInput("");
+        router.push("/flashcards");
+      } else {
+        setErrorMessage(result.error || "Error generating flashcards");
       }
-
-      const data = await response.json();
-      setUserInput("");
-      router.push("/flashcards");
-      console.log("Fiszki zostały wygenerowane:", data);
     } catch (error) {
-      console.error("Failed to generate flashcards:", error);
+      console.error("Flashcard generation client error:", error);
+      setErrorMessage(
+        error instanceof Error 
+          ? `Flashcard generation failed: ${error.message}` 
+          : "An unexpected error occurred during flashcard generation"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +65,7 @@ export default function Hero() {
 
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
-      {isLoading && <Loader />}
+      {isLoading && <AIGenerationLoader />}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -84,7 +93,9 @@ export default function Hero() {
             for your learning journey.
           </motion.p>
 
-          <Categories />
+          <LanguageSettings 
+            onChange={setLanguageSettings}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -92,6 +103,11 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-4 md:px-0"
           >
+            <ErrorMessage 
+              message={errorMessage} 
+              onClose={() => setErrorMessage(null)}
+            />
+            
             <div className="relative w-full group">
               <Textarea
                 className="min-h-[120px] bg-white/[0.08] border-2 border-white/10 text-white resize-none text-lg p-6 focus:border-purple-500/50 focus:bg-white/[0.12] transition-all duration-300"
@@ -121,7 +137,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
               <span className="relative flex items-center justify-center gap-2">
                 <LayoutTemplate className="h-6 w-6" />
-                {isLoading ? "Generating..." : "Generate Flashcards"}
+                {isLoading ? "Generowanie..." : "Generate Flashcards"}
               </span>
             </Button>
           </motion.div>
