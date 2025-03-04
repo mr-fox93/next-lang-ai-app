@@ -1,7 +1,3 @@
-import fs from "fs";
-import path from "path";
-
-// Przykładowe dane fiszek wbudowane bezpośrednio w kod
 const defaultFlashcardExamples = [
   {
     "messages": [
@@ -68,23 +64,7 @@ export const getFlashcardsPrompt = (
   sourceLanguage: string = "en",
   targetLanguage: string = "pl"
 ) => {
-  const getFlashcardsExamples = () => {
-    try {
-      const filePath = path.join(
-        process.cwd(),
-        "public",
-        "data",
-        "flashcards_query_response.json"
-      );
-      const jsonData = fs.readFileSync(filePath, "utf-8");
-      return JSON.parse(jsonData);
-    } catch (error) {
-      console.log("Nie można załadować pliku z przykładami fiszek, używam przykładów domyślnych:", error);
-      return defaultFlashcardExamples;
-    }
-  };
-
-  const previousExamples = getFlashcardsExamples();
+  const previousExamples = defaultFlashcardExamples;
 
   const languageNames: Record<string, string> = {
     "en": "English",
@@ -137,11 +117,7 @@ export const getFlashcardsPrompt = (
 
   ### **Reference Previous Examples:**
   The user has previously requested flashcards for similar topics. Here are some examples:
-  ${
-    previousExamples.length > 0
-      ? JSON.stringify(previousExamples, null, 2)
-      : "No previous examples available."
-  }
+  ${JSON.stringify(previousExamples, null, 2)}
   
   ### **Incorrect Example (for the topic "Job Interview")**
   - Words should help in **handling** the interview (e.g., "experience", "qualifications"), not **general terms** (e.g., "business attire"), because probably such a term may not be used in a conversation with the HR department that will conduct the recruitment. The HR department will want information from us about ourselves, our professional experience, plans for the future, etc. 
