@@ -28,9 +28,26 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
       };
     }
 
-    // Używamy Edge API do generowania fiszek
+    if (process.env.NODE_ENV !== 'production') {
+      const generateParams: GenerateFlashcardsParams = {
+        count,
+        message,
+        level,
+        userId,
+        userEmail: user?.emailAddresses?.[0]?.emailAddress || "",
+        sourceLanguage,
+        targetLanguage
+      };
+  
+      return await getGenerateFlashcardsUseCase().execute(generateParams);
+    }
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://next-lang-ai-app.vercel.app'}/api/generate-flashcards`, {
+      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 
+        process.env.VERCEL_URL || 
+        'https://next-lang-ai-app.vercel.app';
+        
+      const response = await fetch(`${apiUrl}/api/generate-flashcards`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +69,6 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
       const result = await response.json();
       
       if (result.success && result.flashcards && result.flashcards.length > 0) {
-        // Zapisujemy wygenerowane fiszki w bazie danych
         const saveResult = await saveFlashcardsAction({
           flashcards: result.flashcards,
           userId
@@ -66,7 +82,6 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
           };
         }
 
-        // Zwracamy kompletny wynik
         return {
           success: true,
           message: "Fiszki zostały pomyślnie wygenerowane i zapisane",
@@ -79,7 +94,7 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
         };
       }
     } catch (error) {
-      throw error; // Przekazujemy błąd dalej
+      throw error;
     }
   } catch (error) {
     console.error("Flashcard generation error:", error);

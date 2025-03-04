@@ -6,8 +6,9 @@ import { getGenerateFlashcardsUseCase } from "@/lib/container";
 // Zwiększam limit czasu do 60 sekund
 export const maxDuration = 60;
 
-// Określam, że ta funkcja ma używać Edge Runtime
-export const runtime = 'edge';
+// Określam, że ta funkcja ma używać Edge Runtime, ale tylko w produkcji
+// W środowisku lokalnym używamy standardowego runtime
+export const runtime = process.env.NODE_ENV === 'production' ? 'edge' : 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,21 @@ export async function POST(req: NextRequest) {
 
     const { count, message, level, sourceLanguage = "en", targetLanguage = "pl" } = await req.json();
 
-    // Używamy Edge handlera do generowania fiszek
+    if (process.env.NODE_ENV !== 'production') {
+      const generateParams = {
+        count,
+        message,
+        level,
+        userId,
+        userEmail: user?.emailAddresses[0]?.emailAddress || "",
+        sourceLanguage,
+        targetLanguage
+      };
+
+      const result = await getGenerateFlashcardsUseCase().execute(generateParams);
+      return NextResponse.json(result);
+    }
+
     const edgeGenerator = new EdgeFlashcardGenerator();
     const generateParams: EdgeGenerateFlashcardsParams = {
       count,
