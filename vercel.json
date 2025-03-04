@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "src/app/api/**/*": {
+      "maxDuration": 60
+    }
+  },
+  "regions": ["fra1"],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "max-age=3600"
+        }
+      ]
+    }
+  ]
+} 
