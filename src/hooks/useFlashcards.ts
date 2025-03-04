@@ -23,6 +23,8 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
     count: number;
     message: string;
     level: "beginner" | "intermediate" | "advanced";
+    sourceLanguage?: string;
+    targetLanguage?: string;
   }) => {
     if (!isSignedIn) {
       router.push(signInUrl);
@@ -33,7 +35,13 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
     setErrorMessage(null);
     
     try {
-      const result = await generateFlashcardsAction(params);
+      const result = await generateFlashcardsAction({
+        count: params.count,
+        message: params.message,
+        level: params.level,
+        sourceLanguage: params.sourceLanguage || "en",
+        targetLanguage: params.targetLanguage || "pl"
+      });
       
       if (result.success && result.flashcards && result.flashcards.length > 0) {
         // Pobierz kategorię z pierwszej wygenerowanej fiszki
