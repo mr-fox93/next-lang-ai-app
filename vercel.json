@@ -4,6 +4,9 @@
       "maxDuration": 60
     }
   },
+  "edge": {
+    "maxDuration": 60
+  },
   "regions": ["fra1"],
   "headers": [
     {
@@ -12,6 +15,15 @@
         {
           "key": "Vercel-CDN-Cache-Control",
           "value": "max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
         }
       ]
     }

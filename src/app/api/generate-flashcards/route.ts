@@ -1,12 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { EdgeFlashcardGenerator, EdgeGenerateFlashcardsParams } from "./edge-handler";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
-import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 
-// Ustawiam maksymalny czas trwania funkcji na 60 sekund
+// Zwiększam limit czasu do 60 sekund
 export const maxDuration = 60;
 
-export async function POST(req: Request) {
+// Określam, że ta funkcja ma używać Edge Runtime
+export const runtime = 'edge';
+
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     const user = await currentUser();
@@ -20,17 +23,17 @@ export async function POST(req: Request) {
 
     const { count, message, level, sourceLanguage = "en", targetLanguage = "pl" } = await req.json();
 
-    const generateParams: GenerateFlashcardsParams = {
+    // Używamy Edge handlera do generowania fiszek
+    const edgeGenerator = new EdgeFlashcardGenerator();
+    const generateParams: EdgeGenerateFlashcardsParams = {
       count,
       message,
       level,
-      userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || "",
       sourceLanguage,
       targetLanguage
     };
 
-    const result = await getGenerateFlashcardsUseCase().execute(generateParams);
+    const result = await edgeGenerator.generateFlashcards(generateParams);
 
     if (!result.success) {
       return NextResponse.json(
@@ -39,11 +42,18 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json(result);
+    // W Edge Runtime nie zapisujemy fiszek, tylko zwracamy je do klienta
+    // Zapis do bazy danych może być obsłużony przez oddzielny endpoint lub server action
+    return NextResponse.json({
+      success: true,
+      message: "Fiszki zostały pomyślnie wygenerowane",
+      flashcards: result.flashcards,
+      userId: userId // Dołączamy userId, aby klient mógł opcjonalnie zapisać fiszki w bazie
+    });
   } catch (error) {
     console.error("Błąd generowania fiszek:", error);
     return NextResponse.json(
-      { error: "Wystąpił błąd podczas generowania fiszek" },
+      { error: `Wystąpił błąd podczas generowania fiszek: ${error instanceof Error ? error.message : "Nieznany błąd"}` },
       { status: 500 }
     );
   }

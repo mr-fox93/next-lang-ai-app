@@ -4,6 +4,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
+import { EdgeFlashcard } from "../api/generate-flashcards/edge-handler";
+import { saveFlashcardsAction } from "./save-flashcards";
 
 interface GenerateFlashcardsActionParams {
   count: number;
@@ -26,17 +28,59 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
       };
     }
 
-    const generateParams: GenerateFlashcardsParams = {
-      count,
-      message,
-      level,
-      userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || "",
-      sourceLanguage,
-      targetLanguage
-    };
+    // Używamy Edge API do generowania fiszek
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://next-lang-ai-app.vercel.app'}/api/generate-flashcards`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          count,
+          message,
+          level,
+          sourceLanguage,
+          targetLanguage
+        }),
+      });
 
-    return await getGenerateFlashcardsUseCase().execute(generateParams);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API returned ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.flashcards && result.flashcards.length > 0) {
+        // Zapisujemy wygenerowane fiszki w bazie danych
+        const saveResult = await saveFlashcardsAction({
+          flashcards: result.flashcards,
+          userId
+        });
+
+        if (!saveResult.success) {
+          console.error("Error saving flashcards:", saveResult.error);
+          return {
+            success: false,
+            error: `Fiszki zostały wygenerowane, ale nie można ich zapisać: ${saveResult.error}`
+          };
+        }
+
+        // Zwracamy kompletny wynik
+        return {
+          success: true,
+          message: "Fiszki zostały pomyślnie wygenerowane i zapisane",
+          flashcards: result.flashcards
+        };
+      } else {
+        return {
+          success: false,
+          error: result.error || "Nieznany błąd podczas generowania fiszek"
+        };
+      }
+    } catch (error) {
+      throw error; // Przekazujemy błąd dalej
+    }
   } catch (error) {
     console.error("Flashcard generation error:", error);
     return {
