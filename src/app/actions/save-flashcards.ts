@@ -1,7 +1,7 @@
 "use server";
 
 import { EdgeFlashcard } from "../api/generate-flashcards/edge-handler";
-import { getFlashcardRepository, getProgressRepository, getUserRepository } from "@/lib/container";
+import { getFlashcardRepository, getProgressRepository } from "@/lib/container";
 import { auth } from "@clerk/nextjs/server";
 
 export interface SaveFlashcardsParams {

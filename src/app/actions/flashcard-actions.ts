@@ -4,7 +4,6 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
-import { EdgeFlashcard } from "../api/generate-flashcards/edge-handler";
 import { saveFlashcardsAction } from "./save-flashcards";
 
 interface GenerateFlashcardsActionParams {
