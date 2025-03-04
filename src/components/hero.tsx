@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import { LayoutTemplate } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
-import { Categories } from "@/components/categories";
+import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from "@/components/language-settings";
 import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,11 @@ export default function Hero() {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [languageSettings, setLanguageSettings] = useState<LanguageSettingsType>({
+    sourceLanguage: "en",
+    targetLanguage: "pl",
+    difficultyLevel: "easy"
+  });
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -35,7 +40,9 @@ export default function Hero() {
       const result = await generateFlashcardsAction({
         count: 5,
         message: userInput,
-        level: "beginner"
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage
       });
       
       if (result.success) {
@@ -84,7 +91,9 @@ export default function Hero() {
             for your learning journey.
           </motion.p>
 
-          <Categories />
+          <LanguageSettings 
+            onChange={setLanguageSettings}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

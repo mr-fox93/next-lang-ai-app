@@ -9,11 +9,13 @@ interface GenerateFlashcardsActionParams {
   count: number;
   message: string;
   level: string;
+  sourceLanguage: string;
+  targetLanguage: string;
 }
 
 export async function generateFlashcardsAction(params: GenerateFlashcardsActionParams) {
   try {
-    const { count, message, level } = params;
+    const { count, message, level, sourceLanguage, targetLanguage } = params;
     const { userId } = await auth();
     const user = await currentUser();
     
@@ -29,7 +31,9 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
       message,
       level,
       userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || ""
+      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      sourceLanguage,
+      targetLanguage
     };
 
     return await getGenerateFlashcardsUseCase().execute(generateParams);

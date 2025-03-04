@@ -15,14 +15,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const { count, message, level } = await req.json();
+    const { count, message, level, sourceLanguage = "en", targetLanguage = "pl" } = await req.json();
 
     const generateParams: GenerateFlashcardsParams = {
       count,
       message,
       level,
       userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || ""
+      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      sourceLanguage,
+      targetLanguage
     };
 
     const result = await getGenerateFlashcardsUseCase().execute(generateParams);
