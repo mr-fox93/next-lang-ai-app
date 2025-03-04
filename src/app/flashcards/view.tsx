@@ -59,7 +59,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     }
   }, [selectedCategory]);
 
-  const handleNext = (_: boolean) => {
+  const handleNext = (known: boolean) => {
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
