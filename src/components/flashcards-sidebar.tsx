@@ -43,7 +43,6 @@ export function FlashcardsSidebar({
   onToggleCollapse,
   flashcards,
 }: FlashcardsSidebarProps) {
-  // Stan dialogu usuwania
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -52,23 +51,19 @@ export function FlashcardsSidebar({
   const router = useRouter();
   const { toast } = useToast();
   
-  // Pobierz unikalne kategorie z fiszek
   const categories = [...new Set(flashcards.map((card) => card.category))];
 
-  // Funkcja otwierająca dialog usuwania
   const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Zapobiega kliknięciu przycisku kategorii
+    e.stopPropagation();
     setCategoryToDelete(category);
     setIsDeleteDialogOpen(true);
   };
   
-  // Funkcja zamykająca dialog
   const closeDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
     setCategoryToDelete(null);
   };
   
-  // Funkcja obsługująca potwierdzenie usunięcia - to jest akcja klienta, która wywołuje akcję serwera
   const confirmDeleteCategory = async () => {
     if (!categoryToDelete) return;
     
@@ -76,38 +71,37 @@ export function FlashcardsSidebar({
     setErrorMessage(null);
     
     try {
-      // Wywołanie akcji serwera zdefiniowanej w app/actions/flashcard-actions.ts
       const result = await deleteCategoryAction(categoryToDelete);
       
       if (result.success) {
         closeDeleteDialog();
-        // Odśwież stronę, aby zaktualizować listę kategorii
         router.refresh();
         
-        // Wyświetl komunikat o pomyślnym usunięciu kategorii
         toast({
           title: "Kategoria usunięta",
           description: `Pomyślnie usunięto kategorię "${categoryToDelete}" wraz z ${result.deletedCount} fiszkami.`,
           variant: "success",
         });
       } else {
-        setErrorMessage(result.error || "Nie udało się usunąć kategorii");
+        setErrorMessage(result.error || "Failed to delete category");
         
-        // Wyświetl komunikat o błędzie
         toast({
-          title: "Błąd",
-          description: result.error || "Nie udało się usunąć kategorii",
+          title: "Error",
+          description: result.error || "Failed to delete category",
           variant: "destructive",
         });
       }
     } catch (error) {
-      setErrorMessage("Wystąpił nieoczekiwany błąd podczas usuwania kategorii");
-      console.error("Błąd usuwania kategorii:", error);
+      console.error("Category deletion error:", error);
+      const errorMessage = error instanceof Error 
+        ? `Category deletion failed: ${error.message}` 
+        : "An unexpected error occurred while deleting the category";
       
-      // Wyświetl komunikat o nieoczekiwanym błędzie
+      setErrorMessage(errorMessage);
+      
       toast({
-        title: "Błąd",
-        description: "Wystąpił nieoczekiwany błąd podczas usuwania kategorii",
+        title: "Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -149,7 +143,6 @@ export function FlashcardsSidebar({
           </Button>
         </div>
 
-        {/* Przycisk do generowania nowych fiszek - przeniesiony na górę */}
         <div className="p-2 border-b border-white/10">
           <Link href="/" className="block w-full">
             <Button 
@@ -162,7 +155,6 @@ export function FlashcardsSidebar({
           </Link>
         </div>
 
-        {/* Pokaż komunikat o błędzie, jeśli wystąpił */}
         {errorMessage && (
           <div className="p-2">
             <ErrorMessage 
@@ -190,15 +182,12 @@ export function FlashcardsSidebar({
                     <span className="relative z-10">
                       {isCollapsed ? category.charAt(0) : category}
                     </span>
-                    {/* Active indicator */}
                     {selectedCategory === category && (
                       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
                     )}
-                    {/* Hover effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Button>
                   
-                  {/* Przycisk usuwania kategorii - widoczny tylko gdy sidebar nie jest zwinięty */}
                   {!isCollapsed && (
                     <Button
                       variant="ghost"
@@ -221,7 +210,6 @@ export function FlashcardsSidebar({
         </ScrollArea>
       </motion.div>
       
-      {/* Dialog potwierdzający usunięcie kategorii */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -22,7 +22,7 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
@@ -38,10 +38,10 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
 
     return await getGenerateFlashcardsUseCase().execute(generateParams);
   } catch (error) {
-    console.error("Błąd generowania fiszek:", error);
+    console.error("Flashcard generation error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas generowania fiszek"
+      error: `Flashcard generation failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 }
@@ -53,7 +53,7 @@ export async function deleteCategoryAction(category: string) {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
     
@@ -65,10 +65,10 @@ export async function deleteCategoryAction(category: string) {
       deletedCount
     };
   } catch (error) {
-    console.error("Błąd usuwania kategorii:", error);
+    console.error("Category deletion error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas usuwania kategorii"
+      error: `Category deletion failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 } 

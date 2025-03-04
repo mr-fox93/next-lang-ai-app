@@ -20,11 +20,9 @@ interface FlashcardsViewProps {
 }
 
 export default function FlashcardsView({ initialFlashcards, serverError, initialCategory }: FlashcardsViewProps) {
-  // Pobierz parametry z URL
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get('category');
   
-  // Użyj kategorii z URL lub przekazanej jako prop
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     categoryFromUrl ? decodeURIComponent(categoryFromUrl) : (initialCategory || null)
   );
@@ -39,9 +37,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   const { signOut } = useClerk();
   const router = useRouter();
 
-  // Inicjalizacja kategorii - tylko jeśli nie ma wybranej kategorii i nie ma kategorii w URL
   useEffect(() => {
-    // Ustaw pierwszą kategorię jako domyślną jeśli nie wybrano żadnej
     if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
       const categories = [...new Set(initialFlashcards.map(card => card.category))];
       if (categories.length > 0) {
@@ -50,12 +46,10 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     }
   }, [initialFlashcards, selectedCategory, categoryFromUrl]);
 
-  // Reset indeksu karty przy zmianie kategorii
   useEffect(() => {
     setCurrentCardIndex(0);
   }, [selectedCategory]);
 
-  // Aktualizacja URL po zmianie kategorii
   useEffect(() => {
     if (selectedCategory) {
       const params = new URLSearchParams(window.location.search);
@@ -65,10 +59,8 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     }
   }, [selectedCategory]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNext = (known: boolean) => {
-    console.log(
-      `Card ${currentCardIndex} marked as ${known ? "known" : "unknown"}`
-    );
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
@@ -77,12 +69,15 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
       await signOut();
       router.push("/");
     } catch (error) {
-      setError("Wystąpił błąd podczas wylogowania");
-      console.error("Błąd wylogowania:", error);
+      console.error("Sign out error:", error);
+      setError(
+        error instanceof Error 
+          ? `Sign out failed: ${error.message}` 
+          : "An unexpected error occurred during sign out"
+      );
     }
   };
 
-  // Filtrowanie danych według wybranej kategorii
   const categoryCards = selectedCategory
     ? initialFlashcards.filter((card) => card.category === selectedCategory)
     : initialFlashcards;
@@ -221,7 +216,6 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         </main>
       </div>
       
-      {/* Komponent podglądu postępu */}
       <ProgressPreview />
     </div>
   );

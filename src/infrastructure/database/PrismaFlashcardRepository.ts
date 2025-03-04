@@ -93,7 +93,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       
       return result.count;
     } catch (error) {
-      console.error("Błąd podczas usuwania fiszek z kategorii:", error);
+      console.error("Category deletion database error:", error);
       return 0;
     }
   }

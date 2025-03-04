@@ -33,14 +33,12 @@ export function LoadingErrorProvider({ children }: LoadingErrorProviderProps) {
         clearGlobalError
       }}
     >
-      {/* Globalny loader */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500"></div>
         </div>
       )}
       
-      {/* Globalny komunikat o błędzie */}
       {globalError && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-lg px-4">
           <ErrorMessage 

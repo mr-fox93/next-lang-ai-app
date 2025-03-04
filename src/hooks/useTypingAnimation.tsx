@@ -52,28 +52,24 @@ export function useTypingAnimation(
           return;
         }
 
-       
         await new Promise((resolve) => setTimeout(resolve, pauseDelay / 2));
 
         const text = texts[currentTextIndex];
 
-      
         let currentText = "";
         for (let i = 0; i < text.length; i++) {
           if (!isMounted || !isActive) break;
           currentText += text[i];
           setDisplayText(currentText);
-         
+          
           await new Promise((resolve) =>
             setTimeout(resolve, typingDelayMin + Math.random() * (typingDelayMax - typingDelayMin))
           );
         }
 
         if (isActive) {
-        
           await new Promise((resolve) => setTimeout(resolve, pauseDelay));
 
-         
           while (
             currentText.length > 0 &&
             isMounted &&

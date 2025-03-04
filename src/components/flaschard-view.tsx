@@ -10,7 +10,7 @@ import { speak, SupportedTTSLanguage } from "@/utils/speak";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
 
-// Mapowanie kodów języków na kody TTS
+// mapping language to tts code
 const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
   pl: "pl-PL",
@@ -32,23 +32,21 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
     onNext(isCorrect);
   };
   
-  // Filtruj karty, aby uzyskać inne karty niż obecna
+  // filter other flashcards 
   const otherFlashcards = allFlashcards.filter(
     (c) => c.origin_text !== card.origin_text
   );
 
-  // Określenie odpowiednich kodów TTS dla języków źródłowego i docelowego
+  // function for determine tts code for target language
   const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full max-w-3xl mx-auto overflow-hidden pt-10 sm:pt-8">
       <div className="w-full flex flex-col items-center justify-start gap-3 flex-1 overflow-hidden">
-        {/* Card */}
         <div
           className="relative [perspective:1000px] transition-all duration-500 w-full sm:w-[90%] md:w-[85%] lg:w-[80%] aspect-[5/3] sm:aspect-[3/2] cursor-pointer group"
           onClick={() => setIsFlipped(!isFlipped)}
         >
-          {/* Glowing gradient effect */}
           <div
             className={`absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl opacity-30 blur-sm group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-tilt ${
               isFlipped ? "animate-none" : ""
@@ -61,7 +59,6 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
               transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
             }}
           >
-            {/* Front - Language Target (to co chcemy się nauczyć) */}
             <div className="absolute w-full h-full [backface-visibility:hidden]">
               <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/20 backdrop-blur-sm overflow-hidden rounded-xl">
                 <motion.div
@@ -116,7 +113,6 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
               </Card>
             </div>
 
-            {/* Back - Language Source (nasz język ojczysty) */}
             <div
               className="absolute w-full h-full [backface-visibility:hidden]"
               style={{ transform: "rotateY(180deg)" }}
@@ -151,7 +147,6 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
           </div>
         </div>
         
-        {/* Komponent z opcjami wyboru - umieszczony pod kartą */}
         <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[80%]">
           <MultipleChoiceAnswers
             card={card}

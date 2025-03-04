@@ -17,7 +17,7 @@ export async function updateFlashcardProgressAction(params: UpdateProgressAction
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
@@ -34,10 +34,10 @@ export async function updateFlashcardProgressAction(params: UpdateProgressAction
       data: result
     };
   } catch (error) {
-    console.error("Błąd aktualizacji postępu:", error);
+    console.error("Progress update error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas aktualizacji postępu"
+      error: `Progress update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 }
@@ -49,19 +49,17 @@ export async function getUserProgressStatsAction() {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
     const stats = await getUserProgressStatsUseCase().execute(userId);
     
-    // Pobranie dziennego celu użytkownika
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { dailyGoal: true }
     });
     
-    // Obliczanie poziomu użytkownika w oparciu o opanowane fiszki
     const userLevel = Math.max(1, Math.floor(stats.masteredFlashcards / 10) + 1);
     const experiencePoints = stats.masteredFlashcards * 50;
     const nextLevelPoints = userLevel * 500;
@@ -77,18 +75,14 @@ export async function getUserProgressStatsAction() {
       }
     };
   } catch (error) {
-    console.error("Błąd pobierania statystyk postępu:", error);
+    console.error("Progress stats retrieval error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas pobierania statystyk postępu"
+      error: `Failed to retrieve progress statistics: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 }
 
-/**
- * Funkcja zliczająca liczbę fiszek przejrzanych przez użytkownika dzisiaj
- * Wykorzystuje pole lastReviewed w tabeli Progress
- */
 export async function getReviewedTodayCountAction() {
   try {
     const { userId } = await auth();
@@ -96,16 +90,14 @@ export async function getReviewedTodayCountAction() {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany",
+        error: "Authentication required: User is not signed in",
         data: 0
       };
     }
 
-    // Ustawienie daty początku dzisiejszego dnia (00:00:00)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Pobierz wszystkie rekordy postępu z dzisiaj
     const reviewedToday = await prisma.progress.count({
       where: {
         userId: userId,
@@ -120,18 +112,15 @@ export async function getReviewedTodayCountAction() {
       data: reviewedToday
     };
   } catch (error) {
-    console.error("Błąd pobierania liczby dzisiejszych fiszek:", error);
+    console.error("Daily review count retrieval error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas pobierania statystyk dziennych",
+      error: `Failed to retrieve daily review count: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
       data: 0
     };
   }
 }
 
-/**
- * Funkcja do aktualizacji dziennego celu użytkownika
- */
 export async function updateDailyGoalAction(newGoal: number) {
   try {
     const { userId } = await auth();
@@ -139,19 +128,17 @@ export async function updateDailyGoalAction(newGoal: number) {
     if (!userId) {
       return {
         success: false,
-        error: "Nie jesteś zalogowany"
+        error: "Authentication required: User is not signed in"
       };
     }
 
-    // Sprawdzenie poprawności wartości
     if (newGoal < 1 || newGoal > 100) {
       return {
         success: false,
-        error: "Nieprawidłowa wartość celu dziennego (1-100)"
+        error: "Invalid daily goal value: Must be between 1 and 100"
       };
     }
     
-    // Aktualizacja dziennego celu użytkownika
     await prisma.user.update({
       where: { id: userId },
       data: { dailyGoal: newGoal }
@@ -159,13 +146,13 @@ export async function updateDailyGoalAction(newGoal: number) {
     
     return {
       success: true,
-      message: "Dzienny cel został zaktualizowany"
+      message: "Daily goal successfully updated"
     };
   } catch (error) {
-    console.error("Błąd aktualizacji dziennego celu:", error);
+    console.error("Daily goal update error:", error);
     return {
       success: false,
-      error: "Wystąpił błąd podczas aktualizacji dziennego celu"
+      error: `Daily goal update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
 } 
