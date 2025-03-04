@@ -52,41 +52,6 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     });
   }
   
-  async createFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]> {
-    const createdFlashcards = [];
-    
-    for (const flashcard of flashcards) {
-      const { 
-        origin_text, 
-        translate_text, 
-        example_using, 
-        translate_example, 
-        category, 
-        sourceLanguage, 
-        targetLanguage, 
-        difficultyLevel 
-      } = flashcard;
-
-      const created = await this.prisma.flashcard.create({
-        data: {
-          origin_text,
-          translate_text,
-          example_using,
-          translate_example,
-          category,
-          userId,
-          sourceLanguage,
-          targetLanguage,
-          difficultyLevel
-        }
-      });
-      
-      createdFlashcards.push(created);
-    }
-    
-    return createdFlashcards;
-  }
-
   async updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard> {
     // Zapewniamy, że pola są poprawnie przekazane
     const updateData: any = {};
