@@ -14,6 +14,8 @@ export interface GenerateFlashcardsParams {
   level: string;
   userId: string;
   userEmail: string;
+  sourceLanguage: string;
+  targetLanguage: string;
 }
 
 export interface GenerateFlashcardsResult {
@@ -40,7 +42,7 @@ export class GenerateFlashcardsUseCase {
 
   async execute(params: GenerateFlashcardsParams): Promise<GenerateFlashcardsResult> {
     try {
-      const { count, message, level, userId, userEmail } = params;
+      const { count, message, level, userId, userEmail, sourceLanguage, targetLanguage } = params;
 
       if (!userId) {
         return {
@@ -59,15 +61,23 @@ export class GenerateFlashcardsUseCase {
 
       await this.upsertUser(userId, userEmail);
 
-      const prompt = getFlashcardsPrompt(count, message, level);
-      const flashcards = await this.generateFlashcardsWithAI(prompt);
+      const prompt = getFlashcardsPrompt(count, message, level, sourceLanguage, targetLanguage);
+      const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
       
-      if (!flashcards) {
+      if (!generatedFlashcards) {
         return {
           success: false,
           error: "Nie udało się wygenerować fiszek"
         };
       }
+
+      // Przypisz wybrane przez użytkownika ustawienia językowe do wygenerowanych fiszek
+      const flashcards = generatedFlashcards.map(flashcard => ({
+        ...flashcard,
+        sourceLanguage,
+        targetLanguage,
+        difficultyLevel: level
+      }));
 
       const savedFlashcards = await this.saveFlashcards(flashcards, userId);
       await this.createProgressRecords(savedFlashcards, userId);
@@ -134,7 +144,15 @@ export class GenerateFlashcardsUseCase {
         JSON.parse(response.choices[0].message.content || "[]")
       );
 
-      return parsedData.flashcards;
+      // Przygotowujemy struktrurę fiszek zgodną z interfejsem
+      const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(flashcard => ({
+        ...flashcard,
+        sourceLanguage: "en",
+        targetLanguage: "pl",
+        difficultyLevel: "easy"
+      }));
+
+      return flashcardsWithDefaultLanguageSettings;
     } catch (error) {
       console.error("Błąd podczas generowania fiszek z AI:", error);
       throw new Error("Nie udało się wygenerować fiszek przy użyciu AI");
@@ -149,6 +167,9 @@ export class GenerateFlashcardsUseCase {
         example_using: flashcard.example_using,
         translate_example: flashcard.translate_example,
         category: flashcard.category,
+        sourceLanguage: flashcard.sourceLanguage,
+        targetLanguage: flashcard.targetLanguage,
+        difficultyLevel: flashcard.difficultyLevel,
         userId: userId
       })
     );

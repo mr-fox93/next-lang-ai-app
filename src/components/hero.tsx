@@ -40,7 +40,9 @@ export default function Hero() {
       const result = await generateFlashcardsAction({
         count: 5,
         message: userInput,
-        level: languageSettings.difficultyLevel
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage
       });
       
       if (result.success) {
