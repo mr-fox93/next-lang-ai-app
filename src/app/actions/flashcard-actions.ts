@@ -38,7 +38,6 @@ export async function generateFlashcardsAction(params: GenerateFlashcardsActionP
 
     return await getGenerateFlashcardsUseCase().execute(generateParams);
   } catch (error) {
-    console.error("Błąd generowania fiszek:", error);
     return {
       success: false,
       error: "Wystąpił błąd podczas generowania fiszek"
@@ -65,7 +64,6 @@ export async function deleteCategoryAction(category: string) {
       deletedCount
     };
   } catch (error) {
-    console.error("Błąd usuwania kategorii:", error);
     return {
       success: false,
       error: "Wystąpił błąd podczas usuwania kategorii"

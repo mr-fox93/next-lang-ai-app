@@ -44,21 +44,17 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
       });
       
       if (result.success && result.flashcards && result.flashcards.length > 0) {
-        // Pobierz kategorię z pierwszej wygenerowanej fiszki
         const generatedCategory = result.flashcards[0].category;
         
-        // Przekieruj do strony z fiszkami z parametrem kategorii
         router.push(`${redirectUrl}?category=${encodeURIComponent(generatedCategory)}`);
         return { success: true };
       } else {
         setErrorMessage(result.error || "Nie udało się wygenerować fiszek");
-        console.error("Błąd generowania fiszek:", result.error);
         return { success: false, error: result.error };
       }
     } catch (error) {
       const errorMsg = "Wystąpił nieoczekiwany błąd";
       setErrorMessage(errorMsg);
-      console.error("Nie udało się wygenerować fiszek:", error);
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);

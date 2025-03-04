@@ -20,7 +20,6 @@ export const getFlashcardsPrompt = (
 
   const previousExamples = getFlashcardsExamples();
 
-  // Mapowanie kodów języków na nazwy dla czytelności
   const languageNames: Record<string, string> = {
     "en": "English",
     "pl": "Polish",

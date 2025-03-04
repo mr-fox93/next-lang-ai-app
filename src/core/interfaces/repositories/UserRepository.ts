@@ -8,7 +8,6 @@ export interface User {
 export interface UserPreferences {
   theme?: string;
   notifications?: boolean;
-  // Inne preferencje użytkownika
 }
 
 export interface UserRepository {

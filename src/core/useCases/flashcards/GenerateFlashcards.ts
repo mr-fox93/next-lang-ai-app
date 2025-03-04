@@ -88,7 +88,6 @@ export class GenerateFlashcardsUseCase {
         flashcards: savedFlashcards
       };
     } catch (error) {
-      console.error("Błąd generowania fiszek:", error);
       return {
         success: false,
         error: "Wystąpił błąd podczas generowania fiszek"
@@ -97,7 +96,6 @@ export class GenerateFlashcardsUseCase {
   }
 
   private async upsertUser(userId: string, userEmail: string): Promise<void> {
-
     const existingUser = await this.userRepository.getUserById(userId);
     
     if (!existingUser) {
@@ -110,14 +108,10 @@ export class GenerateFlashcardsUseCase {
             updatedAt: new Date()
           }
         });
-        console.log(`Utworzono nowego użytkownika ${userId}`);
       } catch (error) {
-        console.error(`Błąd podczas tworzenia użytkownika ${userId}:`, error);
         throw new Error("Nie udało się utworzyć użytkownika");
       }
     }
-    
-    console.log(`Użytkownik ${userId} już istnieje lub został pomyślnie utworzony`);
   }
 
   private async generateFlashcardsWithAI(prompt: string): Promise<Omit<Flashcard, "id" | "userId">[]> {
@@ -154,7 +148,6 @@ export class GenerateFlashcardsUseCase {
 
       return flashcardsWithDefaultLanguageSettings;
     } catch (error) {
-      console.error("Błąd podczas generowania fiszek z AI:", error);
       throw new Error("Nie udało się wygenerować fiszek przy użyciu AI");
     }
   }

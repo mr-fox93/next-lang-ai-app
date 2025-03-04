@@ -37,23 +37,18 @@ export function MultipleChoiceAnswers({
     const answerField = isFlipped ? "translate_text" : "origin_text";
     const currentCategory = card.category;
 
-    // Filtruj fiszki tylko z tej samej kategorii co aktualna fiszka
     const sameCategory = otherFlashcards.filter(
       (otherCard) => otherCard.category === currentCategory
     );
 
-    // Jeśli mamy zbyt mało fiszek w tej samej kategorii, używamy tylko dostępnych
     const wrongAnswersPool = sameCategory
       .filter((otherCard) => otherCard[answerField] !== correctAnswer)
       .map((otherCard) => otherCard[answerField])
       .sort(() => Math.random() - 0.5);
 
-    // Pobierz do 3 błędnych odpowiedzi (lub mniej, jeśli nie ma wystarczająco fiszek w kategorii)
     const wrongAnswers = wrongAnswersPool.slice(0, 3);
 
-    // Jeśli mamy mniej niż 3 błędne odpowiedzi, uzupełnij z innych kategorii
     if (wrongAnswers.length < 3) {
-      console.log("Nie wystarczająco fiszek w kategorii", currentCategory, "- uzupełniam z innych kategorii");
       const otherCategoriesAnswers = otherFlashcards
         .filter((otherCard) => otherCard.category !== currentCategory)
         .filter((otherCard) => otherCard[answerField] !== correctAnswer)
@@ -80,31 +75,19 @@ export function MultipleChoiceAnswers({
     
     const isCorrect = option === correctAnswer;
     
-    // Diagnostyka - wyświetl informacje o fiszce w konsoli
-    console.log("Card details:", card);
-    console.log("Card ID type:", typeof card.id, "value:", card.id);
-    
-    // Sprawdź, czy karta ma identyfikator
     const flashcardId = 'id' in card ? 
       (typeof card.id === 'number' ? card.id : 
        typeof card.id === 'string' ? parseInt(card.id, 10) : null) 
       : null;
     
-    console.log("Detected flashcard ID:", flashcardId);
-    
     if (flashcardId) {
-      // Aktualizuj postęp użytkownika
       try {
-        console.log("Updating progress for flashcard ID:", flashcardId, "isCorrect:", isCorrect);
         const result = await updateFlashcardProgressAction({
           flashcardId,
           isCorrect
         });
         
-        console.log("Progress update result:", result);
-        
         if (!result.success) {
-          console.error("Błąd aktualizacji postępu:", result.error);
           setErrorMessage("Wystąpił błąd podczas zapisywania postępu");
           toast({
             variant: "destructive",
@@ -113,7 +96,6 @@ export function MultipleChoiceAnswers({
           });
         }
       } catch (error) {
-        console.error("Błąd podczas aktualizacji postępu:", error);
         setErrorMessage("Wystąpił nieoczekiwany błąd podczas zapisywania postępu");
         toast({
           variant: "destructive",
@@ -122,11 +104,9 @@ export function MultipleChoiceAnswers({
         });
       }
     } else {
-      console.warn("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
       setErrorMessage("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
     }
     
-    // Natychmiastowe wywołanie funkcji onAnswer bez opóźnienia
     onAnswer(isCorrect);
   };
 

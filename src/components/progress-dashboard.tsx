@@ -68,7 +68,6 @@ export function ProgressDashboard({ initialStats, initialReviewedToday }: Progre
           });
         }
       } catch (error) {
-        console.error("Błąd aktualizacji celu:", error);
         setErrorMessage("Nie udało się zaktualizować dziennego celu");
         toast({
           title: "Błąd",

@@ -29,7 +29,7 @@ export default function Navbar() {
             <Cpu className="w-4 h-4 text-pink-500 absolute bottom-0 right-0" />
           </div>
           <p className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-2xl font-bold">
-            LearningByCards AI
+          Languito
           </p>
         </Link>
 
@@ -71,12 +71,10 @@ export default function Navbar() {
         </Button>
       </motion.nav>
 
-      {/* Menu mobilne */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 top-20 z-50 bg-black/95 backdrop-blur-md overflow-y-auto">
           <div className="flex flex-col items-center justify-start px-6 py-10">
             <div className="flex flex-col items-center w-full">
-              {/* Linki nawigacyjne w menu mobilnym */}
               <Link 
                 href="/flashcards"
                 className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
@@ -93,7 +91,6 @@ export default function Navbar() {
               </Link>
             </div>
             
-            {/* Sekcja konta użytkownika */}
             <div className="mt-12 w-full max-w-sm">
               <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
                 <div className="text-center mb-6">
