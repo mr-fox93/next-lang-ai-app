@@ -4,9 +4,6 @@
       "maxDuration": 60
     }
   },
-  "edge": {
-    "maxDuration": 60
-  },
   "regions": ["fra1"],
   "headers": [
     {
