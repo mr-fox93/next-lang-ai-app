@@ -145,7 +145,7 @@ export function MultipleChoiceAnswers({
           const isSelected = option === selectedOption;
           
           let gradientClass = "";
-          let buttonClasses = "w-full min-h-[48px] py-2 sm:py-2.5 px-3 sm:px-4 text-left rounded-lg transition-colors duration-300";
+          const buttonClasses = "w-full min-h-[48px] py-2 sm:py-2.5 px-3 sm:px-4 text-left rounded-lg transition-colors duration-300";
           
           if (showResults) {
             if (isCorrect) {

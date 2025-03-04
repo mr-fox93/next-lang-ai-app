@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
 
@@ -54,7 +54,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
   
   async updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard> {
     // Zapewniamy, że pola są poprawnie przekazane
-    const updateData: any = {};
+    const updateData: Partial<Prisma.FlashcardUpdateInput> = {};
     
     if (flashcard.origin_text !== undefined) updateData.origin_text = flashcard.origin_text;
     if (flashcard.translate_text !== undefined) updateData.translate_text = flashcard.translate_text;
