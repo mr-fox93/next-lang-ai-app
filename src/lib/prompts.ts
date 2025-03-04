@@ -1,6 +1,66 @@
 import fs from "fs";
 import path from "path";
 
+// Przykładowe dane fiszek wbudowane bezpośrednio w kod
+const defaultFlashcardExamples = [
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning."
+      },
+      {
+        "role": "user",
+        "content": "job interview"
+      }
+    ],
+    "response": [
+      {
+        "origin_text": "kwalifikacje",
+        "translate_text": "qualifications",
+        "example_using": "Can you tell us more about your qualifications for this position?",
+        "translate_example": "Czy możesz powiedzieć nam więcej o swoich kwalifikacjach do tej posady?",
+        "category": "Job Interview"
+      },
+      {
+        "origin_text": "doświadczenie",
+        "translate_text": "experience",
+        "example_using": "I have five years of experience in project management.",
+        "translate_example": "Mam pięć lat doświadczenia w zarządzaniu projektami.",
+        "category": "Job Interview"
+      }
+    ]
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning."
+      },
+      {
+        "role": "user",
+        "content": "car rental abroad"
+      }
+    ],
+    "response": [
+      {
+        "origin_text": "umowa wynajmu",
+        "translate_text": "rental agreement",
+        "example_using": "Before driving away, make sure to read the rental agreement carefully.",
+        "translate_example": "Zanim odjedziesz, upewnij się, że dokładnie przeczytałeś umowę najmu.",
+        "category": "Car Rental"
+      },
+      {
+        "origin_text": "ubezpieczenie",
+        "translate_text": "insurance",
+        "example_using": "Check if your insurance coverage includes rental cars abroad.",
+        "translate_example": "Sprawdź, czy twoje ubezpieczenie obejmuje samochody wynajmowane za granicą.",
+        "category": "Car Rental"
+      }
+    ]
+  }
+];
+
 export const getFlashcardsPrompt = (
   count: number,
   message: string,
@@ -9,13 +69,19 @@ export const getFlashcardsPrompt = (
   targetLanguage: string = "pl"
 ) => {
   const getFlashcardsExamples = () => {
-    const filePath = path.join(
-      process.cwd(),
-      "data",
-      "flashcards_query_response.json"
-    );
-    const jsonData = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(jsonData);
+    try {
+      const filePath = path.join(
+        process.cwd(),
+        "public",
+        "data",
+        "flashcards_query_response.json"
+      );
+      const jsonData = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(jsonData);
+    } catch (error) {
+      console.log("Nie można załadować pliku z przykładami fiszek, używam przykładów domyślnych:", error);
+      return defaultFlashcardExamples;
+    }
   };
 
   const previousExamples = getFlashcardsExamples();
