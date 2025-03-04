@@ -116,7 +116,7 @@ export function FlashcardsSidebar({
   };
 
   return (
-    <div className="relative h-screen">
+    <div className="relative h-screen overflow-hidden">
       <motion.div
         className={cn(
           "h-full bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col",

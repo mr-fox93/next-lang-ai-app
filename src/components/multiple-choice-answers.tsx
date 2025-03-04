@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import type { FlashCard } from "@/lib/flashcard.schema";
 import { updateFlashcardProgressAction } from "@/app/actions/progress-actions";
@@ -127,9 +126,8 @@ export function MultipleChoiceAnswers({
       setErrorMessage("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
     }
     
-    setTimeout(() => {
-      onAnswer(isCorrect);
-    }, 1500);
+    // Natychmiastowe wywołanie funkcji onAnswer bez opóźnienia
+    onAnswer(isCorrect);
   };
 
   const letters = ["A", "B", "C", "D"];
@@ -141,45 +139,46 @@ export function MultipleChoiceAnswers({
         onClose={() => setErrorMessage(null)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         {options.map((option, index) => {
           const isCorrect = option === correctAnswer;
           const isSelected = option === selectedOption;
           
-          let buttonStyle = "w-full h-auto py-2 sm:py-3 px-3 sm:px-4 text-left bg-black/40 backdrop-blur-md border-2";
+          let gradientClass = "";
+          let buttonClasses = "w-full min-h-[48px] py-2 sm:py-2.5 px-3 sm:px-4 text-left rounded-lg transition-colors duration-300";
           
           if (showResults) {
             if (isCorrect) {
-              buttonStyle += " border-green-500 bg-green-500/20";
+              gradientClass = "from-emerald-800/40 to-emerald-600/40 border-l-4 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]";
             } else if (isSelected) {
-              buttonStyle += " border-red-500 bg-red-500/20";
+              gradientClass = "from-red-900/40 to-red-800/40 border-l-4 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]";
             } else {
-              buttonStyle += " border-white/10 text-white/60";
+              gradientClass = "from-gray-900/40 to-black/40 border-l-0 opacity-60";
             }
           } else {
-            buttonStyle += " border-white/10 hover:border-purple-500/50 hover:bg-black/50";
+            gradientClass = "from-violet-900/40 to-indigo-900/50 hover:from-violet-800/50 hover:to-indigo-700/60 border-l-0 hover:border-l-4 hover:border-l-purple-500";
           }
 
           return (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
+              className="h-auto"
             >
-              <Button
-                variant="outline"
-                className={`${buttonStyle} rounded-xl shadow-md overflow-hidden`}
+              <button
                 onClick={() => handleSelectOption(option)}
                 disabled={showResults}
+                className={`${buttonClasses} bg-gradient-to-r ${gradientClass} backdrop-blur-md shadow-md overflow-hidden group`}
               >
                 <div className="flex items-center w-full">
-                  <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-500/20 text-purple-400 font-bold mr-2 sm:mr-3 flex-shrink-0 text-xs sm:text-sm">
-                    {letters[index]}
+                  <div className="font-bold text-purple-300 mr-2 text-base min-w-[20px] flex-shrink-0">
+                    {letters[index]}.
                   </div>
-                  <span className="text-white text-sm sm:text-base">{option}</span>
+                  <span className="text-white text-sm sm:text-base font-medium pl-1 break-words hyphens-auto">{option}</span>
                 </div>
-              </Button>
+              </button>
             </motion.div>
           );
         })}

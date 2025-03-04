@@ -41,16 +41,16 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
   const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
 
   return (
-    <div className="flex flex-col items-center justify-start w-full max-w-2xl mx-auto h-[calc(100vh-100px)] overflow-hidden">
-      <div className="w-full flex flex-col items-center justify-start gap-2 flex-1 overflow-auto p-4">
+    <div className="flex flex-col items-center justify-start w-full h-full max-w-3xl mx-auto overflow-hidden pt-10 sm:pt-8">
+      <div className="w-full flex flex-col items-center justify-start gap-3 flex-1 overflow-hidden">
         {/* Card */}
         <div
-          className="relative [perspective:1000px] transition-all duration-500 w-full aspect-[4/2] cursor-pointer group max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg shrink-0"
+          className="relative [perspective:1000px] transition-all duration-500 w-full sm:w-[90%] md:w-[85%] lg:w-[80%] aspect-[5/3] sm:aspect-[3/2] cursor-pointer group"
           onClick={() => setIsFlipped(!isFlipped)}
         >
           {/* Glowing gradient effect */}
           <div
-            className={`absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl opacity-30 blur group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-tilt ${
+            className={`absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl opacity-30 blur-sm group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-tilt ${
               isFlipped ? "animate-none" : ""
             }`}
           ></div>
@@ -63,15 +63,15 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
           >
             {/* Front - Language Target (to co chcemy się nauczyć) */}
             <div className="absolute w-full h-full [backface-visibility:hidden]">
-              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/40 backdrop-blur overflow-hidden rounded-xl">
+              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/20 backdrop-blur-sm overflow-hidden rounded-xl">
                 <motion.div
-                  className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center"
+                  className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 text-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <div className="mb-1 md:mb-3 flex flex-col items-center">
-                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 md:mb-3">
+                  <div className="mb-1 md:mb-2 flex flex-col items-center">
+                    <span className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
                       {card.translate_text}
                     </span>
                     <Button
@@ -105,13 +105,13 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
                   </div>
                 </motion.div>
 
-                <div className="p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
+                <div className="p-1.5 sm:p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
                   <div>
                     <Badge variant="outline" className="bg-gray-800/60 text-xs">
                       {card.category}
                     </Badge>
                   </div>
-                  <div className="text-xs">Click to flip</div>
+                  <div className="text-xs">Kliknij, aby odwrócić</div>
                 </div>
               </Card>
             </div>
@@ -121,15 +121,15 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
               className="absolute w-full h-full [backface-visibility:hidden]"
               style={{ transform: "rotateY(180deg)" }}
             >
-              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/40 backdrop-blur overflow-hidden rounded-xl">
+              <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/20 backdrop-blur-sm overflow-hidden rounded-xl">
                 <motion.div
-                  className="flex-1 flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center"
+                  className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 text-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <div className="mb-1 md:mb-3">
-                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+                  <div className="mb-1 md:mb-2">
+                    <span className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold">
                       {card.origin_text}
                     </span>
                   </div>
@@ -138,13 +138,13 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
                   </div>
                 </motion.div>
 
-                <div className="p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
+                <div className="p-1.5 sm:p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
                   <div>
                     <Badge variant="outline" className="bg-gray-800/60 text-xs">
                       {card.category}
                     </Badge>
                   </div>
-                  <div className="text-xs">Click to flip</div>
+                  <div className="text-xs">Kliknij, aby odwrócić</div>
                 </div>
               </Card>
             </div>
@@ -152,7 +152,7 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
         </div>
         
         {/* Komponent z opcjami wyboru - umieszczony pod kartą */}
-        <div className="w-full flex-shrink-0 mt-4">
+        <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[80%]">
           <MultipleChoiceAnswers
             card={card}
             isFlipped={isFlipped}

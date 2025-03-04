@@ -90,8 +90,8 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   const currentCard = categoryCards[currentCardIndex] ?? null;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="flex justify-between items-center p-4 border-b border-white/10">
+    <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center p-3 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center space-x-4">
           {isSignedIn && (
             <>
@@ -109,7 +109,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         </div>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         <Button
           variant="ghost"
           size="icon"
@@ -147,7 +147,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
           />
         )}
 
-        <main className="flex-1 p-4 sm:p-8 pt-20 md:pt-8 relative">
+        <main className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ErrorMessage 
             message={error} 
             onClose={() => setError(null)}
@@ -155,7 +155,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
 
           {selectedCategory || initialFlashcards.length > 0 ? (
             <>
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mt-2 mb-1 flex-shrink-0">
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
                   <Button
                     variant="ghost"
@@ -180,33 +180,36 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
                 </div>
               </div>
 
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={viewMode}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {viewMode === "single" ? (
-                    currentCard ? (
-                      <FlashcardView 
-                        card={currentCard} 
-                        onNext={handleNext} 
-                        allFlashcards={initialFlashcards} 
-                      />
+              <div className="flex-1 overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={viewMode}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="h-full overflow-hidden"
+                  >
+                    {viewMode === "single" ? (
+                      currentCard ? (
+                        <FlashcardView 
+                          card={currentCard} 
+                          onNext={handleNext} 
+                          allFlashcards={initialFlashcards} 
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
+                          <p className="text-gray-400">
+                            Brak dostępnych fiszek dla tej kategorii.
+                          </p>
+                        </div>
+                      )
                     ) : (
-                      <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
-                        <p className="text-gray-400">
-                          Brak dostępnych fiszek dla tej kategorii.
-                        </p>
-                      </div>
-                    )
-                  ) : (
-                    <FlashcardGrid cards={categoryCards} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
+                      <FlashcardGrid cards={categoryCards} />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </>
           ) : (
             <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
