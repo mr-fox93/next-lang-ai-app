@@ -59,7 +59,9 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     }
   }, [selectedCategory]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNext = (known: boolean) => {
+    console.log(`Karta oznaczona jako ${known ? 'znana' : 'nieznana'}`);
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
