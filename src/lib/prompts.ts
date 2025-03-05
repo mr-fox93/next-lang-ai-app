@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-
 export const getFlashcardsPrompt = (
   count: number,
   message: string,
@@ -8,17 +5,141 @@ export const getFlashcardsPrompt = (
   sourceLanguage: string = "en",
   targetLanguage: string = "pl"
 ) => {
-  const getFlashcardsExamples = () => {
-    const filePath = path.join(
-      process.cwd(),
-      "data",
-      "flashcards_query_response.json"
-    );
-    const jsonData = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(jsonData);
-  };
-
-  const previousExamples = getFlashcardsExamples();
+  // Przykłady fiszek zdefiniowane bezpośrednio w kodzie zamiast wczytywania z pliku
+  const previousExamples = [
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning."
+        },
+        {
+          "role": "user",
+          "content": "Generate 3 flashcards about job interviews, level: intermediate"
+        }
+      ],
+      "response": [
+        {
+          "origin_text": "job interview",
+          "translate_text": "rozmowa kwalifikacyjna",
+          "example_using": "I have a job interview scheduled for tomorrow morning.",
+          "translate_example": "Mam zaplanowaną rozmowę kwalifikacyjną na jutro rano.",
+          "category": "Job Application",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "intermediate"
+        },
+        {
+          "origin_text": "resume",
+          "translate_text": "CV",
+          "example_using": "I updated my resume to include my recent work experience.",
+          "translate_example": "Zaktualizowałem moje CV, aby uwzględnić moje ostatnie doświadczenie zawodowe.",
+          "category": "Job Application",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "intermediate"
+        },
+        {
+          "origin_text": "qualifications",
+          "translate_text": "kwalifikacje",
+          "example_using": "The employer was impressed by my qualifications for the position.",
+          "translate_example": "Pracodawca był pod wrażeniem moich kwalifikacji na to stanowisko.",
+          "category": "Job Application",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "intermediate"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning."
+        },
+        {
+          "role": "user",
+          "content": "I need 3 flashcards about car rental, level: beginner"
+        }
+      ],
+      "response": [
+        {
+          "origin_text": "rental agreement",
+          "translate_text": "umowa wynajmu",
+          "example_using": "Before driving away, make sure to read the rental agreement carefully.",
+          "translate_example": "Przed odjazdem upewnij się, że dokładnie przeczytałeś umowę wynajmu.",
+          "category": "Car Rental",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "beginner"
+        },
+        {
+          "origin_text": "insurance coverage",
+          "translate_text": "ochrona ubezpieczeniowa",
+          "example_using": "The insurance coverage for this rental car includes collision damage.",
+          "translate_example": "Ochrona ubezpieczeniowa tego wynajmowanego samochodu obejmuje uszkodzenia w wyniku kolizji.",
+          "category": "Car Rental",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "beginner"
+        },
+        {
+          "origin_text": "mileage limit",
+          "translate_text": "limit kilometrów",
+          "example_using": "There is a daily mileage limit of 200 kilometers for this rental.",
+          "translate_example": "Dla tego wynajmu obowiązuje dzienny limit kilometrów wynoszący 200 kilometrów.",
+          "category": "Car Rental",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "beginner"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning."
+        },
+        {
+          "role": "user",
+          "content": "Create 3 business meeting vocabulary cards, level: advanced"
+        }
+      ],
+      "response": [
+        {
+          "origin_text": "agenda",
+          "translate_text": "porządek obrad",
+          "example_using": "Let's go through the agenda for today's meeting.",
+          "translate_example": "Przejdźmy przez porządek obrad dzisiejszego spotkania.",
+          "category": "Business Meeting",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "advanced"
+        },
+        {
+          "origin_text": "quarterly report",
+          "translate_text": "raport kwartalny",
+          "example_using": "We need to discuss the quarterly report during our next meeting.",
+          "translate_example": "Musimy omówić raport kwartalny podczas naszego następnego spotkania.",
+          "category": "Business Meeting",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "advanced"
+        },
+        {
+          "origin_text": "stakeholder",
+          "translate_text": "interesariusz",
+          "example_using": "All the key stakeholders will be attending tomorrow's presentation.",
+          "translate_example": "Wszyscy kluczowi interesariusze będą obecni na jutrzejszej prezentacji.",
+          "category": "Business Meeting",
+          "sourceLanguage": "en",
+          "targetLanguage": "pl",
+          "difficultyLevel": "advanced"
+        }
+      ]
+    }
+  ];
 
   const languageNames: Record<string, string> = {
     "en": "English",
@@ -73,7 +194,15 @@ export const getFlashcardsPrompt = (
   The user has previously requested flashcards for similar topics. Here are some examples:
   ${
     previousExamples.length > 0
-      ? JSON.stringify(previousExamples, null, 2)
+      ? previousExamples.map(example => `
+        **User Request:** "${example.messages[1].content}"
+        **Response Structure:**
+        \`\`\`json
+        {
+          "flashcards": ${JSON.stringify(example.response, null, 2)}
+        }
+        \`\`\`
+        `).join('\n\n')
       : "No previous examples available."
   }
   
