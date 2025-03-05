@@ -28,3 +28,13 @@ lerna-debug.log*
 *.log
 .vscode/
 .idea/
+
+# Ignorowanie pliku blokady migracji Prisma
+prisma/migration_lock.toml
+
+# Ignorowanie wygenerowanych plików Prisma Client (jeśli istnieją)
+prisma/generated/
+
+
+# clerk configuration (can include secrets)
+/.clerk/

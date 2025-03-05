@@ -14,22 +14,30 @@
       {
         "origin_text": "kwalifikacje",
         "translate_text": "qualifications",
-        "example_using": "Can you tell us more about your qualifications for this position?"
+        "example_using": "Can you tell us more about your qualifications for this position?",
+        "translate_example": "Czy możesz powiedzieć nam więcej o swoich kwalifikacjach do tej posady?",
+        "category": "Job Interview"
       },
       {
         "origin_text": "doświadczenie",
         "translate_text": "experience",
-        "example_using": "I have five years of experience in project management."
+        "example_using": "I have five years of experience in project management.",
+        "translate_example": "Mam pięć lat doświadczenia w zarządzaniu projektami.",
+        "category": "Job Interview"
       },
       {
         "origin_text": "mocne strony",
         "translate_text": "strengths",
-        "example_using": "One of my strengths is my ability to work under pressure."
+        "example_using": "One of my strengths is my ability to work under pressure.",
+        "translate_example": "Jedną z moich mocnych stron jest umiejętność pracy pod presją.",
+        "category": "Job Interview"
       },
       {
         "origin_text": "słabe strony",
         "translate_text": "weaknesses",
-        "example_using": "My biggest weakness is that I sometimes take on too much responsibility."
+        "example_using": "My biggest weakness is that I sometimes take on too much responsibility.",
+        "translate_example": "Moją największą słabością jest to, że czasami biorę na siebie zbyt dużo odpowiedzialności.",
+        "category": "Job Interview"
       }
     ]
   },
@@ -48,17 +56,23 @@
       {
         "origin_text": "umowa wynajmu",
         "translate_text": "rental agreement",
-        "example_using": "Before driving away, make sure to read the rental agreement carefully."
+        "example_using": "Before driving away, make sure to read the rental agreement carefully.",
+        "translate_example": "Zanim odjedziesz, upewnij się, że dokładnie przeczytałeś umowę najmu.",
+        "category": "Car Rental"
       },
       {
         "origin_text": "ubezpieczenie",
         "translate_text": "insurance",
-        "example_using": "Check if your insurance coverage includes rental cars abroad."
+        "example_using": "Check if your insurance coverage includes rental cars abroad.",
+        "translate_example": "Sprawdź, czy twoje ubezpieczenie obejmuje samochody wynajmowane za granicą.",
+        "category": "Car Rental"
       },
       {
         "origin_text": "miejsce zwrotu",
         "translate_text": "drop-off location",
-        "example_using": "You can choose a different drop-off location for an additional fee."
+        "example_using": "You can choose a different drop-off location for an additional fee.",
+        "translate_example": "Możesz wybrać inne miejsce zwrotu za dodatkową opłatą.",
+        "category": "Car Rental"
       }
     ]
   },
@@ -77,17 +91,23 @@
       {
         "origin_text": "zrównoważony rozwój",
         "translate_text": "sustainability",
-        "example_using": "Our ESG department focuses on sustainability to ensure long-term environmental health."
+        "example_using": "Our ESG department focuses on sustainability to ensure long-term environmental health.",
+        "translate_example": "Nasz dział ESG skupia się na zrównoważonym rozwoju, aby zapewnić długoterminowe zdrowie środowiska.",
+        "category": "ESG Work"
       },
       {
         "origin_text": "ślad węglowy",
         "translate_text": "carbon footprint",
-        "example_using": "Reducing the carbon footprint is a key goal in our ESG strategy."
+        "example_using": "Reducing the carbon footprint is a key goal in our ESG strategy.",
+        "translate_example": "Zmniejszenie śladu węglowego jest kluczowym celem naszej strategii ESG.",
+        "category": "ESG Work"
       },
       {
         "origin_text": "zaangażowanie interesariuszy",
         "translate_text": "stakeholder engagement",
-        "example_using": "Effective stakeholder engagement is crucial for the success of our ESG initiatives."
+        "example_using": "Effective stakeholder engagement is crucial for the success of our ESG initiatives.",
+        "translate_example": "Skuteczne zaangażowanie interesariuszy jest kluczowe dla sukcesu naszych inicjatyw ESG.",
+        "category": "ESG Work"
       }
     ]
   }
