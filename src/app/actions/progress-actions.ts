@@ -1,3 +1,6 @@
+// Ustawiam maksymalny czas trwania funkcji na 60 sekund (maksimum dla planu Hobby)
+export const maxDuration = 60;
+
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
@@ -155,4 +158,4 @@ export async function updateDailyGoalAction(newGoal: number) {
       error: `Daily goal update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
-} 
+}

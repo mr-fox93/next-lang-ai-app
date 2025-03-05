@@ -1,10 +1,10 @@
+// Ustawiam maksymalny czas trwania funkcji na 60 sekund (maksimum dla planu Hobby)
+export const maxDuration = 60;
+
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
-
-// Ustawiam maksymalny czas trwania funkcji na 60 sekund
-export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
