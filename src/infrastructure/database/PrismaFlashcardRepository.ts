@@ -19,7 +19,6 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     return flashcards;
   }
   
-  // Metoda getUserFlashcards jest aliasem dla getFlashcardsByUserId dla zachowania spójności API
   async getUserFlashcards(userId: string): Promise<Flashcard[]> {
     return this.getFlashcardsByUserId(userId);
   }
@@ -53,7 +52,6 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
   }
   
   async updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard> {
-    // Zapewniamy, że pola są poprawnie przekazane
     const updateData: Partial<Prisma.FlashcardUpdateInput> = {};
     
     if (flashcard.origin_text !== undefined) updateData.origin_text = flashcard.origin_text;
@@ -95,6 +93,21 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     } catch (error) {
       console.error("Category deletion database error:", error);
       return 0;
+    }
+  }
+  
+  async getUserTargetLanguages(userId: string): Promise<string[]> {
+    try {
+      const languages = await this.prisma.flashcard.findMany({
+        where: { userId },
+        select: { targetLanguage: true },
+        distinct: ['targetLanguage']
+      });
+      
+      return languages.map(lang => lang.targetLanguage);
+    } catch (error) {
+      console.error("Get user languages database error:", error);
+      return [];
     }
   }
 } 

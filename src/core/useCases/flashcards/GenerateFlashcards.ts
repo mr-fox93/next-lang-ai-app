@@ -145,8 +145,8 @@ export class GenerateFlashcardsUseCase {
       // Przygotowujemy struktrurę fiszek zgodną z interfejsem
       const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(flashcard => ({
         ...flashcard,
-        sourceLanguage: "en",
-        targetLanguage: "pl",
+        sourceLanguage: "pl",
+        targetLanguage: "en",
         difficultyLevel: "easy"
       }));
 

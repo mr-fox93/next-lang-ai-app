@@ -10,7 +10,6 @@ import { speak, SupportedTTSLanguage } from "@/utils/speak";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
 
-// mapping language to tts code
 const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
   pl: "pl-PL",
@@ -31,13 +30,11 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
     setIsFlipped(false);
     onNext(isCorrect);
   };
-  
-  // filter other flashcards 
+
   const otherFlashcards = allFlashcards.filter(
     (c) => c.origin_text !== card.origin_text
   );
 
-  // function for determine tts code for target language
   const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
 
   return (
@@ -108,7 +105,7 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
                       {card.category}
                     </Badge>
                   </div>
-                  <div className="text-xs">Kliknij, aby odwrócić</div>
+                  <div className="text-xs">Click to flip</div>
                 </div>
               </Card>
             </div>
@@ -140,7 +137,7 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
                       {card.category}
                     </Badge>
                   </div>
-                  <div className="text-xs">Kliknij, aby odwrócić</div>
+                  <div className="text-xs">Click to flip</div>
                 </div>
               </Card>
             </div>

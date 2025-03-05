@@ -3,9 +3,12 @@ import { useTypingAnimation } from "@/hooks/useTypingAnimation";
 
 const CURSOR = "|";
 const TYPING_TEXTS = [
-  "Mam rozmowe o prace w dziale ESG...",
-  "Przygotowuje się do egzaminu z zarządzania...",
-  "Wylatuję na wakacje do Londynu...",
+  "Potrzebuję fiszek na egzamin z angielskiego...",
+  "I need flashcards for my Spanish exam...",
+  "Ayúdame a aprender terminología de programación...",
+  "Przygotowuję się do prezentacji biznesowej...",
+  "Help me learn programming terminology...",
+  "Estoy preparando vocabulario para mi viaje a Japón...",
 ];
 
 export function AnimatedInput({
