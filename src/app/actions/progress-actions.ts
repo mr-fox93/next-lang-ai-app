@@ -155,4 +155,4 @@ export async function updateDailyGoalAction(newGoal: number) {
       error: `Daily goal update failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
-} 
+}
