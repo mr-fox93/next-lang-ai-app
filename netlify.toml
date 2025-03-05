@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[functions]
+  # Ustawiamy limit czasu wykonania na 26 sekund (maksimum dla planu Starter)
+  node_bundler = "esbuild"
+  included_files = ["**"]
+  
+[functions."src/app/api/generate-flashcards/route"]
+  timeout = 26
+  
+[build.environment]
+  NEXT_USE_NETLIFY_EDGE = "true"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs" 
