@@ -6,12 +6,13 @@ import {
   PlusCircle, 
   ChevronLeft, 
   ChevronRight, 
-  Trash2 
+  Trash2,
+  Globe
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { 
   AlertDialog,
@@ -23,10 +24,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import { deleteCategoryAction } from "@/app/actions/flashcard-actions";
+import { deleteCategoryAction, getUserLanguagesAction } from "@/app/actions/flashcard-actions";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -47,11 +55,58 @@ export function FlashcardsSidebar({
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
   
   const router = useRouter();
   const { toast } = useToast();
   
-  const categories = [...new Set(flashcards.map((card) => card.category))];
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      setIsLoadingLanguages(true);
+      try {
+        const result = await getUserLanguagesAction();
+        if (result.success) {
+          setLanguages(result.languages);
+          setSelectedLanguage('all');
+        } else {
+          setErrorMessage(result.error || "Nie udało się pobrać dostępnych języków");
+        }
+      } catch (error) {
+        console.error("Error fetching languages:", error);
+        setErrorMessage("Wystąpił błąd podczas pobierania dostępnych języków");
+      } finally {
+        setIsLoadingLanguages(false);
+      }
+    };
+    
+    fetchLanguages();
+  }, []);
+  
+  const getLanguageName = (languageCode: string): string => {
+    const languageNames: Record<string, string> = {
+      'en': 'English',
+      'pl': 'Polski',
+      'es': 'Español',
+      'de': 'Deutsch',
+      'fr': 'Français',
+      'it': 'Italiano',
+      'pt': 'Português',
+      'ru': 'Русский',
+      'zh': '中文',
+      'ja': '日本語',
+      'ko': '한국어'
+    };
+    
+    return languageNames[languageCode] || languageCode;
+  };
+  
+  const filteredFlashcards = selectedLanguage && selectedLanguage !== 'all'
+    ? flashcards.filter(card => card.targetLanguage === selectedLanguage)
+    : flashcards;
+  
+  const categories = [...new Set(filteredFlashcards.map((card) => card.category))];
 
   const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -109,6 +164,22 @@ export function FlashcardsSidebar({
     }
   };
 
+  const handleLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+
+    const newCategories = [...new Set(value === 'all' 
+      ? flashcards.map(card => card.category)
+      : flashcards.filter(card => card.targetLanguage === value).map(card => card.category))];
+
+    if (!newCategories.includes(selectedCategory || '')) {
+      if (newCategories.length > 0) {
+        onSelectCategory(newCategories[0]);
+      } else {
+        onSelectCategory('');
+      }
+    }
+  };
+
   return (
     <div className="relative h-screen overflow-hidden">
       <motion.div
@@ -153,6 +224,33 @@ export function FlashcardsSidebar({
               {!isCollapsed && <span>Nowe fiszki</span>}
             </Button>
           </Link>
+          
+          {!isCollapsed && (languages.length > 0 || isLoadingLanguages) && (
+            <div className="mt-2">
+              <Select
+                value={selectedLanguage || undefined}
+                onValueChange={handleLanguageChange}
+                disabled={isLoadingLanguages}
+              >
+                <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-purple-400" />
+                    <SelectValue placeholder="Wybierz język" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/10 text-white">
+                  <SelectItem value="all" className="hover:bg-purple-500/20">
+                    Wszystkie języki
+                  </SelectItem>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang} value={lang} className="hover:bg-purple-500/20">
+                      {getLanguageName(lang)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         {errorMessage && (
@@ -203,7 +301,13 @@ export function FlashcardsSidebar({
               ))
             ) : (
               <p className="text-gray-400 text-center py-4">
-                No categories available
+                {isLoadingLanguages 
+                  ? "Ładowanie kategorii..." 
+                  : selectedLanguage === 'all'
+                    ? "Brak dostępnych kategorii"
+                    : selectedLanguage 
+                      ? `Brak kategorii dla języka ${getLanguageName(selectedLanguage)}` 
+                      : "Brak dostępnych kategorii"}
               </p>
             )}
           </div>
