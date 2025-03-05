@@ -162,7 +162,7 @@ export const getFlashcardsPrompt = (
      - **"translate_text"**: The ${targetLang} translation.
      - **"example_using"**: A sample sentence demonstrating the word/phrase in a real-world context related to the provided topic, in ${sourceLang}.
       - **"translate_example"**: The ${targetLang} translation of the example sentence.
-     - **"category"**: A short, meaningful category that represents the key theme of the flashcard (e.g., "Job Interview", "Car Rental", "ESG Work"). A single, consistent category that applies to **all** generated flashcards.
+     - **"category"**: A short, meaningful category in the ${targetLang} language that represents the key theme of the flashcard (e.g., if learning Polish: "Rozmowa kwalifikacyjna", if learning Spanish: "Entrevista de trabajo", if learning Italian: "Colloquio di lavoro", all instead of the English "Job Interview"). A single, consistent category that applies to **all** generated flashcards.
   3. **Ensure the following:**
      - Words and phrases are **unique** (no repetitions).
      - Example sentences are **diverse** and **practical for real-world use**.
