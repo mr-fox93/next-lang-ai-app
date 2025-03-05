@@ -13,8 +13,8 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 
 // Available languages
 const LANGUAGES = [
-  { code: "en", name: "English" },
   { code: "pl", name: "Polish" },
+  { code: "en", name: "English" },
   { code: "es", name: "Spanish" },
   { code: "it", name: "Italian" },
 ] as const;
@@ -41,8 +41,8 @@ type LanguageSettingsProps = {
 
 export function LanguageSettings({
   onChange,
-  defaultSourceLanguage = "en",
-  defaultTargetLanguage = "pl",
+  defaultSourceLanguage = "pl",
+  defaultTargetLanguage = "en",
   defaultDifficultyLevel = "easy",
 }: LanguageSettingsProps) {
   const [sourceLanguage, setSourceLanguage] = useState(defaultSourceLanguage);
