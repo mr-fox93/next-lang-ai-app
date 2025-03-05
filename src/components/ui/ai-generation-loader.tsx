@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 const generationSteps = [
-  "Analizowanie treści...",
-  "Wyodrębnianie kluczowych pojęć...",
-  "Tworzenie fiszek...",
-  "Dodawanie przykładów...",
-  "Finalizowanie...",
+  "Analyzing content...",
+  "Extracting key concepts...",
+  "Creating flashcards...",
+  "Adding examples...",
+  "Finalizing...",
 ];
 
 export function AIGenerationLoader() {
@@ -25,10 +25,10 @@ export function AIGenerationLoader() {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center overflow-hidden">
       <div className="max-w-md w-full p-8 relative">
-        {/* Tło z gradientem */}
+        {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-2xl" />
         
-        {/* Pulsujące kółka w tle */}
+        {/* Pulsating circles in background */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl">
           {[...Array(6)].map((_, i) => (
             <motion.div
@@ -54,7 +54,7 @@ export function AIGenerationLoader() {
         </div>
         
         <div className="flex flex-col items-center justify-center relative z-10">
-          {/* "Fiszki AI" nagłówek */}
+          {/* "Flashcards AI" header */}
           <motion.h3
             className="text-2xl font-bold text-white mb-8 text-center"
             initial={{ opacity: 0, y: -20 }}
@@ -62,11 +62,11 @@ export function AIGenerationLoader() {
             transition={{ duration: 0.5 }}
           >
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-              Fiszki AI
-            </span> pracują...
+              Flashcards AI
+            </span> working...
           </motion.h3>
           
-          {/* Animowane karty */}
+          {/* Animated cards */}
           <div className="relative w-full h-40 mb-10">
             {[...Array(3)].map((_, i) => (
               <motion.div
@@ -85,7 +85,7 @@ export function AIGenerationLoader() {
                   delay: i * 0.3,
                 }}
               >
-                {/* Linie reprezentujące tekst */}
+                {/* Lines representing text */}
                 <div className="p-4 h-full flex flex-col justify-between">
                   <motion.div
                     className="h-3 bg-white/20 rounded-full w-3/4"
@@ -109,7 +109,7 @@ export function AIGenerationLoader() {
             ))}
           </div>
           
-          {/* Siatka kropek "myślących" */}
+          {/* "Thinking" dots grid */}
           <div className="grid grid-cols-5 gap-3 mb-8">
             {[...Array(5)].map((_, i) => (
               <motion.div
@@ -124,7 +124,7 @@ export function AIGenerationLoader() {
             ))}
           </div>
           
-          {/* Tekst statusu */}
+          {/* Status text */}
           <div className="h-6 relative w-full text-center">
             <AnimatePresence mode="wait">
               <motion.p

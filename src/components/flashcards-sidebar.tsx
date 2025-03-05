@@ -6,12 +6,13 @@ import {
   PlusCircle, 
   ChevronLeft, 
   ChevronRight, 
-  Trash2 
+  Trash2,
+  Globe
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { 
   AlertDialog,
@@ -23,10 +24,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import { deleteCategoryAction } from "@/app/actions/flashcard-actions";
+import { deleteCategoryAction, getUserLanguagesAction } from "@/app/actions/flashcard-actions";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -47,11 +55,72 @@ export function FlashcardsSidebar({
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
   
   const router = useRouter();
   const { toast } = useToast();
   
-  const categories = [...new Set(flashcards.map((card) => card.category))];
+  const fetchLanguages = async () => {
+    setIsLoadingLanguages(true);
+    try {
+      const result = await getUserLanguagesAction();
+      if (result.success) {
+        setLanguages(result.languages);
+        if (!selectedLanguage) {
+          setSelectedLanguage('all');
+        }
+      } else {
+        setErrorMessage(result.error || "Failed to fetch available languages");
+      }
+    } catch (error) {
+      console.error("Error fetching languages:", error);
+      setErrorMessage("An error occurred while fetching available languages");
+    } finally {
+      setIsLoadingLanguages(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchLanguages();
+  }, []);
+  
+  useEffect(() => {
+    if (selectedLanguage && selectedLanguage !== 'all') {
+      const hasLanguageCategories = flashcards.some(
+        card => card.targetLanguage === selectedLanguage
+      );
+      
+      if (!hasLanguageCategories && languages.length > 0) {
+        setSelectedLanguage('all');
+      }
+    }
+  }, [languages, flashcards, selectedLanguage]);
+  
+  const getLanguageName = (languageCode: string): string => {
+    const languageNames: Record<string, string> = {
+      'en': 'English',
+      'pl': 'Polski',
+      'es': 'Español',
+      'de': 'Deutsch',
+      'fr': 'Français',
+      'it': 'Italiano',
+      'pt': 'Português',
+      'ru': 'Русский',
+      'zh': '中文',
+      'ja': '日本語',
+      'ko': '한국어'
+    };
+    
+    return languageNames[languageCode] || languageCode;
+  };
+  
+  const filteredFlashcards = selectedLanguage && selectedLanguage !== 'all'
+    ? flashcards.filter(card => card.targetLanguage === selectedLanguage)
+    : flashcards;
+  
+  const categories = [...new Set(filteredFlashcards.map((card) => card.category))];
 
   const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -75,11 +144,14 @@ export function FlashcardsSidebar({
       
       if (result.success) {
         closeDeleteDialog();
+        
         router.refresh();
         
+        await fetchLanguages();
+        
         toast({
-          title: "Kategoria usunięta",
-          description: `Pomyślnie usunięto kategorię "${categoryToDelete}" wraz z ${result.deletedCount} fiszkami.`,
+          title: "Category deleted",
+          description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
           variant: "success",
         });
       } else {
@@ -106,6 +178,22 @@ export function FlashcardsSidebar({
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+
+    const newCategories = [...new Set(value === 'all' 
+      ? flashcards.map(card => card.category)
+      : flashcards.filter(card => card.targetLanguage === value).map(card => card.category))];
+
+    if (!newCategories.includes(selectedCategory || '')) {
+      if (newCategories.length > 0) {
+        onSelectCategory(newCategories[0]);
+      } else {
+        onSelectCategory('');
+      }
     }
   };
 
@@ -150,9 +238,36 @@ export function FlashcardsSidebar({
               className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center"
             >
               <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
-              {!isCollapsed && <span>Nowe fiszki</span>}
+              {!isCollapsed && <span>New Flashcards</span>}
             </Button>
           </Link>
+          
+          {!isCollapsed && (languages.length > 0 || isLoadingLanguages) && (
+            <div className="mt-2">
+              <Select
+                value={selectedLanguage || undefined}
+                onValueChange={handleLanguageChange}
+                disabled={isLoadingLanguages}
+              >
+                <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-purple-400" />
+                    <SelectValue placeholder="Change language" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/10 text-white">
+                  <SelectItem value="all" className="hover:bg-purple-500/20">
+                    All languages
+                  </SelectItem>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang} value={lang} className="hover:bg-purple-500/20">
+                      {getLanguageName(lang)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         {errorMessage && (
@@ -203,7 +318,13 @@ export function FlashcardsSidebar({
               ))
             ) : (
               <p className="text-gray-400 text-center py-4">
-                No categories available
+                {isLoadingLanguages 
+                  ? "Loading categories..." 
+                  : selectedLanguage === 'all'
+                    ? "No categories available"
+                    : selectedLanguage 
+                      ? `No categories for ${getLanguageName(selectedLanguage)} language` 
+                      : "No categories available"}
               </p>
             )}
           </div>
@@ -213,18 +334,18 @@ export function FlashcardsSidebar({
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Usunąć kategorię &quot;{categoryToDelete}&quot;?</AlertDialogTitle>
+            <AlertDialogTitle>Delete category &quot;{categoryToDelete}&quot;?</AlertDialogTitle>
             <AlertDialogDescription>
-              Wszystkie fiszki z tej kategorii zostaną trwale usunięte.
-              Tej operacji nie można cofnąć.
+              All flashcards in this category will be permanently deleted.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={closeDeleteDialog} disabled={isDeleting}>
-              Anuluj
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteCategory} disabled={isDeleting}>
-              {isDeleting ? "Usuwanie..." : "Usuń kategorię"}
+              {isDeleting ? "Deleting..." : "Delete category"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

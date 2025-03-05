@@ -71,4 +71,33 @@ export async function deleteCategoryAction(category: string) {
       error: `Category deletion failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
     };
   }
+}
+
+export async function getUserLanguagesAction() {
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return {
+        success: false,
+        error: "Authentication required: User is not signed in",
+        languages: []
+      };
+    }
+    
+    const flashcardRepository = new PrismaFlashcardRepository();
+    const languages = await flashcardRepository.getUserTargetLanguages(userId);
+    
+    return {
+      success: true,
+      languages
+    };
+  } catch (error) {
+    console.error("Get user languages error:", error);
+    return {
+      success: false,
+      error: `Failed to get languages: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
+      languages: []
+    };
+  }
 } 

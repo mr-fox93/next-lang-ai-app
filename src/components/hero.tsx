@@ -19,8 +19,8 @@ export default function Hero() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [languageSettings, setLanguageSettings] = useState<LanguageSettingsType>({
-    sourceLanguage: "en",
-    targetLanguage: "pl",
+    sourceLanguage: "pl",
+    targetLanguage: "en",
     difficultyLevel: "easy"
   });
   const router = useRouter();
@@ -137,7 +137,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
               <span className="relative flex items-center justify-center gap-2">
                 <LayoutTemplate className="h-6 w-6" />
-                {isLoading ? "Generowanie..." : "Generate Flashcards"}
+                {isLoading ? "Generating..." : "Generate Flashcards"}
               </span>
             </Button>
           </motion.div>
