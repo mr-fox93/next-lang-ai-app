@@ -1,8 +1,5 @@
 "use server";
 
-// Ustawiam maksymalny czas trwania funkcji na 60 sekund (maksimum dla planu Hobby)
-export const maxDuration = 60;
-
 import { auth } from "@clerk/nextjs/server";
 import { getUpdateFlashcardProgressUseCase, getUserProgressStatsUseCase } from "@/lib/container";
 import prisma from "@/lib/prisma";
