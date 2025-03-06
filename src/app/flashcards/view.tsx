@@ -12,14 +12,20 @@ import { ProgressPreview } from "@/components/progress-preview";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import { UserProgressStats } from "@/types/progress";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
   serverError?: string;
   initialCategory?: string | null;
+  progressStats?: {
+    success: boolean;
+    data?: UserProgressStats;
+    error?: string;
+  };
 }
 
-export default function FlashcardsView({ initialFlashcards, serverError, initialCategory }: FlashcardsViewProps) {
+export default function FlashcardsView({ initialFlashcards, serverError, initialCategory, progressStats }: FlashcardsViewProps) {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get('category');
   
@@ -216,7 +222,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         </main>
       </div>
       
-      <ProgressPreview />
+      <ProgressPreview progressStats={progressStats} />
     </div>
   );
 } 
