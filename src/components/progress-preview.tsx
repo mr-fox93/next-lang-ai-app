@@ -83,15 +83,14 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
   const totalFlashcards = stats ? stats.totalFlashcards : 0;
   
   return (
-    <div className="absolute top-[70px] right-4 z-40 flex flex-col items-end">
-      {/* Przycisk wyświetlany jest cały czas, niezależnie czy podgląd jest otwarty czy nie */}
+    <div className="fixed top-2 right-5 z-50 flex flex-col items-end">
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
         className={`
           flex items-center justify-between gap-2
-          px-4 py-2.5 
+          px-3.5 py-1.5 
           bg-gradient-to-br from-black/90 to-gray-900/90 backdrop-blur-md 
           border border-white/10 
           hover:border-purple-500/50
@@ -101,10 +100,11 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
           transition-all duration-300
           focus:outline-none
           max-w-full
+          h-[48px] my-0
         `}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {!isLoading ? (
             <>
               <div className="relative flex-shrink-0">
@@ -118,7 +118,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                 </span>
                 <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden mt-0.5">
                   <div 
-                    className="h-full bg-gradient-to-r from-yellow-400 to-amber-500" 
+                    className="h-full bg-gradient-to-r from-purple-600 to-amber-500" 
                     style={{ width: `${progressToNextLevel}%` }}
                   />
                 </div>
@@ -142,7 +142,6 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
         />
       </motion.button>
 
-      {/* Panel szczegółowy pojawia się poniżej przycisku */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div 
@@ -176,7 +175,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                 ) : stats ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-br from-yellow-400 to-amber-600 p-2 rounded-lg shadow-lg">
+                      <div className="bg-gradient-to-br from-purple-600 to-amber-500 p-2 rounded-lg shadow-lg">
                         <Award className="text-white h-6 w-6" />
                       </div>
                       <div className="flex-1">
@@ -187,13 +186,13 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                         <Progress 
                           value={progressToNextLevel} 
                           className="h-2 bg-white/10" 
-                          indicatorClassName="bg-gradient-to-r from-yellow-400 to-amber-600"
+                          indicatorClassName="bg-gradient-to-r from-purple-600 to-amber-500"
                         />
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-br from-purple-400 to-indigo-600 p-2 rounded-lg shadow-lg">
+                      <div className="bg-gradient-to-br from-purple-600 to-indigo-400 p-2 rounded-lg shadow-lg">
                         <Star className="text-white h-6 w-6" />
                       </div>
                       <div className="flex-1">
@@ -204,13 +203,13 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                         <Progress 
                           value={masteryPercentage} 
                           className="h-2 bg-white/10" 
-                          indicatorClassName="bg-gradient-to-r from-purple-400 to-indigo-600" 
+                          indicatorClassName="bg-gradient-to-r from-purple-600 to-indigo-400" 
                         />
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-br from-cyan-400 to-blue-600 p-2 rounded-lg shadow-lg">
+                      <div className="bg-gradient-to-br from-purple-600 to-blue-400 p-2 rounded-lg shadow-lg">
                         <BookOpen className="text-white h-6 w-6" />
                       </div>
                       <div className="flex-1">
