@@ -34,6 +34,21 @@ interface FlashcardGenerationResponse {
   redirect?: string;
 }
 
+// Definiuję interfejs dla wewnętrznego API GenerateFlashcardsUseCase
+interface AIFlashcardGenerator {
+  generateFlashcardsWithAI(prompt: string): Promise<Record<string, string>[]>;
+}
+
+// Definiuję interfejs dla wyniku generowania
+interface RawFlashcard {
+  origin_text: string;
+  translate_text: string;
+  example_using: string;
+  translate_example: string;
+  category: string;
+  [key: string]: string;
+}
+
 export async function generateFlashcardsAction(params: GenerateFlashcardsActionParams) {
   try {
     const { count, message, level, sourceLanguage, targetLanguage } = params;
@@ -133,11 +148,9 @@ export async function generateFlashcardsForGuestAction(data: {
   targetLanguage: string;
 }) {
   try {
-    // Używamy istniejącej instancji GenerateFlashcardsUseCase, ale tylko po to, aby skorzystać
-    // z jej metody generateFlashcardsWithAI, bez zapisywania do bazy danych
     const generateUseCase = getGenerateFlashcardsUseCase();
     
-    // Tworzymy prompt do generowania fiszek
+    // Tworzymy prompt dla AI
     const prompt = getFlashcardsPrompt(
       data.count,
       data.message,
@@ -146,18 +159,20 @@ export async function generateFlashcardsForGuestAction(data: {
       data.targetLanguage
     );
     
-    // Wywołujemy metodę prywatną executeGuestFlashcardGeneration, która obsługuje
-    // tylko generowanie AI bez zapisywania do bazy
-    const generatedFlashcards = await (generateUseCase as any)
-      .generateFlashcardsWithAI(prompt);
+    // Bezpieczna konwersja typów
+    const aiGenerator = generateUseCase as unknown as AIFlashcardGenerator;
+    const generatedFlashcards = await aiGenerator.generateFlashcardsWithAI(prompt);
       
     // Uzupełniamy wygenerowane fiszki o informacje o językach i poziomie trudności
-    const flashcards = generatedFlashcards.map((flashcard: any) => ({
-      ...flashcard,
+    const flashcards: ImportableFlashcard[] = generatedFlashcards.map((flashcard: Record<string, string>) => ({
+      origin_text: flashcard.origin_text || '',
+      translate_text: flashcard.translate_text || '',
+      example_using: flashcard.example_using || '',
+      translate_example: flashcard.translate_example || '',
+      category: flashcard.category || '',
       sourceLanguage: data.sourceLanguage,
       targetLanguage: data.targetLanguage,
-      difficultyLevel: data.level,
-      userId: 'guest'
+      difficultyLevel: data.level
     }));
 
     return { 
@@ -236,21 +251,38 @@ export async function handleGuestFlashcardGeneration(data: {
   targetLanguage: string;
 }): Promise<FlashcardGenerationResponse> {
   try {
-    // Wywołujemy akcję generowania fiszek dla gościa
-    const result = await generateFlashcardsForGuestAction(data);
+    const generateUseCase = getGenerateFlashcardsUseCase();
     
-    if (result.success) {
-      return {
-        success: true,
-        flashcards: result.flashcards,
-        redirect: "/guest-flashcard"
-      };
-    } else {
-      return {
-        success: false,
-        error: result.error || "Error generating flashcards"
-      };
-    }
+    // Tworzymy prompt dla AI
+    const prompt = getFlashcardsPrompt(
+      data.count,
+      data.message,
+      data.level,
+      data.sourceLanguage,
+      data.targetLanguage
+    );
+    
+    // Bezpieczna konwersja typów
+    const aiGenerator = generateUseCase as unknown as AIFlashcardGenerator;
+    const generatedFlashcards = await aiGenerator.generateFlashcardsWithAI(prompt);
+      
+    // Uzupełniamy wygenerowane fiszki o informacje o językach i poziomie trudności
+    const flashcards: ImportableFlashcard[] = generatedFlashcards.map((flashcard: Record<string, string>) => ({
+      origin_text: flashcard.origin_text || '',
+      translate_text: flashcard.translate_text || '',
+      example_using: flashcard.example_using || '',
+      translate_example: flashcard.translate_example || '',
+      category: flashcard.category || '',
+      sourceLanguage: data.sourceLanguage,
+      targetLanguage: data.targetLanguage,
+      difficultyLevel: data.level
+    }));
+
+    return {
+      success: true,
+      flashcards: flashcards,
+      redirect: "/guest-flashcard"
+    };
   } catch (error) {
     console.error("Guest flashcard generation error:", error);
     return {
