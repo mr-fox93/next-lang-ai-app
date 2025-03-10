@@ -10,10 +10,9 @@ import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { generateFlashcardsAction, handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
-import { generateFlashcardsForGuestAction } from "@/app/actions/flashcard-actions";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -37,7 +36,7 @@ export default function Hero() {
     try {
       if (!isSignedIn) {
         // Dla niezalogowanych użytkowników
-        const result = await generateFlashcardsForGuestAction({
+        const result = await handleGuestFlashcardGeneration({
           count: 5,
           message: userInput,
           level: languageSettings.difficultyLevel,
@@ -48,10 +47,11 @@ export default function Hero() {
         if (result.success) {
           // Zapisujemy fiszki w localStorage
           guestFlashcardsStorage.addFlashcards(result.flashcards);
-          setUserInput("");
+          
+          // Przekierowujemy użytkownika na stronę z fiszkami dla gości
           router.push("/guest-flashcard");
         } else {
-          setErrorMessage(result.error || "Error generating flashcards");
+          setErrorMessage(result.error || "Wystąpił błąd podczas generowania fiszek.");
         }
       } else {
         // Dla zalogowanych użytkowników - bez zmian

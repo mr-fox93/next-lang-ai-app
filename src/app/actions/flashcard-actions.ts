@@ -4,6 +4,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase, getFlashcardRepository } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
+import { getFlashcardsPrompt } from "@/lib/prompts";
+import { Flashcard } from "@/core/entities/Flashcard";
 
 interface GenerateFlashcardsActionParams {
   count: number;
@@ -103,7 +105,7 @@ export async function getUserLanguagesAction() {
 }
 
 // Akcja dla generowania fiszek dla niezalogowanych użytkowników
-// Ta funkcja ma podobną strukturę do generateFlashcardsAction, ale nie wymaga uwierzytelnienia
+// Zoptymalizowana wersja, która nie korzysta z bazodanowych aspektów GenerateFlashcardsUseCase
 export async function generateFlashcardsForGuestAction(data: {
   count: number;
   message: string;
@@ -111,24 +113,37 @@ export async function generateFlashcardsForGuestAction(data: {
   sourceLanguage: string;
   targetLanguage: string;
 }) {
-  // Uproszczona implementacja bez zapisu do bazy danych
   try {
-    // Wykorzystujemy to samo API generowania co dla zalogowanych użytkowników,
-    // ale nie zapisujemy wyników w bazie danych
-    const result = await getGenerateFlashcardsUseCase().execute({
-      count: data.count,
-      message: data.message,
-      level: data.level,
+    // Używamy istniejącej instancji GenerateFlashcardsUseCase, ale tylko po to, aby skorzystać
+    // z jej metody generateFlashcardsWithAI, bez zapisywania do bazy danych
+    const generateUseCase = getGenerateFlashcardsUseCase();
+    
+    // Tworzymy prompt do generowania fiszek
+    const prompt = getFlashcardsPrompt(
+      data.count,
+      data.message,
+      data.level,
+      data.sourceLanguage,
+      data.targetLanguage
+    );
+    
+    // Wywołujemy metodę prywatną executeGuestFlashcardGeneration, która obsługuje
+    // tylko generowanie AI bez zapisywania do bazy
+    const generatedFlashcards = await (generateUseCase as any)
+      .generateFlashcardsWithAI(prompt);
+      
+    // Uzupełniamy wygenerowane fiszki o informacje o językach i poziomie trudności
+    const flashcards = generatedFlashcards.map((flashcard: any) => ({
+      ...flashcard,
       sourceLanguage: data.sourceLanguage,
       targetLanguage: data.targetLanguage,
-      userId: 'guest', // Używamy 'guest' jako identyfikatora
-      userEmail: 'guest@example.com' // Dodajemy fikcyjny email dla gościa
-    });
+      difficultyLevel: data.level,
+      userId: 'guest'
+    }));
 
     return { 
       success: true, 
-      flashcards: result.flashcards || [],
-      // W przypadku gościa nie zwracamy ID sesji, ponieważ nie zapisujemy jej w bazie
+      flashcards: flashcards,
       sessionId: null 
     };
   } catch (error) {
@@ -188,6 +203,44 @@ export async function importGuestFlashcardsAction(flashcards: any[]) {
       error: error instanceof Error 
         ? error.message 
         : "An unexpected error occurred while importing flashcards"
+    };
+  }
+}
+
+/**
+ * Akcja serwerowa do zarządzania procesem generowania fiszek dla gości
+ * Przenosi logikę biznesową z komponentu klienta (hero.tsx) do akcji serwerowej
+ */
+export async function handleGuestFlashcardGeneration(data: {
+  count: number;
+  message: string;
+  level: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+}) {
+  try {
+    // Wywołujemy akcję generowania fiszek dla gościa
+    const result = await generateFlashcardsForGuestAction(data);
+    
+    if (result.success) {
+      return {
+        success: true,
+        flashcards: result.flashcards,
+        redirect: "/guest-flashcard"
+      };
+    } else {
+      return {
+        success: false,
+        error: result.error || "Error generating flashcards"
+      };
+    }
+  } catch (error) {
+    console.error("Guest flashcard generation error:", error);
+    return {
+      success: false,
+      error: error instanceof Error 
+        ? error.message 
+        : "An unexpected error occurred during flashcard generation"
     };
   }
 } 
