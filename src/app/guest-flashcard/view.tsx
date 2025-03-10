@@ -80,12 +80,12 @@ export default function GuestFlashcardsView({
     }
   }, [selectedCategory]);
 
-  const handleNext = (known: boolean) => {
-    if ((currentCardIndex + 1) % 3 === 0) {
-      setLoginPromptMessage("Track your learning progress! Sign in to save your results and generate personalized flashcards.");
-      setShowLoginPrompt(true);
+  const handleNext = () => {
+    if (currentCardIndex < categoryCards.length - 1) {
+      setCurrentCardIndex(prev => prev + 1);
+    } else {
+      setCurrentCardIndex(0); // Loop back to the beginning when we reach the end
     }
-    setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
   const handleNewFlashcardsClick = () => {

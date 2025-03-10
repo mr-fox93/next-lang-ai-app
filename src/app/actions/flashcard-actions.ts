@@ -5,7 +5,18 @@ import { getGenerateFlashcardsUseCase, getFlashcardRepository } from "@/lib/cont
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { getFlashcardsPrompt } from "@/lib/prompts";
-import { Flashcard } from "@/core/entities/Flashcard";
+
+// Tymczasowa definicja interfejsu
+interface ImportableFlashcard {
+  origin_text: string;
+  translate_text: string;
+  example_using: string;
+  translate_example: string;
+  category: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficultyLevel: string;
+}
 
 interface GenerateFlashcardsActionParams {
   count: number;
@@ -160,7 +171,7 @@ export async function generateFlashcardsForGuestAction(data: {
 }
 
 // Akcja do importowania fiszek gościa do bazy danych po zalogowaniu
-export async function importGuestFlashcardsAction(flashcards: any[]) {
+export async function importGuestFlashcardsAction(flashcards: ImportableFlashcard[]) {
   const { userId } = await auth();
   const user = await currentUser();
   
@@ -190,9 +201,9 @@ export async function importGuestFlashcardsAction(flashcards: any[]) {
       })
     );
     
-    // Zapisujemy wszystkie fiszki równolegle
+    // Wykonujemy wszystkie obietnice równolegle
     await Promise.all(flashcardPromises);
-
+    
     return {
       success: true
     };
@@ -200,9 +211,7 @@ export async function importGuestFlashcardsAction(flashcards: any[]) {
     console.error("Error importing guest flashcards:", error);
     return {
       success: false,
-      error: error instanceof Error 
-        ? error.message 
-        : "An unexpected error occurred while importing flashcards"
+      error: error instanceof Error ? error.message : "Unknown error during import"
     };
   }
 }

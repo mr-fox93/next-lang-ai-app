@@ -95,7 +95,7 @@ export function FlashcardsSidebar({
   
   useEffect(() => {
     fetchLanguages();
-  }, [isGuestMode]);
+  }, [fetchLanguages]);
   
   useEffect(() => {
     if (selectedLanguage && selectedLanguage !== 'all') {

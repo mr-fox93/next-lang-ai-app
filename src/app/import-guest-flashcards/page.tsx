@@ -4,18 +4,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader } from "@/components/ui/loader";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { FlashcardImportAnimation } from "@/components/flashcard-import-animation";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { importGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
+
+interface ImportableFlashcard {
+  origin_text: string;
+  translate_text: string;
+  example_using: string;
+  translate_example: string;
+  category: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficultyLevel: string;
+}
 
 export default function ImportGuestFlashcardsPage() {
   const [isImporting, setIsImporting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flashcardCount, setFlashcardCount] = useState(0);
-  const [shouldDirectRedirect, setShouldDirectRedirect] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,9 +32,6 @@ export default function ImportGuestFlashcardsPage() {
     setFlashcardCount(guestFlashcards.length);
     
     const shouldImport = sessionStorage.getItem("flashcardsToImport");
-    const directRedirect = sessionStorage.getItem("directRedirectAfterImport");
-    
-    setShouldDirectRedirect(true);
     
     if (guestFlashcards.length > 0 && shouldImport === "true") {
       importFlashcards(guestFlashcards);
@@ -34,7 +40,7 @@ export default function ImportGuestFlashcardsPage() {
     }
   }, []);
 
-  const importFlashcards = async (flashcards: any[]) => {
+  const importFlashcards = async (flashcards: ImportableFlashcard[]) => {
     if (flashcards.length === 0) {
       setError("No flashcards to import");
       return;

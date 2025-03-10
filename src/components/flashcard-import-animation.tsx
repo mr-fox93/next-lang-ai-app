@@ -14,30 +14,18 @@ export function FlashcardImportAnimation({
   onComplete 
 }: FlashcardImportAnimationProps) {
   const [stage, setStage] = useState<'preparing' | 'importing' | 'complete'>('preparing');
-  const [progress, setProgress] = useState(0);
   
   useEffect(() => {
     const startAnimation = async () => {
       await new Promise(resolve => setTimeout(resolve, 800));
       setStage('importing');
       
-      const increment = 100 / (flashcardCount || 10);
-      const intervalTime = 1200 / (flashcardCount || 10);
+      const totalDuration = Math.max(2000, Math.min(flashcardCount * 120, 4000));
       
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          const newProgress = prev + increment;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => {
-              setStage('complete');
-              setTimeout(onComplete, 800);
-            }, 500);
-            return 100;
-          }
-          return newProgress;
-        });
-      }, intervalTime);
+      setTimeout(() => {
+        setStage('complete');
+        setTimeout(onComplete, 800);
+      }, totalDuration);
     };
     
     startAnimation();
