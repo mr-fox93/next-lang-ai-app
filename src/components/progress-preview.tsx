@@ -17,9 +17,11 @@ interface ProgressPreviewProps {
     data?: UserProgressStats;
     error?: string;
   };
+  isGuestMode?: boolean;
+  onProgressClick?: () => void;
 }
 
-export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
+export function ProgressPreview({ progressStats, isGuestMode = false, onProgressClick }: ProgressPreviewProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -34,8 +36,8 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
       return;
     }
     
-    // Pobieramy dane tylko jeśli nie otrzymaliśmy ich z props
-    if (!progressStats?.data) {
+    // Pobieramy dane tylko jeśli nie otrzymaliśmy ich z props i nie jesteśmy w trybie gościa
+    if (!progressStats?.data && !isGuestMode) {
       async function fetchStats() {
         try {
           const result = await getUserProgressStatsAction();
@@ -64,7 +66,18 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
       
       fetchStats();
     }
-  }, [progressStats, toast]);
+  }, [progressStats, toast, isGuestMode]);
+  
+  // Obsługa kliknięcia
+  const handleClick = () => {
+    // W trybie gościa nie robimy nic
+    if (isGuestMode) {
+      return;
+    }
+    
+    // W normalnym trybie rozwijamy panel
+    setIsExpanded(!isExpanded);
+  };
   
   // Obliczenia dla paska postępu
   const progressToNextLevel = stats 
@@ -82,8 +95,40 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
   const masteredFlashcards = stats ? stats.masteredFlashcards : 0;
   const totalFlashcards = stats ? stats.totalFlashcards : 0;
   
+  // W trybie gościa pokazujemy tylko prosty wskaźnik, który po kliknięciu pokazuje popup logowania
+  if (isGuestMode) {
+    return (
+      <div className="fixed top-2 right-5 z-10">
+        <div 
+          className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-gradient-to-br from-black/90 to-gray-900/90 backdrop-blur-md border border-white/10 shadow-lg shadow-purple-500/5 rounded-xl max-w-full h-[48px] my-0 cursor-pointer hover:border-purple-500/50 transition-all duration-300"
+          onClick={onProgressClick}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex-shrink-0">
+              <div className="bg-amber-500 text-xs font-bold rounded-full min-w-6 h-6 px-1.5 flex items-center justify-center text-black whitespace-nowrap">
+                LVL 1
+              </div>
+            </div>
+            <div className="hidden sm:flex flex-col items-start">
+              <span className="text-xs font-semibold text-white">
+                0 mastered
+              </span>
+              <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden mt-0.5">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-600 to-amber-500" 
+                  style={{ width: '0%' }}
+                />
+              </div>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-gray-400" />
+        </div>
+      </div>
+    );
+  }
+  
   return (
-    <div className="fixed top-2 right-5 z-50 flex flex-col items-end">
+    <div className="fixed top-2 right-5 z-10">
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -102,7 +147,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
           max-w-full
           h-[48px] my-0
         `}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleClick}
       >
         <div className="flex items-center gap-2.5">
           {!isLoading ? (
@@ -114,7 +159,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
               </div>
               <div className="hidden sm:flex flex-col items-start">
                 <span className="text-xs font-semibold text-white">
-                  {masteredFlashcards} opanowanych
+                  {masteredFlashcards} mastered
                 </span>
                 <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden mt-0.5">
                   <div 
@@ -132,7 +177,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                 </div>
               </div>
               <span className="hidden sm:inline-block text-xs font-semibold text-white">
-                Ładowanie postępu...
+                Loading progress...
               </span>
             </>
           )}
@@ -163,7 +208,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                     className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20"
                     onClick={() => router.push('/progress')}
                   >
-                    Pełny widok <ChevronRight className="h-4 w-4 ml-1" />
+                    Full View <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </CardHeader>
@@ -181,7 +226,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-sm font-semibold text-white">Level {userLevel}</span>
-                          <span className="text-xs text-gray-400">{experiencePoints}/{nextLevelPoints} PD</span>
+                          <span className="text-xs text-gray-400">{experiencePoints}/{nextLevelPoints} XP</span>
                         </div>
                         <Progress 
                           value={progressToNextLevel} 
@@ -197,7 +242,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-semibold text-white">Biegłość</span>
+                          <span className="text-sm font-semibold text-white">Mastery</span>
                           <span className="text-xs text-gray-400">{masteryPercentage.toFixed(0)}%</span>
                         </div>
                         <Progress 
@@ -214,9 +259,9 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-semibold text-white">Fiszki</span>
+                          <span className="text-sm font-semibold text-white">Flashcards</span>
                           <span className="text-xs text-gray-400">
-                            {masteredFlashcards}/{totalFlashcards} opanowanych
+                            {masteredFlashcards}/{totalFlashcards} mastered
                           </span>
                         </div>
                       </div>
@@ -225,7 +270,7 @@ export function ProgressPreview({ progressStats }: ProgressPreviewProps) {
                 ) : (
                   <div className="text-center py-2">
                     <p className="text-sm text-gray-400">
-                      Nie udało się załadować danych postępu
+                      Failed to load progress data
                     </p>
                   </div>
                 )}

@@ -21,14 +21,17 @@ interface FlashcardViewProps {
   card: Flashcard;
   onNext: (known: boolean) => void;
   allFlashcards: Flashcard[];
+  isGuestMode?: boolean;
 }
 
-export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProps) {
+export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false }: FlashcardViewProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const handleAnswer = (isCorrect: boolean) => {
-    setIsFlipped(false);
-    onNext(isCorrect);
+    setTimeout(() => {
+      setIsFlipped(false);
+      onNext(isCorrect);
+    }, 1500);
   };
 
   const otherFlashcards = allFlashcards.filter(
@@ -150,6 +153,7 @@ export function FlashcardView({ card, onNext, allFlashcards }: FlashcardViewProp
             isFlipped={isFlipped}
             onAnswer={handleAnswer}
             otherFlashcards={otherFlashcards}
+            isGuestMode={isGuestMode}
           />
         </div>
       </div>
