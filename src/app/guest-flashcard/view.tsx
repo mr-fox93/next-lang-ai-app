@@ -26,20 +26,22 @@ interface GuestFlashcardsViewProps {
   };
 }
 
-export default function GuestFlashcardsView({ 
-  initialFlashcards, 
-  serverError, 
-  initialCategory, 
-  progressStats 
+export default function GuestFlashcardsView({
+  initialFlashcards,
+  serverError,
+  initialCategory,
+  progressStats,
 }: GuestFlashcardsViewProps) {
   const searchParams = useSearchParams();
-  const categoryFromUrl = searchParams.get('category');
-  
+  const categoryFromUrl = searchParams.get("category");
+
   const [flashcards, setFlashcards] = useState<Flashcard[]>(initialFlashcards);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryFromUrl ? decodeURIComponent(categoryFromUrl) : (initialCategory || null)
+    categoryFromUrl
+      ? decodeURIComponent(categoryFromUrl)
+      : initialCategory || null
   );
-  
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -60,7 +62,7 @@ export default function GuestFlashcardsView({
 
   useEffect(() => {
     if (flashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
-      const categories = [...new Set(flashcards.map(card => card.category))];
+      const categories = [...new Set(flashcards.map((card) => card.category))];
       if (categories.length > 0) {
         setSelectedCategory(categories[0]);
       }
@@ -74,30 +76,32 @@ export default function GuestFlashcardsView({
   useEffect(() => {
     if (selectedCategory) {
       const params = new URLSearchParams(window.location.search);
-      params.set('category', selectedCategory);
+      params.set("category", selectedCategory);
       const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.pushState({}, '', newUrl);
+      window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
 
   const handleNext = () => {
     if (currentCardIndex < categoryCards.length - 1) {
-      setCurrentCardIndex(prev => prev + 1);
+      setCurrentCardIndex((prev) => prev + 1);
     } else {
       setCurrentCardIndex(0); // Loop back to the beginning when we reach the end
     }
   };
 
   const handleNewFlashcardsClick = () => {
-    setLoginPromptMessage("Sign in to generate multiple categories of flashcards! As a guest, you can only create one category.");
+    setLoginPromptMessage(
+      "Sign in to generate multiple categories of flashcards! As a guest, you can only create one category."
+    );
     setShowLoginPrompt(true);
   };
-  
+
   const handleImportAndSignIn = async () => {
     setIsImporting(true);
     try {
-      sessionStorage.setItem('flashcardsToImport', 'true');
-      sessionStorage.setItem('directRedirectAfterImport', 'true');
+      sessionStorage.setItem("flashcardsToImport", "true");
+      sessionStorage.setItem("directRedirectAfterImport", "true");
       router.push("/sign-in?redirect=/import-guest-flashcards");
     } catch (error) {
       console.error("Error preparing for import:", error);
@@ -108,12 +112,16 @@ export default function GuestFlashcardsView({
   };
 
   const handleProgressClick = () => {
-    setLoginPromptMessage("Sign in to access detailed progress statistics and track your learning journey!");
+    setLoginPromptMessage(
+      "Sign in to access detailed progress statistics and track your learning journey!"
+    );
     setShowLoginPrompt(true);
   };
 
   const handleLanguageSelectClick = () => {
-    setLoginPromptMessage("Sign in to manage your languages and create flashcards in various languages!");
+    setLoginPromptMessage(
+      "Sign in to manage your languages and create flashcards in various languages!"
+    );
     setShowLoginPrompt(true);
   };
 
@@ -129,9 +137,10 @@ export default function GuestFlashcardsView({
         <div className="text-center max-w-md mx-auto px-4">
           <h2 className="text-2xl font-bold mb-4">Brak fiszek</h2>
           <p className="text-gray-400 mb-6">
-            Wygląda na to, że jeszcze nie wygenerowałeś żadnych fiszek. Wróć do strony głównej, aby wygenerować swoje pierwsze fiszki.
+            Wygląda na to, że jeszcze nie wygenerowałeś żadnych fiszek. Wróć do
+            strony głównej, aby wygenerować swoje pierwsze fiszki.
           </p>
-          <Button 
+          <Button
             onClick={() => router.push("/")}
             className="bg-purple-600 hover:bg-purple-500 text-white"
           >
@@ -144,8 +153,8 @@ export default function GuestFlashcardsView({
 
   return (
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
-      <LoginPromptPopup 
-        isOpen={showLoginPrompt} 
+      <LoginPromptPopup
+        isOpen={showLoginPrompt}
         onClose={() => setShowLoginPrompt(false)}
         message={loginPromptMessage}
       />
@@ -207,10 +216,7 @@ export default function GuestFlashcardsView({
         )}
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-          <ErrorMessage 
-            message={error} 
-            onClose={() => setError(null)}
-          />
+          <ErrorMessage message={error} onClose={() => setError(null)} />
 
           {selectedCategory || flashcards.length > 0 ? (
             <>
@@ -251,10 +257,10 @@ export default function GuestFlashcardsView({
                   >
                     {viewMode === "single" ? (
                       currentCard ? (
-                        <FlashcardView 
-                          card={currentCard} 
-                          onNext={handleNext} 
-                          allFlashcards={flashcards} 
+                        <FlashcardView
+                          card={currentCard}
+                          onNext={handleNext}
+                          allFlashcards={flashcards}
                           isGuestMode={true}
                         />
                       ) : (
@@ -274,18 +280,19 @@ export default function GuestFlashcardsView({
           ) : (
             <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
               <p className="text-gray-400">
-                No flashcards available. Create new flashcards to start learning.
+                No flashcards available. Create new flashcards to start
+                learning.
               </p>
             </div>
           )}
         </main>
       </div>
-      
-      <ProgressPreview 
-        progressStats={progressStats} 
+
+      <ProgressPreview
+        progressStats={progressStats}
         isGuestMode={true}
         onProgressClick={handleProgressClick}
       />
     </div>
   );
-} 
+}
