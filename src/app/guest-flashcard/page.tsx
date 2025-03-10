@@ -12,7 +12,7 @@ export default async function GuestFlashcardsPage() {
     <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader /></div>}>
       <GuestFlashcardsView 
         initialFlashcards={flashcards} 
-        serverError={error} 
+        serverError={error || undefined} 
         initialCategory={null}
         progressStats={progressStats}
       />
