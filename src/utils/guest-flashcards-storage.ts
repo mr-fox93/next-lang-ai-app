@@ -30,7 +30,7 @@ export const guestFlashcardsStorage = {
   },
   
   // Dodawanie nowych fiszek do istniejących
-  addFlashcards: (newFlashcards: Flashcard[]): Flashcard[] => {
+  addFlashcards: (newFlashcards: any[]): Flashcard[] => {
     const existingFlashcards = guestFlashcardsStorage.getFlashcards();
     
     // Dodajemy nowe fiszki i upewniamy się, że ID są unikalne
@@ -43,7 +43,7 @@ export const guestFlashcardsStorage = {
       ...card,
       id: highestId + index + 1,
       userId: 'guest',
-    }));
+    })) as Flashcard[];
     
     const updatedFlashcards = [...existingFlashcards, ...flashcardsWithIds];
     guestFlashcardsStorage.saveFlashcards(updatedFlashcards);

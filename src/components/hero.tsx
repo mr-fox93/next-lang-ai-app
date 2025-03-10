@@ -9,10 +9,10 @@ import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from 
 import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { generateFlashcardsAction, handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
+import { Flashcard } from "@/core/entities/Flashcard";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -25,7 +25,6 @@ export default function Hero() {
     difficultyLevel: "easy"
   });
   const router = useRouter();
-  const { isSignedIn } = useAuth();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -34,37 +33,22 @@ export default function Hero() {
     setErrorMessage(null);
 
     try {
-      if (!isSignedIn) {
-        const result = await handleGuestFlashcardGeneration({
-          count: 5,
-          message: userInput,
-          level: languageSettings.difficultyLevel,
-          sourceLanguage: languageSettings.sourceLanguage,
-          targetLanguage: languageSettings.targetLanguage
-        });
-        
-        if (result.success) {
-          guestFlashcardsStorage.addFlashcards(result.flashcards);
-          
-          router.push("/guest-flashcard");
-        } else {
-          setErrorMessage(result.error || "Wystąpił błąd podczas generowania fiszek.");
-        }
+      // Generowanie fiszek dla niezalogowanych użytkowników
+      const result = await handleGuestFlashcardGeneration({
+        count: 5,
+        message: userInput,
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage
+      });
+      
+      if (result.success && result.flashcards) {
+        // Bezpieczne przetwarzanie fiszek z zapewnieniem, że nie są undefined
+        guestFlashcardsStorage.addFlashcards(result.flashcards);
+        setUserInput("");
+        router.push("/guest-flashcard");
       } else {
-        const result = await generateFlashcardsAction({
-          count: 5,
-          message: userInput,
-          level: languageSettings.difficultyLevel,
-          sourceLanguage: languageSettings.sourceLanguage,
-          targetLanguage: languageSettings.targetLanguage
-        });
-        
-        if (result.success) {
-          setUserInput("");
-          router.push("/flashcards");
-        } else {
-          setErrorMessage(result.error || "Error generating flashcards");
-        }
+        setErrorMessage(result.error || "Error generating flashcards");
       }
     } catch (error) {
       console.error("Flashcard generation client error:", error);
