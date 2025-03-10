@@ -13,6 +13,7 @@ interface MultipleChoiceAnswersProps {
   isFlipped: boolean;
   onAnswer: (isCorrect: boolean) => void;
   otherFlashcards: (FlashCard | Flashcard)[];
+  isGuestMode?: boolean;
 }
 
 export function MultipleChoiceAnswers({
@@ -20,6 +21,7 @@ export function MultipleChoiceAnswers({
   isFlipped,
   onAnswer,
   otherFlashcards,
+  isGuestMode = false
 }: MultipleChoiceAnswersProps) {
   const [options, setOptions] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -75,6 +77,10 @@ export function MultipleChoiceAnswers({
     
     const isCorrect = option === correctAnswer;
     
+    onAnswer(isCorrect);
+    
+    if (isGuestMode) return;
+    
     const flashcardId = 'id' in card ? 
       (typeof card.id === 'number' ? card.id : 
        typeof card.id === 'string' ? parseInt(card.id, 10) : null) 
@@ -111,8 +117,6 @@ export function MultipleChoiceAnswers({
     } else {
       setErrorMessage("Nie można zaktualizować postępu - fiszka nie ma prawidłowego ID");
     }
-    
-    onAnswer(isCorrect);
   };
 
   const letters = ["A", "B", "C", "D"];

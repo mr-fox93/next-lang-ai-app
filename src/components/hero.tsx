@@ -9,9 +9,9 @@ import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from 
 import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -24,20 +24,16 @@ export default function Hero() {
     difficultyLevel: "easy"
   });
   const router = useRouter();
-  const { isSignedIn } = useAuth();
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
 
-    if (!isSignedIn) {
-      router.push("/sign-in?redirect=/");
-      return;
-    }
-
     setIsLoading(true);
     setErrorMessage(null);
+
     try {
-      const result = await generateFlashcardsAction({
+      // Generowanie fiszek dla niezalogowanych użytkowników
+      const result = await handleGuestFlashcardGeneration({
         count: 5,
         message: userInput,
         level: languageSettings.difficultyLevel,
@@ -45,9 +41,11 @@ export default function Hero() {
         targetLanguage: languageSettings.targetLanguage
       });
       
-      if (result.success) {
+      if (result.success && result.flashcards) {
+        // Bezpieczne przetwarzanie fiszek z zapewnieniem, że nie są undefined
+        guestFlashcardsStorage.addFlashcards(result.flashcards);
         setUserInput("");
-        router.push("/flashcards");
+        router.push("/guest-flashcard");
       } else {
         setErrorMessage(result.error || "Error generating flashcards");
       }
