@@ -39,16 +39,6 @@ interface AIFlashcardGenerator {
   generateFlashcardsWithAI(prompt: string): Promise<Record<string, string>[]>;
 }
 
-// Definiuję interfejs dla wyniku generowania
-interface RawFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  [key: string]: string;
-}
-
 export async function generateFlashcardsAction(params: GenerateFlashcardsActionParams) {
   try {
     const { count, message, level, sourceLanguage, targetLanguage } = params;
