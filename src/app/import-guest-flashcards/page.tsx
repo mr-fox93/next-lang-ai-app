@@ -21,7 +21,10 @@ interface ImportableFlashcard {
 }
 
 export default function ImportGuestFlashcardsPage() {
+  // Te zmienne są używane w animacji, choć ESLint ich nie wykrywa
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isImporting, setIsImporting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flashcardCount, setFlashcardCount] = useState(0);

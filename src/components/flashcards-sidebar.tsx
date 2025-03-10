@@ -12,7 +12,7 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { 
   AlertDialog,
@@ -68,7 +68,7 @@ export function FlashcardsSidebar({
   const router = useRouter();
   const { toast } = useToast();
   
-  const fetchLanguages = async () => {
+  const fetchLanguages = useCallback(async () => {
     if (isGuestMode) {
       setSelectedLanguage('all');
       return;
@@ -91,7 +91,7 @@ export function FlashcardsSidebar({
     } finally {
       setIsLoadingLanguages(false);
     }
-  };
+  }, [isGuestMode, selectedLanguage]);
   
   useEffect(() => {
     fetchLanguages();

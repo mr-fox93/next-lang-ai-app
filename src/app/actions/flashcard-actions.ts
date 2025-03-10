@@ -26,6 +26,14 @@ interface GenerateFlashcardsActionParams {
   targetLanguage: string;
 }
 
+// Definiuję typy dla response z GPT
+interface FlashcardGenerationResponse {
+  success: boolean;
+  flashcards?: ImportableFlashcard[];
+  error?: string;
+  redirect?: string;
+}
+
 export async function generateFlashcardsAction(params: GenerateFlashcardsActionParams) {
   try {
     const { count, message, level, sourceLanguage, targetLanguage } = params;
@@ -226,7 +234,7 @@ export async function handleGuestFlashcardGeneration(data: {
   level: string;
   sourceLanguage: string;
   targetLanguage: string;
-}) {
+}): Promise<FlashcardGenerationResponse> {
   try {
     // Wywołujemy akcję generowania fiszek dla gościa
     const result = await generateFlashcardsForGuestAction(data);
