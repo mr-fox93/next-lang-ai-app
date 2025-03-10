@@ -9,10 +9,9 @@ import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from 
 import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
-import { generateFlashcardsAction, handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
+import { handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
-import { Flashcard } from "@/core/entities/Flashcard";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
