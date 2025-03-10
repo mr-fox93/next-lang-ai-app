@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
+import { generateFlashcardsForGuestAction } from "@/app/actions/flashcard-actions";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -29,27 +31,44 @@ export default function Hero() {
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
 
-    if (!isSignedIn) {
-      router.push("/sign-in?redirect=/");
-      return;
-    }
-
     setIsLoading(true);
     setErrorMessage(null);
+
     try {
-      const result = await generateFlashcardsAction({
-        count: 5,
-        message: userInput,
-        level: languageSettings.difficultyLevel,
-        sourceLanguage: languageSettings.sourceLanguage,
-        targetLanguage: languageSettings.targetLanguage
-      });
-      
-      if (result.success) {
-        setUserInput("");
-        router.push("/flashcards");
+      if (!isSignedIn) {
+        // Dla niezalogowanych użytkowników
+        const result = await generateFlashcardsForGuestAction({
+          count: 5,
+          message: userInput,
+          level: languageSettings.difficultyLevel,
+          sourceLanguage: languageSettings.sourceLanguage,
+          targetLanguage: languageSettings.targetLanguage
+        });
+        
+        if (result.success) {
+          // Zapisujemy fiszki w localStorage
+          guestFlashcardsStorage.addFlashcards(result.flashcards);
+          setUserInput("");
+          router.push("/guest-flashcard");
+        } else {
+          setErrorMessage(result.error || "Error generating flashcards");
+        }
       } else {
-        setErrorMessage(result.error || "Error generating flashcards");
+        // Dla zalogowanych użytkowników - bez zmian
+        const result = await generateFlashcardsAction({
+          count: 5,
+          message: userInput,
+          level: languageSettings.difficultyLevel,
+          sourceLanguage: languageSettings.sourceLanguage,
+          targetLanguage: languageSettings.targetLanguage
+        });
+        
+        if (result.success) {
+          setUserInput("");
+          router.push("/flashcards");
+        } else {
+          setErrorMessage(result.error || "Error generating flashcards");
+        }
       }
     } catch (error) {
       console.error("Flashcard generation client error:", error);

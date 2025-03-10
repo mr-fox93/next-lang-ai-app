@@ -42,6 +42,9 @@ interface FlashcardsSidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   flashcards: Flashcard[];
+  isGuestMode?: boolean;
+  onLanguageSelectClick?: () => void;
+  onNewFlashcardsClick?: () => void;
 }
 
 export function FlashcardsSidebar({
@@ -50,6 +53,9 @@ export function FlashcardsSidebar({
   isCollapsed,
   onToggleCollapse,
   flashcards,
+  isGuestMode = false,
+  onLanguageSelectClick,
+  onNewFlashcardsClick
 }: FlashcardsSidebarProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -63,6 +69,11 @@ export function FlashcardsSidebar({
   const { toast } = useToast();
   
   const fetchLanguages = async () => {
+    if (isGuestMode) {
+      setSelectedLanguage('all');
+      return;
+    }
+    
     setIsLoadingLanguages(true);
     try {
       const result = await getUserLanguagesAction();
@@ -84,7 +95,7 @@ export function FlashcardsSidebar({
   
   useEffect(() => {
     fetchLanguages();
-  }, []);
+  }, [isGuestMode]);
   
   useEffect(() => {
     if (selectedLanguage && selectedLanguage !== 'all') {
@@ -182,6 +193,11 @@ export function FlashcardsSidebar({
   };
 
   const handleLanguageChange = (value: string) => {
+    if (isGuestMode && onLanguageSelectClick) {
+      onLanguageSelectClick();
+      return;
+    }
+
     setSelectedLanguage(value);
 
     const newCategories = [...new Set(value === 'all' 
@@ -232,40 +248,58 @@ export function FlashcardsSidebar({
         </div>
 
         <div className="p-2 border-b border-white/10">
-          <Link href="/" className="block w-full">
+          {isGuestMode && onNewFlashcardsClick ? (
             <Button 
               variant="outline" 
-              className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center rounded-md"
+              onClick={onNewFlashcardsClick}
             >
               <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
               {!isCollapsed && <span>New Flashcards</span>}
             </Button>
-          </Link>
-          
-          {!isCollapsed && (languages.length > 0 || isLoadingLanguages) && (
-            <div className="mt-2">
-              <Select
-                value={selectedLanguage || undefined}
-                onValueChange={handleLanguageChange}
-                disabled={isLoadingLanguages}
+          ) : (
+            <Link href="/" className="block w-full">
+              <Button 
+                variant="outline" 
+                className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center rounded-md"
               >
-                <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-purple-400" />
-                    <SelectValue placeholder="Change language" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-black/90 border-white/10 text-white">
-                  <SelectItem value="all" className="hover:bg-purple-500/20">
-                    All languages
-                  </SelectItem>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang} value={lang} className="hover:bg-purple-500/20">
-                      {getLanguageName(lang)}
+                <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
+                {!isCollapsed && <span>New Flashcards</span>}
+              </Button>
+            </Link>
+          )}
+          
+          {!isCollapsed && (isGuestMode || languages.length > 0 || isLoadingLanguages) && (
+            <div className="mt-2">
+              {isGuestMode ? (
+                <div className="w-full bg-black/20 border border-white/10 text-white rounded-md px-3 py-2 text-sm flex items-center cursor-pointer opacity-80 hover:bg-purple-500/10 transition-colors duration-200" onClick={onLanguageSelectClick}>
+                  <Globe className="h-4 w-4 text-purple-400 mr-2" />
+                  <span className="text-gray-400">Log in to manage</span>
+                </div>
+              ) : (
+                <Select
+                  value={selectedLanguage || undefined}
+                  onValueChange={handleLanguageChange}
+                  disabled={isLoadingLanguages}
+                >
+                  <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-purple-400" />
+                      <SelectValue placeholder="Change language" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-black/90 border-white/10 text-white">
+                    <SelectItem value="all" className="hover:bg-purple-500/20">
+                      All languages
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {languages.map((lang) => (
+                      <SelectItem key={lang} value={lang} className="hover:bg-purple-500/20">
+                        {getLanguageName(lang)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           )}
         </div>

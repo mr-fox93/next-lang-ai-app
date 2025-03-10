@@ -1,7 +1,7 @@
 "use server";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getGenerateFlashcardsUseCase } from "@/lib/container";
+import { getGenerateFlashcardsUseCase, getFlashcardRepository } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 
@@ -98,6 +98,96 @@ export async function getUserLanguagesAction() {
       success: false,
       error: `Failed to get languages: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
       languages: []
+    };
+  }
+}
+
+// Akcja dla generowania fiszek dla niezalogowanych użytkowników
+// Ta funkcja ma podobną strukturę do generateFlashcardsAction, ale nie wymaga uwierzytelnienia
+export async function generateFlashcardsForGuestAction(data: {
+  count: number;
+  message: string;
+  level: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+}) {
+  // Uproszczona implementacja bez zapisu do bazy danych
+  try {
+    // Wykorzystujemy to samo API generowania co dla zalogowanych użytkowników,
+    // ale nie zapisujemy wyników w bazie danych
+    const result = await getGenerateFlashcardsUseCase().execute({
+      count: data.count,
+      message: data.message,
+      level: data.level,
+      sourceLanguage: data.sourceLanguage,
+      targetLanguage: data.targetLanguage,
+      userId: 'guest', // Używamy 'guest' jako identyfikatora
+      userEmail: 'guest@example.com' // Dodajemy fikcyjny email dla gościa
+    });
+
+    return { 
+      success: true, 
+      flashcards: result.flashcards || [],
+      // W przypadku gościa nie zwracamy ID sesji, ponieważ nie zapisujemy jej w bazie
+      sessionId: null 
+    };
+  } catch (error) {
+    console.error("Error generating flashcards for guest:", error);
+    return {
+      success: false,
+      error: error instanceof Error 
+        ? error.message 
+        : "An unexpected error occurred while generating flashcards",
+      flashcards: [],
+      sessionId: null
+    };
+  }
+}
+
+// Akcja do importowania fiszek gościa do bazy danych po zalogowaniu
+export async function importGuestFlashcardsAction(flashcards: any[]) {
+  const { userId } = await auth();
+  const user = await currentUser();
+  
+  if (!userId || !user) {
+    return {
+      success: false,
+      error: "User not authenticated"
+    };
+  }
+
+  try {
+    // Otrzymujemy repozytorium fiszek
+    const flashcardRepository = getFlashcardRepository();
+    
+    // Tworzymy tablicę obietnic dla każdej fiszki
+    const flashcardPromises = flashcards.map(card => 
+      flashcardRepository.createFlashcard({
+        origin_text: card.origin_text,
+        translate_text: card.translate_text,
+        example_using: card.example_using,
+        translate_example: card.translate_example,
+        category: card.category,
+        sourceLanguage: card.sourceLanguage,
+        targetLanguage: card.targetLanguage,
+        difficultyLevel: card.difficultyLevel,
+        userId: userId
+      })
+    );
+    
+    // Zapisujemy wszystkie fiszki równolegle
+    await Promise.all(flashcardPromises);
+
+    return {
+      success: true
+    };
+  } catch (error) {
+    console.error("Error importing guest flashcards:", error);
+    return {
+      success: false,
+      error: error instanceof Error 
+        ? error.message 
+        : "An unexpected error occurred while importing flashcards"
     };
   }
 } 
