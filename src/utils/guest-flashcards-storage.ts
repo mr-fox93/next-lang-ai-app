@@ -1,5 +1,17 @@
 import { Flashcard } from "@/core/entities/Flashcard";
 
+// Definiuję interfejs dla ImportableFlashcard, aby uniknąć zależności od pliku actions.ts
+interface ImportableFlashcard {
+  origin_text: string;
+  translate_text: string;
+  example_using: string;
+  translate_example: string;
+  category: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficultyLevel: string;
+}
+
 const GUEST_FLASHCARDS_KEY = "guest_flashcards";
 
 export const guestFlashcardsStorage = {
@@ -30,7 +42,7 @@ export const guestFlashcardsStorage = {
   },
   
   // Dodawanie nowych fiszek do istniejących
-  addFlashcards: (newFlashcards: any[]): Flashcard[] => {
+  addFlashcards: (newFlashcards: ImportableFlashcard[]): Flashcard[] => {
     const existingFlashcards = guestFlashcardsStorage.getFlashcards();
     
     // Dodajemy nowe fiszki i upewniamy się, że ID są unikalne
