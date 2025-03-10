@@ -35,7 +35,6 @@ export default function Hero() {
 
     try {
       if (!isSignedIn) {
-        // Dla niezalogowanych użytkowników
         const result = await handleGuestFlashcardGeneration({
           count: 5,
           message: userInput,
@@ -45,16 +44,13 @@ export default function Hero() {
         });
         
         if (result.success) {
-          // Zapisujemy fiszki w localStorage
           guestFlashcardsStorage.addFlashcards(result.flashcards);
           
-          // Przekierowujemy użytkownika na stronę z fiszkami dla gości
           router.push("/guest-flashcard");
         } else {
           setErrorMessage(result.error || "Wystąpił błąd podczas generowania fiszek.");
         }
       } else {
-        // Dla zalogowanych użytkowników - bez zmian
         const result = await generateFlashcardsAction({
           count: 5,
           message: userInput,

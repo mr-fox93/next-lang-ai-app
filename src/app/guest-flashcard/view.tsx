@@ -97,10 +97,11 @@ export default function GuestFlashcardsView({
     setIsImporting(true);
     try {
       sessionStorage.setItem('flashcardsToImport', 'true');
+      sessionStorage.setItem('directRedirectAfterImport', 'true');
       router.push("/sign-in?redirect=/import-guest-flashcards");
     } catch (error) {
-      console.error("Błąd przygotowania do importu:", error);
-      setError("Nie udało się przygotować fiszek do importu.");
+      console.error("Error preparing for import:", error);
+      setError("Failed to prepare flashcards for import.");
     } finally {
       setIsImporting(false);
     }

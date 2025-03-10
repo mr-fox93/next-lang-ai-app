@@ -3,10 +3,7 @@ import { getFlashcardsForGuest, getProgressStatsForGuest } from './actions';
 import GuestFlashcardsView from './view';
 import { Loader } from "@/components/ui/loader";
 
-/**
- * Komponent strony dla niezalogowanych użytkowników.
- * Wyświetla przykładowe fiszki i zachęca do założenia konta.
- */
+
 export default async function GuestFlashcardsPage() {
   const { flashcards, error } = await getFlashcardsForGuest();
   const progressStats = await getProgressStatsForGuest();
