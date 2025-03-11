@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Grid, Maximize2, Upload, PlusCircle, Save } from "lucide-react";
+import { Menu, Grid, Maximize2, PlusCircle, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
@@ -49,7 +49,7 @@ export default function GuestFlashcardsView({
   const [error, setError] = useState<string | null>(serverError || null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
-  const [isImporting, setIsImporting] = useState(false);
+  const [isImporting] = useState(false);
 
   const router = useRouter();
 
@@ -168,8 +168,9 @@ export default function GuestFlashcardsView({
           </h2>
 
           <p className="text-gray-300 mb-8 text-lg">
-            It looks like you haven't created any flashcards yet. Head back to
-            the main page to generate your first set of interactive flashcards!
+            It looks like you haven&apos;t created any flashcards yet. Head back
+            to the main page to generate your first set of interactive
+            flashcards!
           </p>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

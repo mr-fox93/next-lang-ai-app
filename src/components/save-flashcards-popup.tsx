@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, LogIn, UserPlus, Save, ChevronRight, Sparkles } from "lucide-react";
+import { X, LogIn, UserPlus, Save, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
