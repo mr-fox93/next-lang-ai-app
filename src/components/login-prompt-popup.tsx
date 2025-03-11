@@ -10,6 +10,7 @@ import {
   Check,
   ChevronRight,
   Sparkles,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -53,6 +54,11 @@ export function LoginPromptPopup({
     window.location.href =
       "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
     onClose();
+  };
+
+  const handleClerkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open("https://clerk.com/", "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -179,6 +185,22 @@ export function LoginPromptPopup({
                 Continue as Guest
                 <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
               </Button>
+
+              {/* Secured by Clerk */}
+              <div className="mt-6 pt-4 border-t border-purple-500/20 flex items-center justify-center">
+                <div className="flex items-center space-x-2 text-xs text-gray-400">
+                  <Shield className="h-3.5 w-3.5 text-emerald-500" />
+                  <span>
+                    Secured by{" "}
+                    <button
+                      onClick={handleClerkClick}
+                      className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+                    >
+                      Clerk
+                    </button>
+                  </span>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
