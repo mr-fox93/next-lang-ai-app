@@ -45,7 +45,15 @@ export function LoginPromptPopup({
   }, [isOpen]);
 
   const handleSignIn = () => {
-    router.push("/sign-in?redirect=/flashcards");
+    try {
+      // Ustawienie wartości w sessionStorage potrzebnych do importu fiszek
+      sessionStorage.setItem("flashcardsToImport", "true");
+      sessionStorage.setItem("directRedirectAfterImport", "true");
+      // Zmiana przekierowania na stronę importu fiszek
+      router.push("/sign-in?redirect=/import-guest-flashcards");
+    } catch (error) {
+      console.error("Error preparing for import:", error);
+    }
     onClose();
   };
 
