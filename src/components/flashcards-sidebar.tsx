@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -48,6 +49,7 @@ interface FlashcardsSidebarProps {
   isGuestMode?: boolean;
   onLanguageSelectClick?: () => void;
   onNewFlashcardsClick?: () => void;
+  onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
 }
 
 export function FlashcardsSidebar({
@@ -59,6 +61,7 @@ export function FlashcardsSidebar({
   isGuestMode = false,
   onLanguageSelectClick,
   onNewFlashcardsClick,
+  onFlashcardsUpdate,
 }: FlashcardsSidebarProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -157,28 +160,45 @@ export function FlashcardsSidebar({
     setErrorMessage(null);
 
     try {
-      const result = await deleteCategoryAction(categoryToDelete);
+      if (isGuestMode) {
+        const deletedCount =
+          guestFlashcardsStorage.deleteFlashcardsByCategory(categoryToDelete);
 
-      if (result.success) {
         closeDeleteDialog();
-
         router.refresh();
-
-        await fetchLanguages();
 
         toast({
           title: "Category deleted",
-          description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
+          description: `Successfully deleted category "${categoryToDelete}" with ${deletedCount} flashcards.`,
           variant: "success",
         });
-      } else {
-        setErrorMessage(result.error || "Failed to delete category");
 
-        toast({
-          title: "Error",
-          description: result.error || "Failed to delete category",
-          variant: "destructive",
-        });
+        const updatedFlashcards = guestFlashcardsStorage.getFlashcards();
+        if (onFlashcardsUpdate) {
+          onFlashcardsUpdate(updatedFlashcards);
+        }
+      } else {
+        const result = await deleteCategoryAction(categoryToDelete);
+
+        if (result.success) {
+          closeDeleteDialog();
+          router.refresh();
+          await fetchLanguages();
+
+          toast({
+            title: "Category deleted",
+            description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
+            variant: "success",
+          });
+        } else {
+          setErrorMessage(result.error || "Failed to delete category");
+
+          toast({
+            title: "Error",
+            description: result.error || "Failed to delete category",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Category deletion error:", error);

@@ -9,7 +9,7 @@ import {
   LanguagesIcon,
   Check,
   ChevronRight,
-  Globe,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -50,7 +50,8 @@ export function LoginPromptPopup({
   };
 
   const handleSignUp = () => {
-    router.push("/sign-up?redirect=/flashcards");
+    window.location.href =
+      "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
     onClose();
   };
 
@@ -94,8 +95,21 @@ export function LoginPromptPopup({
             </button>
 
             <div className="text-center mb-8 relative">
-              <div className="inline-block p-3 bg-purple-500/10 rounded-full mb-4">
-                <Globe className="h-8 w-8 text-purple-400" />
+              <div className="inline-block p-4 bg-gradient-to-br from-purple-600/30 to-purple-800/30 rounded-full mb-4 border border-purple-500/30 shadow-lg shadow-purple-500/20">
+                <motion.div
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 2, 0, -2, 0],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  }}
+                >
+                  <LanguagesIcon className="h-10 w-10 text-purple-400" />
+                </motion.div>
               </div>
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 mb-3">
                 Enhance Your Learning Experience
@@ -128,17 +142,17 @@ export function LoginPromptPopup({
                 <div className="flex items-center text-gray-300">
                   <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0" />
                   <span className="text-sm">
-                    Unlimited access to flashcards in all languages
+                    Unlimited access to flashcards in all languages.
                   </span>
                 </div>
                 <div className="flex items-center text-gray-300">
                   <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0" />
-                  <span className="text-sm">Track your learning progress</span>
+                  <span className="text-sm">Track your learning progress.</span>
                 </div>
                 <div className="flex items-center text-gray-300">
                   <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0" />
                   <span className="text-sm">
-                    Sync flashcards across all your devices
+                    Sync flashcards across all your devices.
                   </span>
                 </div>
               </div>
