@@ -2,19 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  PlusCircle, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  PlusCircle,
+  ChevronLeft,
+  ChevronRight,
   Trash2,
-  Globe
+  Globe,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { Flashcard } from "@/core/entities/Flashcard";
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -24,7 +24,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import { deleteCategoryAction, getUserLanguagesAction } from "@/app/actions/flashcard-actions";
+import {
+  deleteCategoryAction,
+  getUserLanguagesAction,
+} from "@/app/actions/flashcard-actions";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useToast } from "@/components/ui/use-toast";
@@ -35,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -45,6 +49,7 @@ interface FlashcardsSidebarProps {
   isGuestMode?: boolean;
   onLanguageSelectClick?: () => void;
   onNewFlashcardsClick?: () => void;
+  onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
 }
 
 export function FlashcardsSidebar({
@@ -55,7 +60,8 @@ export function FlashcardsSidebar({
   flashcards,
   isGuestMode = false,
   onLanguageSelectClick,
-  onNewFlashcardsClick
+  onNewFlashcardsClick,
+  onFlashcardsUpdate,
 }: FlashcardsSidebarProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -64,23 +70,23 @@ export function FlashcardsSidebar({
   const [languages, setLanguages] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
-  
+
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const fetchLanguages = useCallback(async () => {
     if (isGuestMode) {
-      setSelectedLanguage('all');
+      setSelectedLanguage("all");
       return;
     }
-    
+
     setIsLoadingLanguages(true);
     try {
       const result = await getUserLanguagesAction();
       if (result.success) {
         setLanguages(result.languages);
         if (!selectedLanguage) {
-          setSelectedLanguage('all');
+          setSelectedLanguage("all");
         }
       } else {
         setErrorMessage(result.error || "Failed to fetch available languages");
@@ -92,96 +98,117 @@ export function FlashcardsSidebar({
       setIsLoadingLanguages(false);
     }
   }, [isGuestMode, selectedLanguage]);
-  
+
   useEffect(() => {
     fetchLanguages();
   }, [fetchLanguages]);
-  
+
   useEffect(() => {
-    if (selectedLanguage && selectedLanguage !== 'all') {
+    if (selectedLanguage && selectedLanguage !== "all") {
       const hasLanguageCategories = flashcards.some(
-        card => card.targetLanguage === selectedLanguage
+        (card) => card.targetLanguage === selectedLanguage
       );
-      
+
       if (!hasLanguageCategories && languages.length > 0) {
-        setSelectedLanguage('all');
+        setSelectedLanguage("all");
       }
     }
   }, [languages, flashcards, selectedLanguage]);
-  
+
   const getLanguageName = (languageCode: string): string => {
     const languageNames: Record<string, string> = {
-      'en': 'English',
-      'pl': 'Polski',
-      'es': 'Español',
-      'de': 'Deutsch',
-      'fr': 'Français',
-      'it': 'Italiano',
-      'pt': 'Português',
-      'ru': 'Русский',
-      'zh': '中文',
-      'ja': '日本語',
-      'ko': '한국어'
+      en: "English",
+      pl: "Polski",
+      es: "Español",
+      de: "Deutsch",
+      fr: "Français",
+      it: "Italiano",
+      pt: "Português",
+      ru: "Русский",
+      zh: "中文",
+      ja: "日本語",
+      ko: "한국어",
     };
-    
+
     return languageNames[languageCode] || languageCode;
   };
-  
-  const filteredFlashcards = selectedLanguage && selectedLanguage !== 'all'
-    ? flashcards.filter(card => card.targetLanguage === selectedLanguage)
-    : flashcards;
-  
-  const categories = [...new Set(filteredFlashcards.map((card) => card.category))];
+
+  const filteredFlashcards =
+    selectedLanguage && selectedLanguage !== "all"
+      ? flashcards.filter((card) => card.targetLanguage === selectedLanguage)
+      : flashcards;
+
+  const categories = [
+    ...new Set(filteredFlashcards.map((card) => card.category)),
+  ];
 
   const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setCategoryToDelete(category);
     setIsDeleteDialogOpen(true);
   };
-  
+
   const closeDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
     setCategoryToDelete(null);
   };
-  
+
   const confirmDeleteCategory = async () => {
     if (!categoryToDelete) return;
-    
+
     setIsDeleting(true);
     setErrorMessage(null);
-    
+
     try {
-      const result = await deleteCategoryAction(categoryToDelete);
-      
-      if (result.success) {
+      if (isGuestMode) {
+        const deletedCount =
+          guestFlashcardsStorage.deleteFlashcardsByCategory(categoryToDelete);
+
         closeDeleteDialog();
-        
         router.refresh();
-        
-        await fetchLanguages();
-        
+
         toast({
           title: "Category deleted",
-          description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
+          description: `Successfully deleted category "${categoryToDelete}" with ${deletedCount} flashcards.`,
           variant: "success",
         });
+
+        const updatedFlashcards = guestFlashcardsStorage.getFlashcards();
+        if (onFlashcardsUpdate) {
+          onFlashcardsUpdate(updatedFlashcards);
+        }
       } else {
-        setErrorMessage(result.error || "Failed to delete category");
-        
-        toast({
-          title: "Error",
-          description: result.error || "Failed to delete category",
-          variant: "destructive",
-        });
+        const result = await deleteCategoryAction(categoryToDelete);
+
+        if (result.success) {
+          closeDeleteDialog();
+          router.refresh();
+          await fetchLanguages();
+
+          toast({
+            title: "Category deleted",
+            description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
+            variant: "success",
+          });
+        } else {
+          setErrorMessage(result.error || "Failed to delete category");
+
+          toast({
+            title: "Error",
+            description: result.error || "Failed to delete category",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Category deletion error:", error);
-      const errorMessage = error instanceof Error 
-        ? `Category deletion failed: ${error.message}` 
-        : "An unexpected error occurred while deleting the category";
-      
+      const errorMessage =
+        error instanceof Error
+          ? `Category deletion failed: ${error.message}`
+          : "An unexpected error occurred while deleting the category";
+
       setErrorMessage(errorMessage);
-      
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -200,15 +227,21 @@ export function FlashcardsSidebar({
 
     setSelectedLanguage(value);
 
-    const newCategories = [...new Set(value === 'all' 
-      ? flashcards.map(card => card.category)
-      : flashcards.filter(card => card.targetLanguage === value).map(card => card.category))];
+    const newCategories = [
+      ...new Set(
+        value === "all"
+          ? flashcards.map((card) => card.category)
+          : flashcards
+              .filter((card) => card.targetLanguage === value)
+              .map((card) => card.category)
+      ),
+    ];
 
-    if (!newCategories.includes(selectedCategory || '')) {
+    if (!newCategories.includes(selectedCategory || "")) {
       if (newCategories.length > 0) {
         onSelectCategory(newCategories[0]);
       } else {
-        onSelectCategory('');
+        onSelectCategory("");
       }
     }
   };
@@ -249,8 +282,8 @@ export function FlashcardsSidebar({
 
         <div className="p-2 border-b border-white/10">
           {isGuestMode && onNewFlashcardsClick ? (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center rounded-md"
               onClick={onNewFlashcardsClick}
             >
@@ -259,8 +292,8 @@ export function FlashcardsSidebar({
             </Button>
           ) : (
             <Link href="/" className="block w-full">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center rounded-md"
               >
                 <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
@@ -268,47 +301,63 @@ export function FlashcardsSidebar({
               </Button>
             </Link>
           )}
-          
-          {!isCollapsed && (isGuestMode || languages.length > 0 || isLoadingLanguages) && (
-            <div className="mt-2">
-              {isGuestMode ? (
-                <div className="w-full bg-black/20 border border-white/10 text-white rounded-md px-3 py-2 text-sm flex items-center cursor-pointer opacity-80 hover:bg-purple-500/10 transition-colors duration-200" onClick={onLanguageSelectClick}>
-                  <Globe className="h-4 w-4 text-purple-400 mr-2" />
-                  <span className="text-gray-400">Log in to manage</span>
-                </div>
-              ) : (
-                <Select
-                  value={selectedLanguage || undefined}
-                  onValueChange={handleLanguageChange}
-                  disabled={isLoadingLanguages}
-                >
-                  <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
-                    <div className="flex items-center gap-2">
+
+          {!isCollapsed &&
+            (isGuestMode || languages.length > 0 || isLoadingLanguages) && (
+              <div className="mt-2">
+                {isGuestMode ? (
+                  <div
+                    className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200"
+                    onClick={onLanguageSelectClick}
+                  >
+                    <div className="flex items-center gap-2 text-sm">
                       <Globe className="h-4 w-4 text-purple-400" />
-                      <SelectValue placeholder="Change language" />
+                      <span className="text-white">All languages</span>
                     </div>
-                  </SelectTrigger>
-                  <SelectContent className="bg-black/90 border-white/10 text-white">
-                    <SelectItem value="all" className="hover:bg-purple-500/20">
-                      All languages
-                    </SelectItem>
-                    {languages.map((lang) => (
-                      <SelectItem key={lang} value={lang} className="hover:bg-purple-500/20">
-                        {getLanguageName(lang)}
+                    <div className="ml-auto">
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </div>
+                  </div>
+                ) : (
+                  <Select
+                    value={selectedLanguage || undefined}
+                    onValueChange={handleLanguageChange}
+                    disabled={isLoadingLanguages}
+                  >
+                    <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-purple-400" />
+                        <SelectValue placeholder="Change language" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-black/90 border-white/10 text-white">
+                      <SelectItem
+                        value="all"
+                        className="hover:bg-purple-500/20"
+                      >
+                        All languages
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          )}
+                      {languages.map((lang) => (
+                        <SelectItem
+                          key={lang}
+                          value={lang}
+                          className="hover:bg-purple-500/20"
+                        >
+                          {getLanguageName(lang)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            )}
         </div>
 
         {errorMessage && (
           <div className="p-2">
-            <ErrorMessage 
-              message={errorMessage} 
-              onClose={() => setErrorMessage(null)} 
+            <ErrorMessage
+              message={errorMessage}
+              onClose={() => setErrorMessage(null)}
             />
           </div>
         )}
@@ -336,7 +385,7 @@ export function FlashcardsSidebar({
                     )}
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Button>
-                  
+
                   {!isCollapsed && (
                     <Button
                       variant="ghost"
@@ -352,33 +401,46 @@ export function FlashcardsSidebar({
               ))
             ) : (
               <p className="text-gray-400 text-center py-4">
-                {isLoadingLanguages 
-                  ? "Loading categories..." 
-                  : selectedLanguage === 'all'
-                    ? "No categories available"
-                    : selectedLanguage 
-                      ? `No categories for ${getLanguageName(selectedLanguage)} language` 
-                      : "No categories available"}
+                {isLoadingLanguages
+                  ? "Loading categories..."
+                  : selectedLanguage === "all"
+                  ? "No categories available"
+                  : selectedLanguage
+                  ? `No categories for ${getLanguageName(
+                      selectedLanguage
+                    )} language`
+                  : "No categories available"}
               </p>
             )}
           </div>
         </ScrollArea>
       </motion.div>
-      
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete category &quot;{categoryToDelete}&quot;?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Delete category &quot;{categoryToDelete}&quot;?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              All flashcards in this category will be permanently deleted.
-              This action cannot be undone.
+              All flashcards in this category will be permanently deleted. This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDeleteDialog} disabled={isDeleting}>
+            <AlertDialogCancel
+              onClick={closeDeleteDialog}
+              disabled={isDeleting}
+            >
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteCategory} disabled={isDeleting}>
+            <AlertDialogAction
+              onClick={confirmDeleteCategory}
+              disabled={isDeleting}
+            >
               {isDeleting ? "Deleting..." : "Delete category"}
             </AlertDialogAction>
           </AlertDialogFooter>
