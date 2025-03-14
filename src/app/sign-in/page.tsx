@@ -1,17 +1,15 @@
 "use client";
 
-import { Suspense } from 'react';
+import { Suspense } from "react";
 import { SignIn } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 
-// Stwórz osobny komponent używający useSearchParams
 function SignInWithRedirect() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
-  
-  // Ustaw domyślne przekierowanie na /flashcards, chyba że określono inaczej
+
   const fallbackRedirectUrl = redirect || "/flashcards";
-  
+
   return (
     <SignIn
       path="/sign-in"
@@ -30,7 +28,6 @@ function SignInWithRedirect() {
   );
 }
 
-// Główny komponent strony
 export default function SignInPage() {
   return (
     <div className="min-h-screen w-full bg-black antialiased relative overflow-hidden flex items-center justify-center p-4">

@@ -3,14 +3,13 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 
-// Ustawiam maksymalny czas trwania funkcji na 60 sekund (maksimum dla planu Hobby)
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     const user = await currentUser();
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: "Nie jesteś zalogowany" },
@@ -18,7 +17,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const { count, message, level, sourceLanguage = "en", targetLanguage = "pl" } = await req.json();
+    const {
+      count,
+      message,
+      level,
+      sourceLanguage = "en",
+      targetLanguage = "pl",
+    } = await req.json();
 
     const generateParams: GenerateFlashcardsParams = {
       count,
@@ -27,16 +32,13 @@ export async function POST(req: Request) {
       userId,
       userEmail: user?.primaryEmailAddress?.emailAddress || "",
       sourceLanguage,
-      targetLanguage
+      targetLanguage,
     };
 
     const result = await getGenerateFlashcardsUseCase().execute(generateParams);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
     return NextResponse.json(result);

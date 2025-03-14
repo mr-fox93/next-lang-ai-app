@@ -5,7 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import { LayoutTemplate } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
-import { LanguageSettings, type LanguageSettings as LanguageSettingsType } from "@/components/language-settings";
+import {
+  LanguageSettings,
+  type LanguageSettings as LanguageSettingsType,
+} from "@/components/language-settings";
 import { useState } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
@@ -18,11 +21,12 @@ export default function Hero() {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [languageSettings, setLanguageSettings] = useState<LanguageSettingsType>({
-    sourceLanguage: "pl",
-    targetLanguage: "en",
-    difficultyLevel: "easy"
-  });
+  const [languageSettings, setLanguageSettings] =
+    useState<LanguageSettingsType>({
+      sourceLanguage: "pl",
+      targetLanguage: "en",
+      difficultyLevel: "easy",
+    });
   const router = useRouter();
 
   const handleGenerateFlashcards = async () => {
@@ -32,17 +36,15 @@ export default function Hero() {
     setErrorMessage(null);
 
     try {
-      // Generowanie fiszek dla niezalogowanych użytkowników
       const result = await handleGuestFlashcardGeneration({
         count: 5,
         message: userInput,
         level: languageSettings.difficultyLevel,
         sourceLanguage: languageSettings.sourceLanguage,
-        targetLanguage: languageSettings.targetLanguage
+        targetLanguage: languageSettings.targetLanguage,
       });
-      
+
       if (result.success && result.flashcards) {
-        // Bezpieczne przetwarzanie fiszek z zapewnieniem, że nie są undefined
         guestFlashcardsStorage.addFlashcards(result.flashcards);
         setUserInput("");
         router.push("/guest-flashcard");
@@ -52,8 +54,8 @@ export default function Hero() {
     } catch (error) {
       console.error("Flashcard generation client error:", error);
       setErrorMessage(
-        error instanceof Error 
-          ? `Flashcard generation failed: ${error.message}` 
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
           : "An unexpected error occurred during flashcard generation"
       );
     } finally {
@@ -91,9 +93,7 @@ export default function Hero() {
             for your learning journey.
           </motion.p>
 
-          <LanguageSettings 
-            onChange={setLanguageSettings}
-          />
+          <LanguageSettings onChange={setLanguageSettings} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -101,11 +101,11 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-4 md:px-0"
           >
-            <ErrorMessage 
-              message={errorMessage} 
+            <ErrorMessage
+              message={errorMessage}
               onClose={() => setErrorMessage(null)}
             />
-            
+
             <div className="relative w-full group">
               <Textarea
                 className="min-h-[120px] bg-white/[0.08] border-2 border-white/10 text-white resize-none text-lg p-6 focus:border-purple-500/50 focus:bg-white/[0.12] transition-all duration-300"
