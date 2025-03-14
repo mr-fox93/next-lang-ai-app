@@ -44,17 +44,6 @@ import {
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 
-interface ImportableFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-}
-
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
   onSelectCategory: (category: string) => void;
