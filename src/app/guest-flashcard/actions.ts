@@ -1,4 +1,4 @@
-import { ProgressActionResult, UserProgressStats } from "@/types/progress";
+import { ProgressActionResult } from "@/types/progress";
 
 export async function getFlashcardsForGuest() {
   return {

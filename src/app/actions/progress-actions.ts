@@ -15,7 +15,7 @@ interface UpdateProgressActionParams {
 
 export async function updateFlashcardProgressAction(
   params: UpdateProgressActionParams
-): Promise<{ success: boolean; data?: any; error?: string }> {
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     const { flashcardId, isCorrect } = params;
     const { userId } = await auth();

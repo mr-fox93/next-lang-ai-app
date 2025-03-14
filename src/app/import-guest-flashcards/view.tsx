@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader } from "lucide-react";
 import { FlashcardImportAnimation } from "@/components/flashcard-import-animation";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { importGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
@@ -105,6 +105,45 @@ export default function ImportGuestFlashcardsView() {
           </CardContent>
 
           <CardFooter className="flex justify-center">
+            <Button
+              onClick={() => router.push("/flashcards")}
+              className="bg-purple-600 hover:bg-purple-500 text-white"
+            >
+              Go to Flashcards
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isImporting) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-gray-700 bg-gray-900 text-white">
+          <CardHeader>
+            <CardTitle>Importing Flashcards</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center">
+            <Loader className="w-12 h-12 mb-4" />
+            <p>Your flashcards are being imported...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isComplete) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-gray-700 bg-gray-900 text-white">
+          <CardHeader>
+            <CardTitle className="text-green-500">Import Complete</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>All flashcards have been successfully imported.</p>
+          </CardContent>
+          <CardFooter>
             <Button
               onClick={handleComplete}
               className="bg-purple-600 hover:bg-purple-500 text-white"
