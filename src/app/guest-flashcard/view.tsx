@@ -86,7 +86,7 @@ export default function GuestFlashcardsView({
     if (currentCardIndex < categoryCards.length - 1) {
       setCurrentCardIndex((prev) => prev + 1);
     } else {
-      setCurrentCardIndex(0); // Loop back to the beginning when we reach the end
+      setCurrentCardIndex(0);
     }
   };
 
