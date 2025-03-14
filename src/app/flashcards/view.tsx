@@ -13,6 +13,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
+import { toast } from "@/components/ui/use-toast";
+import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -45,6 +47,7 @@ export default function FlashcardsView({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -90,6 +93,72 @@ export default function FlashcardsView({
           ? `Sign out failed: ${error.message}`
           : "An unexpected error occurred during sign out"
       );
+    }
+  };
+
+  const handleGenerateFlashcards = async (category: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Zbieramy istniejące fiszki dla tej kategorii
+      const existingFlashcards = initialFlashcards.filter(
+        (card) => card.category === category
+      );
+
+      const targetLanguage = existingFlashcards[0]?.targetLanguage || "en";
+      const sourceLanguage = existingFlashcards[0]?.sourceLanguage || "pl";
+      const difficultyLevel = existingFlashcards[0]?.difficultyLevel || "easy";
+
+      // Zbieramy istniejące terminy, aby uniknąć duplikatów
+      const existingTerms = Array.from(
+        new Set(
+          existingFlashcards.map((card) => card.origin_text.toLowerCase())
+        )
+      );
+
+      const result = await generateMoreFlashcardsAction({
+        category,
+        existingTerms,
+        count: 5,
+        sourceLanguage,
+        targetLanguage,
+        difficultyLevel,
+      });
+
+      if (result.success) {
+        router.refresh();
+        toast({
+          title: "Flashcards Added",
+          description: `Successfully added new flashcards to the "${category}" category.`,
+          variant: "success",
+          duration: 1000,
+        });
+      } else {
+        setError(result.error || "Failed to generate new flashcards");
+        toast({
+          title: "Error",
+          description: result.error || "Failed to generate new flashcards",
+          variant: "destructive",
+          duration: 1000,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating additional flashcards:", error);
+      const errorMessage =
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
+          : "An unexpected error occurred during flashcard generation";
+
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -212,7 +281,10 @@ export default function FlashcardsView({
                         </div>
                       )
                     ) : (
-                      <FlashcardGrid cards={categoryCards} />
+                      <FlashcardGrid
+                        cards={categoryCards}
+                        onGenerateFlashcards={handleGenerateFlashcards}
+                      />
                     )}
                   </motion.div>
                 </AnimatePresence>
