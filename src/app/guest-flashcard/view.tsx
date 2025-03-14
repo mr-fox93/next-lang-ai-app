@@ -52,7 +52,7 @@ export default function GuestFlashcardsView({
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
   const [isImporting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
