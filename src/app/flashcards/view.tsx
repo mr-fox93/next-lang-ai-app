@@ -25,14 +25,21 @@ interface FlashcardsViewProps {
   };
 }
 
-export default function FlashcardsView({ initialFlashcards, serverError, initialCategory, progressStats }: FlashcardsViewProps) {
+export default function FlashcardsView({
+  initialFlashcards,
+  serverError,
+  initialCategory,
+  progressStats,
+}: FlashcardsViewProps) {
   const searchParams = useSearchParams();
-  const categoryFromUrl = searchParams.get('category');
-  
+  const categoryFromUrl = searchParams.get("category");
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryFromUrl ? decodeURIComponent(categoryFromUrl) : (initialCategory || null)
+    categoryFromUrl
+      ? decodeURIComponent(categoryFromUrl)
+      : initialCategory || null
   );
-  
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -45,7 +52,9 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
 
   useEffect(() => {
     if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
-      const categories = [...new Set(initialFlashcards.map(card => card.category))];
+      const categories = [
+        ...new Set(initialFlashcards.map((card) => card.category)),
+      ];
       if (categories.length > 0) {
         setSelectedCategory(categories[0]);
       }
@@ -59,9 +68,9 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   useEffect(() => {
     if (selectedCategory) {
       const params = new URLSearchParams(window.location.search);
-      params.set('category', selectedCategory);
+      params.set("category", selectedCategory);
       const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.pushState({}, '', newUrl);
+      window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
 
@@ -77,8 +86,8 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     } catch (error) {
       console.error("Sign out error:", error);
       setError(
-        error instanceof Error 
-          ? `Sign out failed: ${error.message}` 
+        error instanceof Error
+          ? `Sign out failed: ${error.message}`
           : "An unexpected error occurred during sign out"
       );
     }
@@ -149,10 +158,7 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         )}
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-          <ErrorMessage 
-            message={error} 
-            onClose={() => setError(null)}
-          />
+          <ErrorMessage message={error} onClose={() => setError(null)} />
 
           {selectedCategory || initialFlashcards.length > 0 ? (
             <>
@@ -193,10 +199,10 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
                   >
                     {viewMode === "single" ? (
                       currentCard ? (
-                        <FlashcardView 
-                          card={currentCard} 
-                          onNext={handleNext} 
-                          allFlashcards={initialFlashcards} 
+                        <FlashcardView
+                          card={currentCard}
+                          onNext={handleNext}
+                          allFlashcards={initialFlashcards}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
@@ -221,8 +227,8 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
           )}
         </main>
       </div>
-      
+
       <ProgressPreview progressStats={progressStats} />
     </div>
   );
-} 
+}
