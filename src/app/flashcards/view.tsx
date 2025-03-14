@@ -13,6 +13,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
+import { toast } from "@/components/ui/use-toast";
+import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -25,19 +27,27 @@ interface FlashcardsViewProps {
   };
 }
 
-export default function FlashcardsView({ initialFlashcards, serverError, initialCategory, progressStats }: FlashcardsViewProps) {
+export default function FlashcardsView({
+  initialFlashcards,
+  serverError,
+  initialCategory,
+  progressStats,
+}: FlashcardsViewProps) {
   const searchParams = useSearchParams();
-  const categoryFromUrl = searchParams.get('category');
-  
+  const categoryFromUrl = searchParams.get("category");
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categoryFromUrl ? decodeURIComponent(categoryFromUrl) : (initialCategory || null)
+    categoryFromUrl
+      ? decodeURIComponent(categoryFromUrl)
+      : initialCategory || null
   );
-  
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -45,7 +55,9 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
 
   useEffect(() => {
     if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
-      const categories = [...new Set(initialFlashcards.map(card => card.category))];
+      const categories = [
+        ...new Set(initialFlashcards.map((card) => card.category)),
+      ];
       if (categories.length > 0) {
         setSelectedCategory(categories[0]);
       }
@@ -59,9 +71,9 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
   useEffect(() => {
     if (selectedCategory) {
       const params = new URLSearchParams(window.location.search);
-      params.set('category', selectedCategory);
+      params.set("category", selectedCategory);
       const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.pushState({}, '', newUrl);
+      window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
 
@@ -77,10 +89,76 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
     } catch (error) {
       console.error("Sign out error:", error);
       setError(
-        error instanceof Error 
-          ? `Sign out failed: ${error.message}` 
+        error instanceof Error
+          ? `Sign out failed: ${error.message}`
           : "An unexpected error occurred during sign out"
       );
+    }
+  };
+
+  const handleGenerateFlashcards = async (category: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Zbieramy istniejące fiszki dla tej kategorii
+      const existingFlashcards = initialFlashcards.filter(
+        (card) => card.category === category
+      );
+
+      const targetLanguage = existingFlashcards[0]?.targetLanguage || "en";
+      const sourceLanguage = existingFlashcards[0]?.sourceLanguage || "pl";
+      const difficultyLevel = existingFlashcards[0]?.difficultyLevel || "easy";
+
+      // Zbieramy istniejące terminy, aby uniknąć duplikatów
+      const existingTerms = Array.from(
+        new Set(
+          existingFlashcards.map((card) => card.origin_text.toLowerCase())
+        )
+      );
+
+      const result = await generateMoreFlashcardsAction({
+        category,
+        existingTerms,
+        count: 5,
+        sourceLanguage,
+        targetLanguage,
+        difficultyLevel,
+      });
+
+      if (result.success) {
+        router.refresh();
+        toast({
+          title: "Flashcards Added",
+          description: `Successfully added new flashcards to the "${category}" category.`,
+          variant: "success",
+          duration: 1000,
+        });
+      } else {
+        setError(result.error || "Failed to generate new flashcards");
+        toast({
+          title: "Error",
+          description: result.error || "Failed to generate new flashcards",
+          variant: "destructive",
+          duration: 1000,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating additional flashcards:", error);
+      const errorMessage =
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
+          : "An unexpected error occurred during flashcard generation";
+
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -149,10 +227,13 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
         )}
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-          <ErrorMessage 
-            message={error} 
-            onClose={() => setError(null)}
-          />
+          <ErrorMessage message={error} onClose={() => setError(null)} />
+
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+          )}
 
           {selectedCategory || initialFlashcards.length > 0 ? (
             <>
@@ -193,10 +274,10 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
                   >
                     {viewMode === "single" ? (
                       currentCard ? (
-                        <FlashcardView 
-                          card={currentCard} 
-                          onNext={handleNext} 
-                          allFlashcards={initialFlashcards} 
+                        <FlashcardView
+                          card={currentCard}
+                          onNext={handleNext}
+                          allFlashcards={initialFlashcards}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
@@ -206,7 +287,10 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
                         </div>
                       )
                     ) : (
-                      <FlashcardGrid cards={categoryCards} />
+                      <FlashcardGrid
+                        cards={categoryCards}
+                        onGenerateFlashcards={handleGenerateFlashcards}
+                      />
                     )}
                   </motion.div>
                 </AnimatePresence>
@@ -221,8 +305,8 @@ export default function FlashcardsView({ initialFlashcards, serverError, initial
           )}
         </main>
       </div>
-      
+
       <ProgressPreview progressStats={progressStats} />
     </div>
   );
-} 
+}

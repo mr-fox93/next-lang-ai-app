@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Trash2,
   Globe,
+  Plus,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,8 @@ import {
 import {
   deleteCategoryAction,
   getUserLanguagesAction,
+  generateMoreFlashcardsAction,
+  generateMoreGuestFlashcardsAction,
 } from "@/app/actions/flashcard-actions";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -39,6 +42,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
+import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
+import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -70,6 +75,14 @@ export function FlashcardsSidebar({
   const [languages, setLanguages] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingCategory, setGeneratingCategory] = useState<string | null>(
+    null
+  );
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [categoryToGenerate, setCategoryToGenerate] = useState<string | null>(
+    null
+  );
 
   const router = useRouter();
   const { toast } = useToast();
@@ -148,6 +161,12 @@ export function FlashcardsSidebar({
     setIsDeleteDialogOpen(true);
   };
 
+  const handleGenerateClick = (category: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCategoryToGenerate(category);
+    setIsGenerateDialogOpen(true);
+  };
+
   const closeDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
     setCategoryToDelete(null);
@@ -171,6 +190,7 @@ export function FlashcardsSidebar({
           title: "Category deleted",
           description: `Successfully deleted category "${categoryToDelete}" with ${deletedCount} flashcards.`,
           variant: "success",
+          duration: 1000,
         });
 
         const updatedFlashcards = guestFlashcardsStorage.getFlashcards();
@@ -189,6 +209,7 @@ export function FlashcardsSidebar({
             title: "Category deleted",
             description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
             variant: "success",
+            duration: 1000,
           });
         } else {
           setErrorMessage(result.error || "Failed to delete category");
@@ -197,6 +218,7 @@ export function FlashcardsSidebar({
             title: "Error",
             description: result.error || "Failed to delete category",
             variant: "destructive",
+            duration: 1000,
           });
         }
       }
@@ -213,6 +235,7 @@ export function FlashcardsSidebar({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
+        duration: 1000,
       });
     } finally {
       setIsDeleting(false);
@@ -246,14 +269,130 @@ export function FlashcardsSidebar({
     }
   };
 
+  const handleGenerateMoreFlashcards = async () => {
+    if (!categoryToGenerate) return;
+
+    setIsGenerating(true);
+    setGeneratingCategory(categoryToGenerate);
+    setErrorMessage(null);
+    closeGenerateDialog();
+
+    try {
+      const existingFlashcards = flashcards.filter(
+        (card) => card.category === categoryToGenerate
+      );
+
+      const targetLanguage = existingFlashcards[0]?.targetLanguage || "en";
+      const sourceLanguage = existingFlashcards[0]?.sourceLanguage || "pl";
+      const difficultyLevel = existingFlashcards[0]?.difficultyLevel || "easy";
+
+      const existingTerms = Array.from(
+        new Set(
+          existingFlashcards.map((card) => card.origin_text.toLowerCase())
+        )
+      );
+
+      if (isGuestMode) {
+        const result = await generateMoreGuestFlashcardsAction({
+          category: categoryToGenerate,
+          existingTerms,
+          count: 5,
+          sourceLanguage,
+          targetLanguage,
+          difficultyLevel,
+        });
+
+        if (result.success && result.flashcards) {
+          const updatedFlashcards = guestFlashcardsStorage.addFlashcards(
+            result.flashcards
+          );
+
+          if (onFlashcardsUpdate) {
+            onFlashcardsUpdate(updatedFlashcards);
+          }
+
+          toast({
+            title: "Flashcards Added",
+            description: `Successfully added ${result.flashcards.length} new flashcards to the "${categoryToGenerate}" category.`,
+            variant: "success",
+            duration: 1000,
+          });
+        } else {
+          setErrorMessage(result.error || "Failed to generate new flashcards");
+
+          toast({
+            title: "Error",
+            description: result.error || "Failed to generate new flashcards",
+            variant: "destructive",
+            duration: 1000,
+          });
+        }
+      } else {
+        const result = await generateMoreFlashcardsAction({
+          category: categoryToGenerate,
+          existingTerms,
+          count: 5,
+          sourceLanguage,
+          targetLanguage,
+          difficultyLevel,
+        });
+
+        if (result.success) {
+          router.refresh();
+
+          toast({
+            title: "Flashcards Added",
+            description: `Successfully added new flashcards to the "${categoryToGenerate}" category.`,
+            variant: "success",
+            duration: 1000,
+          });
+        } else {
+          setErrorMessage(result.error || "Failed to generate new flashcards");
+
+          toast({
+            title: "Error",
+            description: result.error || "Failed to generate new flashcards",
+            variant: "destructive",
+            duration: 1000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error generating additional flashcards:", error);
+      const errorMessage =
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
+          : "An unexpected error occurred during flashcard generation";
+
+      setErrorMessage(errorMessage);
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsGenerating(false);
+      setGeneratingCategory(null);
+    }
+  };
+
+  const closeGenerateDialog = () => {
+    setIsGenerateDialogOpen(false);
+    setCategoryToGenerate(null);
+  };
+
   return (
     <div className="relative h-screen overflow-hidden">
+      {isGenerating && <AIGenerationLoader />}
+
       <motion.div
         className={cn(
           "h-full bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col",
-          isCollapsed ? "w-[60px]" : "w-[240px]"
+          isCollapsed ? "w-[60px]" : "w-[280px]"
         )}
-        animate={{ width: isCollapsed ? 60 : 240 }}
+        animate={{ width: isCollapsed ? 60 : 280 }}
         transition={{ duration: 0.2 }}
       >
         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
@@ -366,7 +505,7 @@ export function FlashcardsSidebar({
           <div className="p-2 space-y-1">
             {categories.length > 0 ? (
               categories.map((category) => (
-                <div key={category} className="flex items-center space-x-1">
+                <div key={category} className="flex items-center space-x-2">
                   <Button
                     variant="ghost"
                     className={cn(
@@ -377,7 +516,7 @@ export function FlashcardsSidebar({
                     )}
                     onClick={() => onSelectCategory(category)}
                   >
-                    <span className="relative z-10">
+                    <span className="relative z-10 truncate">
                       {isCollapsed ? category.charAt(0) : category}
                     </span>
                     {selectedCategory === category && (
@@ -387,15 +526,32 @@ export function FlashcardsSidebar({
                   </Button>
 
                   {!isCollapsed && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
-                      onClick={(e) => handleDeleteCategory(category, e)}
-                      title="Usuń kategorię"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-green-400 hover:bg-green-500/10"
+                        onClick={(e) => handleGenerateClick(category, e)}
+                        title="Add more flashcards to this category"
+                        disabled={
+                          isGenerating || generatingCategory === category
+                        }
+                      >
+                        <Plus className="h-4 w-4" />
+                        {generatingCategory === category && (
+                          <span className="sr-only">Generating...</span>
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                        onClick={(e) => handleDeleteCategory(category, e)}
+                        title="Delete category"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
                   )}
                 </div>
               ))
@@ -446,6 +602,14 @@ export function FlashcardsSidebar({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GenerateFlashcardsDialog
+        isOpen={isGenerateDialogOpen}
+        onOpenChange={setIsGenerateDialogOpen}
+        onConfirm={handleGenerateMoreFlashcards}
+        categoryName={categoryToGenerate}
+        isGenerating={isGenerating}
+      />
     </div>
   );
 }

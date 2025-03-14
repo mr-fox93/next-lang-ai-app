@@ -14,6 +14,8 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
+import { toast } from "@/components/ui/use-toast";
+import { generateMoreGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface GuestFlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -50,6 +52,7 @@ export default function GuestFlashcardsView({
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
   const [isImporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -116,6 +119,78 @@ export default function GuestFlashcardsView({
       "Sign in to manage your languages and create flashcards in various languages!"
     );
     setShowLoginPrompt(true);
+  };
+
+  const handleGenerateFlashcards = async (category: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Zbieramy istniejące fiszki dla tej kategorii
+      const existingFlashcards = flashcards.filter(
+        (card) => card.category === category
+      );
+
+      const targetLanguage = existingFlashcards[0]?.targetLanguage || "en";
+      const sourceLanguage = existingFlashcards[0]?.sourceLanguage || "pl";
+      const difficultyLevel = existingFlashcards[0]?.difficultyLevel || "easy";
+
+      // Zbieramy istniejące terminy, aby uniknąć duplikatów
+      const existingTerms = Array.from(
+        new Set(
+          existingFlashcards.map((card) => card.origin_text.toLowerCase())
+        )
+      );
+
+      const result = await generateMoreGuestFlashcardsAction({
+        category,
+        existingTerms,
+        count: 5,
+        sourceLanguage,
+        targetLanguage,
+        difficultyLevel,
+      });
+
+      if (result.success && result.flashcards) {
+        const updatedFlashcards = guestFlashcardsStorage.addFlashcards(
+          result.flashcards
+        );
+        setFlashcards(updatedFlashcards);
+
+        toast({
+          title: "Flashcards Added",
+          description: `Successfully added ${result.flashcards.length} new flashcards to the "${category}" category.`,
+          variant: "success",
+          duration: 1000,
+        });
+      } else {
+        setError(result.error || "Failed to generate new flashcards");
+
+        toast({
+          title: "Error",
+          description: result.error || "Failed to generate new flashcards",
+          variant: "destructive",
+          duration: 1000,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating additional flashcards:", error);
+      const errorMessage =
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
+          : "An unexpected error occurred during flashcard generation";
+
+      setError(errorMessage);
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const categoryCards = selectedCategory
@@ -198,6 +273,12 @@ export default function GuestFlashcardsView({
             </motion.span>
           </p>
         </motion.div>
+
+        {isLoading && (
+          <div className="absolute inset-0 flex justify-center items-center z-50 bg-black/30 backdrop-blur-sm">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+          </div>
+        )}
       </div>
     );
   }
@@ -307,6 +388,12 @@ export default function GuestFlashcardsView({
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ErrorMessage message={error} onClose={() => setError(null)} />
 
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+          )}
+
           {selectedCategory || flashcards.length > 0 ? (
             <>
               <div className="flex justify-center mt-2 mb-1 flex-shrink-0">
@@ -360,7 +447,10 @@ export default function GuestFlashcardsView({
                         </div>
                       )
                     ) : (
-                      <FlashcardGrid cards={categoryCards} />
+                      <FlashcardGrid
+                        cards={categoryCards}
+                        onGenerateFlashcards={handleGenerateFlashcards}
+                      />
                     )}
                   </motion.div>
                 </AnimatePresence>

@@ -236,3 +236,120 @@ export async function handleGuestFlashcardGeneration(data: {
     };
   }
 }
+
+export async function generateMoreFlashcardsAction(params: {
+  category: string;
+  existingTerms: string[];
+  count: number;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficultyLevel: string;
+}) {
+  try {
+    const { userId } = await auth();
+    const user = await currentUser();
+
+    if (!userId) {
+      return {
+        success: false,
+        error: "Authentication required: User is not signed in",
+      };
+    }
+
+    const {
+      category,
+      existingTerms,
+      count,
+      sourceLanguage,
+      targetLanguage,
+      difficultyLevel,
+    } = params;
+
+    const message = `Generate ${count} new flashcards for the category "${category}" that DO NOT CONTAIN the following terms: ${existingTerms.join(
+      ", "
+    )}. The flashcards should be related to the same category.`;
+
+    const generateParams: GenerateFlashcardsParams = {
+      count,
+      message,
+      level: difficultyLevel,
+      userId,
+      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      sourceLanguage,
+      targetLanguage,
+    };
+
+    const result = await getGenerateFlashcardsUseCase().execute(generateParams);
+
+    if (result.success && result.flashcards) {
+      // Currently the API doesn't allow direct category modification when using GenerateFlashcardsUseCase
+      // In practice, the AI model should return flashcards in the requested category, but we may add additional
+      // checks/modifications here in the future if needed
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Additional flashcards generation error:", error);
+    return {
+      success: false,
+      error: `Additional flashcards generation failed: ${
+        error instanceof Error ? error.message : "Unknown error occurred"
+      }`,
+    };
+  }
+}
+
+export async function generateMoreGuestFlashcardsAction(params: {
+  category: string;
+  existingTerms: string[];
+  count: number;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficultyLevel: string;
+}): Promise<FlashcardGenerationResponse> {
+  try {
+    const {
+      category,
+      existingTerms,
+      count,
+      sourceLanguage,
+      targetLanguage,
+      difficultyLevel,
+    } = params;
+
+    const message = `Generate ${count} new flashcards for the category "${category}" that DO NOT CONTAIN the following terms: ${existingTerms.join(
+      ", "
+    )}. The flashcards should be related to the same category.`;
+
+    const result = await handleGuestFlashcardGeneration({
+      count,
+      message,
+      level: difficultyLevel,
+      sourceLanguage,
+      targetLanguage,
+    });
+
+    if (result.success && result.flashcards) {
+      const flashcardsWithCategory = result.flashcards.map((card) => ({
+        ...card,
+        category: category,
+      }));
+
+      return {
+        success: true,
+        flashcards: flashcardsWithCategory,
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Additional guest flashcards generation error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during guest flashcard generation",
+    };
+  }
+}
