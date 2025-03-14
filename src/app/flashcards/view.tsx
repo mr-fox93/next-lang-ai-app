@@ -47,7 +47,7 @@ export default function FlashcardsView({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
-  const [_isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
@@ -228,6 +228,12 @@ export default function FlashcardsView({
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ErrorMessage message={error} onClose={() => setError(null)} />
+
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+          )}
 
           {selectedCategory || initialFlashcards.length > 0 ? (
             <>

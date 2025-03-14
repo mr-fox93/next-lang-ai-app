@@ -52,7 +52,7 @@ export default function GuestFlashcardsView({
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
   const [isImporting] = useState(false);
-  const [_isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -273,6 +273,12 @@ export default function GuestFlashcardsView({
             </motion.span>
           </p>
         </motion.div>
+
+        {isLoading && (
+          <div className="absolute inset-0 flex justify-center items-center z-50 bg-black/30 backdrop-blur-sm">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+          </div>
+        )}
       </div>
     );
   }
@@ -381,6 +387,12 @@ export default function GuestFlashcardsView({
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ErrorMessage message={error} onClose={() => setError(null)} />
+
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+          )}
 
           {selectedCategory || flashcards.length > 0 ? (
             <>
