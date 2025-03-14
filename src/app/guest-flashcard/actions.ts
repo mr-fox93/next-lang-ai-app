@@ -1,15 +1,17 @@
-export async function getFlashcardsForGuest() { 
-  return { 
-    flashcards: [], 
-    error: undefined 
-  }; 
-} 
+import { ProgressActionResult, UserProgressStats } from "@/types/progress";
 
-export async function getProgressStatsForGuest() { 
-  return { 
-    success: true, 
-    data: { 
-      totalFlashcards: 0, 
+export async function getFlashcardsForGuest() {
+  return {
+    flashcards: [],
+    error: undefined,
+  };
+}
+
+export async function getProgressStatsForGuest(): Promise<ProgressActionResult> {
+  return {
+    success: true,
+    data: {
+      totalFlashcards: 0,
       masteredFlashcards: 0,
       inProgressFlashcards: 0,
       untouchedFlashcards: 0,
@@ -17,8 +19,8 @@ export async function getProgressStatsForGuest() {
       userLevel: 1,
       experiencePoints: 0,
       nextLevelPoints: 100,
-      dailyGoal: 5
-    }, 
-    error: undefined 
-  }; 
+      dailyGoal: 5,
+    },
+    error: undefined,
+  };
 }

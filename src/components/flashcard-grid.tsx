@@ -12,7 +12,7 @@ const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
   pl: "pl-PL",
   es: "es-ES",
-  it: "it-IT"
+  it: "it-IT",
 };
 
 interface FlashcardGridProps {
@@ -32,9 +32,8 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
       {cards.map((card, index) => {
-        // Określ język TTS dla docelowego języka
         const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
-        
+
         return (
           <motion.div
             key={index}
@@ -44,14 +43,12 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
             className="aspect-[3/2] relative cursor-pointer [perspective:1000px] group"
             onClick={() => toggleCard(index)}
           >
-            {/* Card glow effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500" />
 
             <motion.div
               className="w-full h-full relative [transform-style:preserve-3d] transition-transform duration-150"
               animate={{ rotateY: flippedCards[index] ? 180 : 0 }}
             >
-              {/* Front - Language Target (to co chcemy się nauczyć) */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                 <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-6 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl overflow-hidden">
                   <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
@@ -86,14 +83,13 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto pt-3 text-xs text-gray-400 border-t border-white/10">
                     Click to flip
                   </div>
                 </div>
               </div>
 
-              {/* Back - Language Source (nasz język ojczysty) */}
               <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
                 <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-6 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl overflow-hidden">
                   <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
@@ -104,7 +100,7 @@ export function FlashcardGrid({ cards }: FlashcardGridProps) {
                       &quot;{card.example_using}&quot;
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto pt-3 text-xs text-gray-400 border-t border-white/10">
                     Click to flip
                   </div>
