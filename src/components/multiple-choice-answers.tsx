@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import type { FlashCard } from "@/lib/flashcard.schema";
 import { updateFlashcardProgressAction } from "@/app/actions/progress-actions";
@@ -137,6 +137,24 @@ export function MultipleChoiceAnswers({
 
   const letters = ["A", "B", "C", "D"];
 
+  const getFontSizeClass = (textLength: number) => {
+    if (textLength > 60) return "text-xs";
+    if (textLength > 40) return "text-sm";
+    return "text-sm sm:text-base";
+  };
+
+  // Określamy wysokość kafelków na podstawie najdłuższej odpowiedzi
+  const containerHeightClass = useMemo(() => {
+    if (!options.length) return "min-h-[60px] sm:min-h-[60px]";
+
+    const maxLength = Math.max(...options.map((option) => option.length));
+
+    if (maxLength < 15) return "min-h-[50px] sm:min-h-[50px]"; // Dla bardzo krótkich odpowiedzi
+    if (maxLength < 30) return "min-h-[60px] sm:min-h-[60px]"; // Dla krótkich odpowiedzi
+    if (maxLength < 50) return "min-h-[70px] sm:min-h-[70px]"; // Dla średnich odpowiedzi
+    return "min-h-[80px] sm:min-h-[90px]"; // Dla długich odpowiedzi
+  }, [options]);
+
   return (
     <div className="w-full mx-auto relative">
       <ErrorMessage
@@ -157,10 +175,10 @@ export function MultipleChoiceAnswers({
         {options.map((option, index) => {
           const isCorrect = option === correctAnswer;
           const isSelected = option === selectedOption;
+          const fontSizeClass = getFontSizeClass(option.length);
 
           let gradientClass = "";
-          const buttonClasses =
-            "w-full min-h-[48px] py-2 sm:py-2.5 px-3 sm:px-4 text-left rounded-lg transition-colors duration-300";
+          const buttonClasses = `w-full ${containerHeightClass} py-2 sm:py-2.5 px-3 sm:px-4 text-left rounded-lg transition-colors duration-300 flex items-center`;
 
           if (showResults) {
             if (isCorrect) {
@@ -184,18 +202,20 @@ export function MultipleChoiceAnswers({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="h-auto"
+              className="h-full"
             >
               <button
                 onClick={() => handleSelectOption(option)}
                 disabled={showResults}
-                className={`${buttonClasses} bg-gradient-to-r ${gradientClass} backdrop-blur-md shadow-md overflow-hidden group`}
+                className={`${buttonClasses} bg-gradient-to-r ${gradientClass} backdrop-blur-md shadow-md overflow-hidden group h-full`}
               >
-                <div className="flex items-center w-full">
-                  <div className="font-bold text-purple-300 mr-2 text-base min-w-[20px] flex-shrink-0">
+                <div className="flex items-start w-full">
+                  <div className="font-bold text-purple-300 mr-2 text-base min-w-[20px] flex-shrink-0 mt-0.5">
                     {letters[index]}.
                   </div>
-                  <span className="text-white text-sm sm:text-base font-medium pl-1 break-words hyphens-auto">
+                  <span
+                    className={`text-white font-medium pl-1 break-words hyphens-auto ${fontSizeClass}`}
+                  >
                     {option}
                   </span>
                 </div>
