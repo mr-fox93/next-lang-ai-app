@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ImageModal } from "./image-modal";
 import Image from "next/image";
 
 export default function HowItWorks() {
   return (
     <div className="relative min-h-screen w-full py-20">
-      {/* Content with overlay to ensure stars are visible but don't interfere with text */}
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -26,7 +26,6 @@ export default function HowItWorks() {
           </p>
         </motion.div>
 
-        {/* Section 1: Description on left, flashcard.png on right */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -66,7 +65,6 @@ export default function HowItWorks() {
               </li>
             </ul>
 
-            {/* Language option capsules - updated to match screenshot exactly */}
             <div className="flex flex-wrap gap-3 mt-8">
               <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
                 <span className="font-bold mr-2">EN</span> English
@@ -83,24 +81,17 @@ export default function HowItWorks() {
             </div>
           </div>
 
-          {/* Optimized image container - better width/height ratio and contrast */}
-          <div className="p-0.5 border border-purple-600/40 rounded-xl overflow-hidden shadow-lg shadow-purple-900/20 bg-black">
-            <div className="relative w-full" style={{ height: "400px" }}>
-              <Image
+          <div className="flex items-center justify-center">
+            <div className="group inline-block rounded-xl border border-purple-600/40 shadow-lg shadow-purple-900/20 bg-black/40 p-[3px] group-hover:border-purple-500/70 group-hover:shadow-purple-700/30 transition-all duration-300">
+              <ImageModal
                 src="/flashcard.png"
                 alt="Intelligent AI Flashcards"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-                quality={100}
-                className="object-contain"
-                unoptimized
+                className="rounded-lg"
               />
             </div>
           </div>
         </motion.div>
 
-        {/* Section 2: progress.png on left, description on right */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -108,18 +99,12 @@ export default function HowItWorks() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-32"
         >
-          {/* Optimized image container - better width/height ratio and contrast */}
-          <div className="p-0.5 border border-pink-600/40 rounded-xl overflow-hidden shadow-lg shadow-pink-900/20 bg-black order-2 md:order-1">
-            <div className="relative w-full" style={{ height: "400px" }}>
-              <Image
+          <div className="flex items-center justify-center order-2 md:order-1">
+            <div className="group inline-block rounded-xl border border-pink-600/40 shadow-lg shadow-pink-900/20 bg-black/40 p-[3px] group-hover:border-pink-500/70 group-hover:shadow-pink-700/30 transition-all duration-300">
+              <ImageModal
                 src="/progress.png"
                 alt="Progress Tracking"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-                quality={100}
-                className="object-contain"
-                unoptimized
+                className="rounded-lg"
               />
             </div>
           </div>
@@ -153,7 +138,6 @@ export default function HowItWorks() {
               </li>
             </ul>
 
-            {/* Progress tracking feature capsules - updated to match screenshot */}
             <div className="flex flex-wrap gap-3 mt-8">
               <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
                 Cloud synchronization
@@ -168,7 +152,6 @@ export default function HowItWorks() {
           </div>
         </motion.div>
 
-        {/* Section 3: Description on left, grid.png on right */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -207,7 +190,6 @@ export default function HowItWorks() {
               </li>
             </ul>
 
-            {/* Advanced learning feature capsules - updated to match screenshot */}
             <div className="flex flex-wrap gap-3 mt-8">
               <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
                 Voice pronunciation
@@ -221,18 +203,12 @@ export default function HowItWorks() {
             </div>
           </div>
 
-          {/* Optimized image container - better width/height ratio and contrast */}
-          <div className="p-0.5 border border-purple-600/40 rounded-xl overflow-hidden shadow-lg shadow-purple-900/20 bg-black">
-            <div className="relative w-full" style={{ height: "400px" }}>
-              <Image
+          <div className="flex items-center justify-center">
+            <div className="group inline-block rounded-xl border border-purple-600/40 shadow-lg shadow-purple-900/20 bg-black/40 p-[3px] group-hover:border-purple-500/70 group-hover:shadow-purple-700/30 transition-all duration-300">
+              <ImageModal
                 src="/grid.png"
                 alt="Advanced Learning Features"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-                quality={100}
-                className="object-contain"
-                unoptimized
+                className="rounded-lg"
               />
             </div>
           </div>
