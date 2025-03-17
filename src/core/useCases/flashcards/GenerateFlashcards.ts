@@ -40,43 +40,58 @@ export class GenerateFlashcardsUseCase {
     this.prisma = new PrismaClient();
   }
 
-  async execute(params: GenerateFlashcardsParams): Promise<GenerateFlashcardsResult> {
+  async execute(
+    params: GenerateFlashcardsParams
+  ): Promise<GenerateFlashcardsResult> {
     try {
-      const { count, message, level, userId, userEmail, sourceLanguage, targetLanguage } = params;
+      const {
+        count,
+        message,
+        level,
+        userId,
+        userEmail,
+        sourceLanguage,
+        targetLanguage,
+      } = params;
 
       if (!userId) {
         return {
           success: false,
-          error: "Nie jesteś zalogowany"
+          error: "Nie jesteś zalogowany",
         };
       }
 
       if (!count || count <= 0) {
         return {
           success: false,
-          error: "Liczba fiszek musi być większa niż 0"
+          error: "Liczba fiszek musi być większa niż 0",
         };
       }
 
-
       await this.upsertUser(userId, userEmail);
 
-      const prompt = getFlashcardsPrompt(count, message, level, sourceLanguage, targetLanguage);
+      const prompt = getFlashcardsPrompt(
+        count,
+        message,
+        level,
+        sourceLanguage,
+        targetLanguage
+      );
       const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
-      
+
       if (!generatedFlashcards) {
         return {
           success: false,
-          error: "Nie udało się wygenerować fiszek"
+          error: "Nie udało się wygenerować fiszek",
         };
       }
 
       // Przypisz wybrane przez użytkownika ustawienia językowe do wygenerowanych fiszek
-      const flashcards = generatedFlashcards.map(flashcard => ({
+      const flashcards = generatedFlashcards.map((flashcard) => ({
         ...flashcard,
         sourceLanguage,
         targetLanguage,
-        difficultyLevel: level
+        difficultyLevel: level,
       }));
 
       const savedFlashcards = await this.saveFlashcards(flashcards, userId);
@@ -85,20 +100,22 @@ export class GenerateFlashcardsUseCase {
       return {
         success: true,
         message: "Fiszki zostały pomyślnie wygenerowane i zapisane",
-        flashcards: savedFlashcards
+        flashcards: savedFlashcards,
       };
     } catch (error) {
       console.error("Flashcard generation error:", error);
       return {
         success: false,
-        error: `Flashcard generation failed: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+        error: `Flashcard generation failed: ${
+          error instanceof Error ? error.message : "Unknown error occurred"
+        }`,
       };
     }
   }
 
   private async upsertUser(userId: string, userEmail: string): Promise<void> {
     const existingUser = await this.userRepository.getUserById(userId);
-    
+
     if (!existingUser) {
       try {
         await this.prisma.user.create({
@@ -106,19 +123,23 @@ export class GenerateFlashcardsUseCase {
             id: userId,
             email: userEmail,
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       } catch (error) {
         console.error("User creation error:", error);
         throw new Error(
-          `Failed to create user: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+          `Failed to create user: ${
+            error instanceof Error ? error.message : "Unknown error occurred"
+          }`
         );
       }
     }
   }
 
-  private async generateFlashcardsWithAI(prompt: string): Promise<Omit<Flashcard, "id" | "userId">[]> {
+  private async generateFlashcardsWithAI(
+    prompt: string
+  ): Promise<Omit<Flashcard, "id" | "userId">[]> {
     try {
       const response = await this.openai.chat.completions.create({
         model: "gpt-4o",
@@ -133,7 +154,10 @@ export class GenerateFlashcardsUseCase {
             content: prompt,
           },
         ],
-        response_format: zodResponseFormat(FlashCardSchema, "flashcardResponse"),
+        response_format: zodResponseFormat(
+          FlashCardSchema,
+          "flashcardResponse"
+        ),
         temperature: 0.1,
         max_tokens: 500,
       });
@@ -142,25 +166,38 @@ export class GenerateFlashcardsUseCase {
         JSON.parse(response.choices[0].message.content || "[]")
       );
 
-      // Przygotowujemy struktrurę fiszek zgodną z interfejsem
-      const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(flashcard => ({
-        ...flashcard,
-        sourceLanguage: "pl",
-        targetLanguage: "en",
-        difficultyLevel: "easy"
-      }));
+      const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(
+        (flashcard) => ({
+          ...flashcard,
+          sourceLanguage: "pl",
+          targetLanguage: "en",
+          difficultyLevel: "easy",
+        })
+      );
 
       return flashcardsWithDefaultLanguageSettings;
     } catch (error) {
       console.error("AI flashcard generation error:", error);
+
+      if (error instanceof Error && error.message.includes("429")) {
+        throw new Error(
+          "Przekroczono limit zapytań do API OpenAI. Spróbuj ponownie później lub skontaktuj się z administratorem w celu aktualizacji planu subskrypcji."
+        );
+      }
+
       throw new Error(
-        `Failed to generate flashcards with AI: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+        `Failed to generate flashcards with AI: ${
+          error instanceof Error ? error.message : "Unknown error occurred"
+        }`
       );
     }
   }
 
-  private async saveFlashcards(flashcards: Omit<Flashcard, "id" | "userId">[], userId: string): Promise<Flashcard[]> {
-    const flashcardPromises = flashcards.map(flashcard => 
+  private async saveFlashcards(
+    flashcards: Omit<Flashcard, "id" | "userId">[],
+    userId: string
+  ): Promise<Flashcard[]> {
+    const flashcardPromises = flashcards.map((flashcard) =>
       this.flashcardRepository.createFlashcard({
         origin_text: flashcard.origin_text,
         translate_text: flashcard.translate_text,
@@ -170,25 +207,28 @@ export class GenerateFlashcardsUseCase {
         sourceLanguage: flashcard.sourceLanguage,
         targetLanguage: flashcard.targetLanguage,
         difficultyLevel: flashcard.difficultyLevel,
-        userId: userId
+        userId: userId,
       })
     );
-    
+
     return await Promise.all(flashcardPromises);
   }
 
-  private async createProgressRecords(flashcards: Flashcard[], userId: string): Promise<void> {
-    const progressPromises = flashcards.map(flashcard => 
+  private async createProgressRecords(
+    flashcards: Flashcard[],
+    userId: string
+  ): Promise<void> {
+    const progressPromises = flashcards.map((flashcard) =>
       this.progressRepository.createProgress({
         flashcardId: flashcard.id,
         userId: userId,
         masteryLevel: 0,
         correctAnswers: 0,
         incorrectAnswers: 0,
-        nextReviewDate: new Date()
+        nextReviewDate: new Date(),
       })
     );
-    
+
     await Promise.all(progressPromises);
   }
-} 
+}

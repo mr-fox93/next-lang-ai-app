@@ -8,8 +8,8 @@ import { Flashcard } from "@/core/entities/Flashcard";
 import { speak, SupportedTTSLanguage } from "@/utils/speak";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
+import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 
-// Mapowanie kodów języków na kody TTS
 const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
   pl: "pl-PL",
@@ -29,6 +29,7 @@ export function FlashcardGrid({
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const toggleCard = (index: number) => {
     setFlippedCards((prev) => ({
@@ -38,7 +39,6 @@ export function FlashcardGrid({
   };
 
   const handleGenerateButtonClick = () => {
-    // Jeśli kategoria nie jest dostarczona, użyj domyślnej nazwy lub pierwszej dostępnej kategorii
     const defaultCategory =
       cards.length > 0 ? cards[0].category : "New Category";
     setSelectedCategory(defaultCategory);
@@ -47,15 +47,27 @@ export function FlashcardGrid({
 
   const handleConfirmGenerate = () => {
     if (selectedCategory && onGenerateFlashcards) {
-      onGenerateFlashcards(selectedCategory);
+      setIsGenerateDialogOpen(false);
+      setIsGenerating(true);
+
+      const handleGeneration = async () => {
+        try {
+          await onGenerateFlashcards(selectedCategory);
+        } finally {
+          setIsGenerating(false);
+        }
+      };
+
+      handleGeneration();
     }
   };
 
   return (
     <>
+      {isGenerating && <AIGenerationLoader />}
+
       <ScrollArea className="h-[calc(100vh-80px)] pr-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 pb-16">
-          {/* Generate New Flashcards Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -117,7 +129,6 @@ export function FlashcardGrid({
             </div>
           </motion.div>
 
-          {/* Regular Flashcards */}
           {cards.map((card, index) => {
             const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
 
@@ -205,7 +216,7 @@ export function FlashcardGrid({
         onOpenChange={setIsGenerateDialogOpen}
         onConfirm={handleConfirmGenerate}
         categoryName={selectedCategory}
-        isGenerating={false}
+        isGenerating={isGenerating}
       />
     </>
   );
