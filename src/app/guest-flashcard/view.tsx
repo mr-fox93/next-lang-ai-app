@@ -3,15 +3,7 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  Grid,
-  Maximize2,
-  PlusCircle,
-  Save,
-  LogOut,
-  PanelLeftOpen,
-} from "lucide-react";
+import { Grid, Maximize2, PlusCircle, Save, PanelLeftOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";

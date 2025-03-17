@@ -4,17 +4,7 @@ import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  Grid,
-  Maximize2,
-  LogOut,
-  Book,
-  BookOpen,
-  ListPlus,
-  PanelLeftOpen,
-  Layers,
-} from "lucide-react";
+import { Grid, Maximize2, LogOut, PanelLeftOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
