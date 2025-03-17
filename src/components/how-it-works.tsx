@@ -2,11 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ImageModal } from "./image-modal";
-import Image from "next/image";
 
 export default function HowItWorks() {
   return (
-    <div className="relative min-h-screen w-full py-20">
+    <div id="how-it-works" className="relative min-h-screen w-full py-20">
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
