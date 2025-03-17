@@ -21,85 +21,80 @@ interface ProgressPreviewProps {
   onProgressClick?: () => void;
 }
 
-export function ProgressPreview({ progressStats, isGuestMode = false, onProgressClick }: ProgressPreviewProps) {
+export function ProgressPreview({
+  progressStats,
+  isGuestMode = false,
+  onProgressClick,
+}: ProgressPreviewProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
   const [stats, setStats] = useState<UserProgressStats | null>(null);
   const [isLoading, setIsLoading] = useState(!progressStats?.data);
-  
-  // Używamy statystyk z props, jeśli są dostępne, w przeciwnym razie pobieramy dane po stronie klienta
+
   useEffect(() => {
     if (progressStats?.success && progressStats.data) {
       setStats(progressStats.data);
       setIsLoading(false);
       return;
     }
-    
-    // Pobieramy dane tylko jeśli nie otrzymaliśmy ich z props i nie jesteśmy w trybie gościa
+
     if (!progressStats?.data && !isGuestMode) {
       async function fetchStats() {
         try {
           const result = await getUserProgressStatsAction();
-          
+
           if (result.success && result.data) {
             setStats(result.data);
           } else {
-            console.error("Błąd pobierania statystyk:", result.error);
+            console.error("Error fetching statistics:", result.error);
             toast({
-              title: "Błąd",
-              description: "Nie udało się pobrać statystyk",
-              variant: "destructive"
+              title: "Error",
+              description: "Failed to load statistics",
+              variant: "destructive",
             });
           }
         } catch (error) {
-          console.error("Błąd pobierania statystyk:", error);
+          console.error("Error fetching statistics:", error);
           toast({
-            title: "Błąd",
-            description: "Wystąpił problem podczas ładowania danych",
-            variant: "destructive"
+            title: "Error",
+            description: "An error occurred while loading data",
+            variant: "destructive",
           });
         } finally {
           setIsLoading(false);
         }
       }
-      
+
       fetchStats();
     }
   }, [progressStats, toast, isGuestMode]);
-  
-  // Obsługa kliknięcia
+
   const handleClick = () => {
-    // W trybie gościa nie robimy nic
     if (isGuestMode) {
       return;
     }
-    
-    // W normalnym trybie rozwijamy panel
+
     setIsExpanded(!isExpanded);
   };
-  
-  // Obliczenia dla paska postępu
-  const progressToNextLevel = stats 
-    ? (stats.experiencePoints % 500) / 5 
-    : 0;
-  
-  const masteryPercentage = stats && stats.totalFlashcards > 0 
-    ? (stats.masteredFlashcards / stats.totalFlashcards) * 100 
-    : 0;
-  
-  // Pokaż gwiazdkę, nawet jeśli nie ma jeszcze danych
+
+  const progressToNextLevel = stats ? (stats.experiencePoints % 500) / 5 : 0;
+
+  const masteryPercentage =
+    stats && stats.totalFlashcards > 0
+      ? (stats.masteredFlashcards / stats.totalFlashcards) * 100
+      : 0;
+
   const userLevel = stats ? stats.userLevel : 1;
   const experiencePoints = stats ? stats.experiencePoints : 0;
   const nextLevelPoints = stats ? stats.nextLevelPoints : 500;
   const masteredFlashcards = stats ? stats.masteredFlashcards : 0;
   const totalFlashcards = stats ? stats.totalFlashcards : 0;
-  
-  // W trybie gościa pokazujemy tylko prosty wskaźnik, który po kliknięciu pokazuje popup logowania
+
   if (isGuestMode) {
     return (
       <div className="fixed top-2 right-5 z-10">
-        <div 
+        <div
           className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-gradient-to-br from-black/90 to-gray-900/90 backdrop-blur-md border border-white/10 shadow-lg shadow-purple-500/5 rounded-xl max-w-full h-[48px] my-0 cursor-pointer hover:border-purple-500/50 transition-all duration-300"
           onClick={onProgressClick}
         >
@@ -114,9 +109,9 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
                 0 mastered
               </span>
               <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden mt-0.5">
-                <div 
-                  className="h-full bg-gradient-to-r from-purple-600 to-amber-500" 
-                  style={{ width: '0%' }}
+                <div
+                  className="h-full bg-gradient-to-r from-purple-600 to-amber-500"
+                  style={{ width: "0%" }}
                 />
               </div>
             </div>
@@ -126,9 +121,9 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
       </div>
     );
   }
-  
+
   return (
-    <div className="fixed top-2 right-5 z-10">
+    <div className="fixed top-2 right-5 z-10 flex flex-col items-end">
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -141,7 +136,7 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
           hover:border-purple-500/50
           shadow-lg shadow-purple-500/5
           rounded-xl
-          ${isLoading ? 'animate-pulse' : ''}
+          ${isLoading ? "animate-pulse" : ""}
           transition-all duration-300
           focus:outline-none
           max-w-full
@@ -162,8 +157,8 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
                   {masteredFlashcards} mastered
                 </span>
                 <div className="w-24 h-1.5 bg-white/20 rounded-full overflow-hidden mt-0.5">
-                  <div 
-                    className="h-full bg-gradient-to-r from-purple-600 to-amber-500" 
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-600 to-amber-500"
                     style={{ width: `${progressToNextLevel}%` }}
                   />
                 </div>
@@ -183,18 +178,20 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
           )}
         </div>
         <ChevronRight
-          className={`h-4 w-4 text-gray-400 transition-transform duration-300 ml-1 ${isExpanded ? 'rotate-90' : ''}`}
+          className={`h-4 w-4 text-gray-400 transition-transform duration-300 ml-1 ${
+            isExpanded ? "rotate-90" : ""
+          }`}
         />
       </motion.button>
 
       <AnimatePresence>
         {isExpanded && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: 10, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="mt-2 w-72 overflow-hidden"
+            className="absolute top-[52px] right-0 w-72 overflow-hidden"
           >
             <Card className="bg-black/80 backdrop-blur-md border border-white/10 shadow-xl">
               <CardHeader className="pb-2 pl-6">
@@ -202,11 +199,11 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
                   <CardTitle className="text-lg text-white">
                     Your Progress
                   </CardTitle>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20"
-                    onClick={() => router.push('/progress')}
+                    onClick={() => router.push("/progress")}
                   >
                     Full View <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -225,41 +222,51 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-semibold text-white">Level {userLevel}</span>
-                          <span className="text-xs text-gray-400">{experiencePoints}/{nextLevelPoints} XP</span>
+                          <span className="text-sm font-semibold text-white">
+                            Level {userLevel}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {experiencePoints}/{nextLevelPoints} XP
+                          </span>
                         </div>
-                        <Progress 
-                          value={progressToNextLevel} 
-                          className="h-2 bg-white/10" 
+                        <Progress
+                          value={progressToNextLevel}
+                          className="h-2 bg-white/10"
                           indicatorClassName="bg-gradient-to-r from-purple-600 to-amber-500"
                         />
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                       <div className="bg-gradient-to-br from-purple-600 to-indigo-400 p-2 rounded-lg shadow-lg">
                         <Star className="text-white h-6 w-6" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-semibold text-white">Mastery</span>
-                          <span className="text-xs text-gray-400">{masteryPercentage.toFixed(0)}%</span>
+                          <span className="text-sm font-semibold text-white">
+                            Mastery
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {masteryPercentage.toFixed(0)}%
+                          </span>
                         </div>
-                        <Progress 
-                          value={masteryPercentage} 
-                          className="h-2 bg-white/10" 
-                          indicatorClassName="bg-gradient-to-r from-purple-600 to-indigo-400" 
+                        <Progress
+                          value={masteryPercentage}
+                          className="h-2 bg-white/10"
+                          indicatorClassName="bg-gradient-to-r from-purple-600 to-indigo-400"
                         />
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                       <div className="bg-gradient-to-br from-purple-600 to-blue-400 p-2 rounded-lg shadow-lg">
                         <BookOpen className="text-white h-6 w-6" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-semibold text-white">Flashcards</span>
+                          <span className="text-sm font-semibold text-white">
+                            Flashcards
+                          </span>
                           <span className="text-xs text-gray-400">
                             {masteredFlashcards}/{totalFlashcards} mastered
                           </span>
@@ -281,4 +288,4 @@ export function ProgressPreview({ progressStats, isGuestMode = false, onProgress
       </AnimatePresence>
     </div>
   );
-} 
+}

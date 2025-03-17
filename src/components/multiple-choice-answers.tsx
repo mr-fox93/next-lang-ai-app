@@ -143,16 +143,15 @@ export function MultipleChoiceAnswers({
     return "text-sm sm:text-base";
   };
 
-  // Określamy wysokość kafelków na podstawie najdłuższej odpowiedzi
   const containerHeightClass = useMemo(() => {
     if (!options.length) return "min-h-[60px] sm:min-h-[60px]";
 
     const maxLength = Math.max(...options.map((option) => option.length));
 
-    if (maxLength < 15) return "min-h-[50px] sm:min-h-[50px]"; // Dla bardzo krótkich odpowiedzi
-    if (maxLength < 30) return "min-h-[60px] sm:min-h-[60px]"; // Dla krótkich odpowiedzi
-    if (maxLength < 50) return "min-h-[70px] sm:min-h-[70px]"; // Dla średnich odpowiedzi
-    return "min-h-[80px] sm:min-h-[90px]"; // Dla długich odpowiedzi
+    if (maxLength < 15) return "min-h-[50px] sm:min-h-[50px]";
+    if (maxLength < 30) return "min-h-[60px] sm:min-h-[60px]";
+    if (maxLength < 50) return "min-h-[70px] sm:min-h-[70px]";
+    return "min-h-[80px] sm:min-h-[90px]";
   }, [options]);
 
   return (
