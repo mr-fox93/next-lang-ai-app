@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Grid, Maximize2, PlusCircle, Save } from "lucide-react";
+import {
+  Menu,
+  Grid,
+  Maximize2,
+  PlusCircle,
+  Save,
+  LogOut,
+  PanelLeftOpen,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
@@ -293,6 +301,14 @@ export default function GuestFlashcardsView({
 
       <div className="flex justify-between items-center p-3 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            size="icon"
+            className="md:hidden text-white bg-purple-700/80 border-purple-500 hover:bg-purple-600 hover:border-purple-400 mr-2"
+            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          >
+            <PanelLeftOpen className="h-5 w-5" />
+          </Button>
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -327,14 +343,6 @@ export default function GuestFlashcardsView({
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden fixed top-4 left-4 z-50 text-white"
-          onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
         <div
           className={`
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
