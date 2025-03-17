@@ -15,6 +15,17 @@ export default function Navbar() {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const scrollToHowItWorks = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const howItWorksSection = document.getElementById("how-it-works");
+    if (howItWorksSection) {
+      howItWorksSection.scrollIntoView({ behavior: "smooth" });
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    }
+  };
+
   return (
     <div className="w-full px-4 pt-4">
       <motion.nav
@@ -36,7 +47,9 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center justify-center space-x-8">
           <NavLink href="/flashcards">Flashcards</NavLink>
-          <NavLink href="#">How It Works</NavLink>
+          <NavLink href="#how-it-works" onClick={scrollToHowItWorks}>
+            How It Works
+          </NavLink>
         </div>
 
         <div className="hidden md:flex items-center justify-end space-x-4">
@@ -98,13 +111,13 @@ export default function Navbar() {
               >
                 Flashcards
               </Link>
-              <Link
-                href="#"
+              <a
+                href="#how-it-works"
                 className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={scrollToHowItWorks}
               >
                 How It Works
-              </Link>
+              </a>
             </div>
 
             <div className="mt-12 w-full max-w-sm">
@@ -166,17 +179,20 @@ export default function Navbar() {
 function NavLink({
   href,
   children,
+  onClick,
 }: {
   href: string;
   children: React.ReactNode;
+  onClick?: (e: React.MouseEvent) => void;
 }) {
   return (
-    <Link
+    <a
       href={href}
+      onClick={onClick}
       className="text-gray-300 hover:text-white transition-colors relative group"
     >
       {children}
       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all group-hover:w-full" />
-    </Link>
+    </a>
   );
 }
