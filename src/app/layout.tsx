@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingErrorProvider } from "@/shared/ui/loading-error-provider";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
+import Footer from "@/components/footer";
 
 export default function RootLayout({
   children,
@@ -16,6 +17,7 @@ export default function RootLayout({
           <ErrorBoundary>
             <LoadingErrorProvider>
               {children}
+              <Footer />
             </LoadingErrorProvider>
           </ErrorBoundary>
           <Toaster />
