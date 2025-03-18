@@ -9,12 +9,17 @@ import {
   LanguageSettings,
   type LanguageSettings as LanguageSettingsType,
 } from "@/components/language-settings";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from "next/navigation";
-import { handleGuestFlashcardGeneration } from "@/app/actions/flashcard-actions";
+import {
+  handleGuestFlashcardGeneration,
+  generateFlashcardsAction,
+} from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -28,6 +33,12 @@ export default function Hero() {
       difficultyLevel: "easy",
     });
   const router = useRouter();
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+
+  useEffect(() => {
+    console.log("Auth state changed:", isSignedIn);
+  }, [isSignedIn]);
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -35,21 +46,54 @@ export default function Hero() {
     setIsLoading(true);
     setErrorMessage(null);
 
-    try {
-      const result = await handleGuestFlashcardGeneration({
-        count: 5,
-        message: userInput,
-        level: languageSettings.difficultyLevel,
-        sourceLanguage: languageSettings.sourceLanguage,
-        targetLanguage: languageSettings.targetLanguage,
-      });
+    const authState = isSignedIn;
+    console.log("Current auth state before generation:", authState);
 
-      if (result.success && result.flashcards) {
-        guestFlashcardsStorage.addFlashcards(result.flashcards);
-        setUserInput("");
-        router.push("/guest-flashcard");
+    try {
+      if (authState && user) {
+        console.log("Generating flashcards as authenticated user:", user.id);
+
+        const result = await generateFlashcardsAction({
+          count: 5,
+          message: userInput,
+          level: languageSettings.difficultyLevel,
+          sourceLanguage: languageSettings.sourceLanguage,
+          targetLanguage: languageSettings.targetLanguage,
+        });
+
+        if (result.success) {
+          setUserInput("");
+          toast({
+            title: "Success!",
+            description:
+              "Flashcards have been generated and saved to your account.",
+            variant: "success",
+          });
+
+          setTimeout(() => {
+            router.push("/flashcards");
+          }, 100);
+        } else {
+          setErrorMessage(result.error || "Error generating flashcards");
+        }
       } else {
-        setErrorMessage(result.error || "Error generating flashcards");
+        console.log("Generating flashcards as guest");
+
+        const result = await handleGuestFlashcardGeneration({
+          count: 5,
+          message: userInput,
+          level: languageSettings.difficultyLevel,
+          sourceLanguage: languageSettings.sourceLanguage,
+          targetLanguage: languageSettings.targetLanguage,
+        });
+
+        if (result.success && result.flashcards) {
+          guestFlashcardsStorage.addFlashcards(result.flashcards);
+          setUserInput("");
+          router.push("/guest-flashcard");
+        } else {
+          setErrorMessage(result.error || "Error generating flashcards");
+        }
       }
     } catch (error) {
       console.error("Flashcard generation client error:", error);
