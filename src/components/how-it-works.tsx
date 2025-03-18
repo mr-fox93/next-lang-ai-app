@@ -1,9 +1,35 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ImageModal } from "./image-modal";
+import { useState, useEffect } from "react";
+import { ChevronUp } from "lucide-react";
 
 export default function HowItWorks() {
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const howItWorksSection = document.getElementById("how-it-works");
+
+      if (howItWorksSection) {
+        const sectionTop = howItWorksSection.offsetTop;
+        setShowScrollButton(scrollY > sectionTop + 300);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div id="how-it-works" className="relative min-h-screen w-full py-20">
       <div className="container mx-auto px-6 relative z-10">
@@ -213,6 +239,22 @@ export default function HowItWorks() {
           </div>
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {showScrollButton && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 p-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-900/30 hover:shadow-purple-700/40 z-50 border border-white/10 hover:border-white/20 transition-all duration-300"
+            aria-label="Przewiń do góry"
+          >
+            <ChevronUp size={24} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
