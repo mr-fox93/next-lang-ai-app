@@ -8,13 +8,16 @@ const isProtectedRoute = createRouteMatcher([
   "/import-guest-flashcards(.*)",
 ]);
 
-// Public routes that don't require authentication
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/guest-flashcard(.*)",
-]);
+// Public routes - defined but not directly used in middleware
+// We keep this for documentation purposes or future use
+// To fix the lint error, we'll use commenting approach instead
+
+/* Public routes that don't require authentication:
+ * - /
+ * - /sign-in
+ * - /sign-up
+ * - /guest-flashcard
+ */
 
 export default clerkMiddleware(async (auth, req) => {
   // Check if the path requires authentication
