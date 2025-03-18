@@ -25,6 +25,14 @@
     --ring: 224.3 76.3% 48%;
     --radius: 0.5rem;
   }
+
+  html,
+  body {
+    background-color: black;
+    min-height: 100%;
+    overflow-x: hidden;
+    color: white;
+  }
 }
 
 .bg-grid-white\/\[0\.02\] {

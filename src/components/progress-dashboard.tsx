@@ -254,7 +254,6 @@ export function ProgressDashboard({
               <CardContent>
                 <div className="text-sm">
                   <div className="flex justify-between">
-                    {/* eslint-disable-next-line react/no-unescaped-entities */}
                     <span className="text-gray-400">
                       Today&apos;s flashcards:
                     </span>
@@ -310,7 +309,6 @@ export function ProgressDashboard({
           <div className="space-y-4">
             {stats.categories.length === 0 ? (
               <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-8 text-center">
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 <p className="text-gray-400">
                   You don&apos;t have any flashcard categories yet.
                 </p>

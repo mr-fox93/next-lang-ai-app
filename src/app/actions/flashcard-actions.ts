@@ -8,6 +8,7 @@ import {
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { getFlashcardsPrompt } from "@/lib/prompts";
+import { PrismaClient } from "@prisma/client";
 
 interface ImportableFlashcard {
   origin_text: string;
@@ -52,6 +53,31 @@ export async function generateFlashcardsAction(
         success: false,
         error: "Authentication required: User is not signed in",
       };
+    }
+
+    try {
+      const prisma = new PrismaClient();
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!dbUser) {
+        console.log(
+          "Creating new user in database before generating flashcards:",
+          userId
+        );
+        await prisma.user.create({
+          data: {
+            id: userId,
+            email: user?.primaryEmailAddress?.emailAddress || "",
+            username: user?.username || user?.firstName || "User",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+    } catch (userError) {
+      console.error("Error checking/creating user:", userError);
     }
 
     const generateParams: GenerateFlashcardsParams = {
@@ -153,6 +179,31 @@ export async function importGuestFlashcardsAction(
   }
 
   try {
+    const prisma = new PrismaClient();
+    let dbUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!dbUser) {
+      try {
+        dbUser = await prisma.user.create({
+          data: {
+            id: userId,
+            email: user.primaryEmailAddress?.emailAddress || "",
+            username: user.username || user.firstName || "User",
+          },
+        });
+        console.log("Created new user in database:", dbUser.id);
+      } catch (createError) {
+        console.error("Failed to create user:", createError);
+        return {
+          success: false,
+          error: "Failed to create user record in database",
+        };
+      }
+    }
+
+    // Teraz gdy mamy pewność, że użytkownik istnieje, importujemy fiszki
     const flashcardRepository = getFlashcardRepository();
 
     const flashcardPromises = flashcards.map((card) =>
