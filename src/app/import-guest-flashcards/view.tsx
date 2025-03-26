@@ -135,24 +135,10 @@ export default function ImportGuestFlashcardsView() {
 
   if (isComplete) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border border-gray-700 bg-gray-900 text-white">
-          <CardHeader>
-            <CardTitle className="text-green-500">Import Complete</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>All flashcards have been successfully imported.</p>
-          </CardContent>
-          <CardFooter>
-            <Button
-              onClick={handleComplete}
-              className="bg-purple-600 hover:bg-purple-500 text-white"
-            >
-              Go to Flashcards
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <FlashcardImportAnimation
+        flashcardCount={flashcardCount}
+        onComplete={handleComplete}
+      />
     );
   }
 
