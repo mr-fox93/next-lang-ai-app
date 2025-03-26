@@ -201,7 +201,9 @@ export default function HowItWorks() {
             <ul className="space-y-3 text-gray-400">
               <li className="flex items-start">
                 <span className="text-purple-400 mr-2 text-xl">•</span>
-                <span>See what you've mastered and what's left to learn.</span>
+                <span>
+                  See what you&apos;ve mastered and what&apos;s left to learn.
+                </span>
               </li>
               <li className="flex items-start">
                 <span className="text-purple-400 mr-2 text-xl">•</span>
