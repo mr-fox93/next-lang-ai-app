@@ -59,6 +59,7 @@ interface FlashcardsSidebarProps {
   onNewFlashcardsClick?: () => void;
   onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
   masteredCategories?: string[];
+  onLearningFilterClick?: () => void;
 }
 
 export function FlashcardsSidebar({
@@ -72,6 +73,7 @@ export function FlashcardsSidebar({
   onNewFlashcardsClick,
   onFlashcardsUpdate,
   masteredCategories = [],
+  onLearningFilterClick,
 }: FlashcardsSidebarProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -551,6 +553,21 @@ export function FlashcardsSidebar({
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {isGuestMode && onLearningFilterClick && (
+                  <div
+                    className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200 mt-2"
+                    onClick={onLearningFilterClick}
+                  >
+                    <div className="flex items-center gap-2 text-sm">
+                      <ListFilter className="h-4 w-4 text-purple-400" />
+                      <span className="text-white">Wszystkie kategorie</span>
+                    </div>
+                    <div className="ml-auto">
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </div>
                   </div>
                 )}
               </div>
