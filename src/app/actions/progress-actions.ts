@@ -175,3 +175,53 @@ export async function updateDailyGoalAction(newGoal: number) {
     };
   }
 }
+
+// Funkcja zwracająca kategorie gdzie wszystkie fiszki są już opanowane
+export async function getMasteredCategoriesAction() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { success: false, error: "Użytkownik nie jest zalogowany" };
+    }
+
+    const userCategories = await prisma.flashcard.findMany({
+      where: { userId },
+      select: { category: true },
+      distinct: ["category"],
+    });
+
+    const masteredCategories: string[] = [];
+
+    for (const { category } of userCategories) {
+      const flashcardsInCategory = await prisma.flashcard.findMany({
+        where: { userId, category },
+        select: { id: true },
+      });
+
+      const flashcardIds = flashcardsInCategory.map((f) => f.id);
+
+      const progress = await prisma.progress.findMany({
+        where: {
+          userId,
+          flashcardId: { in: flashcardIds },
+          masteryLevel: { gte: 5 },
+        },
+      });
+
+      if (progress.length === flashcardsInCategory.length) {
+        masteredCategories.push(category);
+      }
+    }
+
+    return {
+      success: true,
+      data: masteredCategories,
+    };
+  } catch (error) {
+    console.error("Błąd podczas pobierania opanowanych kategorii:", error);
+    return {
+      success: false,
+      error: "Wystąpił błąd podczas pobierania opanowanych kategorii",
+    };
+  }
+}

@@ -9,6 +9,9 @@ import {
   Trash2,
   Globe,
   Plus,
+  BookOpen,
+  CheckCircle,
+  ListFilter,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -55,6 +58,8 @@ interface FlashcardsSidebarProps {
   onLanguageSelectClick?: () => void;
   onNewFlashcardsClick?: () => void;
   onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
+  masteredCategories?: string[];
+  onLearningFilterClick?: () => void;
 }
 
 export function FlashcardsSidebar({
@@ -67,6 +72,8 @@ export function FlashcardsSidebar({
   onLanguageSelectClick,
   onNewFlashcardsClick,
   onFlashcardsUpdate,
+  masteredCategories = [],
+  onLearningFilterClick,
 }: FlashcardsSidebarProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
@@ -83,6 +90,7 @@ export function FlashcardsSidebar({
   const [categoryToGenerate, setCategoryToGenerate] = useState<string | null>(
     null
   );
+  const [learningFilter, setLearningFilter] = useState<string>("all");
 
   const router = useRouter();
   const { toast } = useToast();
@@ -154,6 +162,23 @@ export function FlashcardsSidebar({
   const categories = [
     ...new Set(filteredFlashcards.map((card) => card.category)),
   ];
+
+  const getFilteredCategoriesByLearningStatus = () => {
+    if (learningFilter === "all") {
+      return categories;
+    } else if (learningFilter === "mastered") {
+      return categories.filter((category) =>
+        masteredCategories.includes(category)
+      );
+    } else if (learningFilter === "learning") {
+      return categories.filter(
+        (category) => !masteredCategories.includes(category)
+      );
+    }
+    return categories;
+  };
+
+  const displayedCategories = getFilteredCategoriesByLearningStatus();
 
   const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -443,7 +468,7 @@ export function FlashcardsSidebar({
 
           {!isCollapsed &&
             (isGuestMode || languages.length > 0 || isLoadingLanguages) && (
-              <div className="mt-2">
+              <div className="space-y-2 mt-2">
                 {isGuestMode ? (
                   <div
                     className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200"
@@ -488,6 +513,63 @@ export function FlashcardsSidebar({
                     </SelectContent>
                   </Select>
                 )}
+
+                {!isGuestMode && (
+                  <div>
+                    <Select
+                      value={learningFilter}
+                      onValueChange={setLearningFilter}
+                    >
+                      <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
+                        <div className="flex items-center gap-2">
+                          <ListFilter className="h-4 w-4 text-purple-400" />
+                          <SelectValue placeholder="Filter progress" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-black/90 border-white/10 text-white">
+                        <SelectItem
+                          value="all"
+                          className="hover:bg-purple-500/20"
+                        >
+                          All categories
+                        </SelectItem>
+                        <SelectItem
+                          value="learning"
+                          className="hover:bg-blue-500/20"
+                        >
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-blue-400" />
+                            <span>Learning</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="mastered"
+                          className="hover:bg-green-500/20"
+                        >
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                            <span>Mastered</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {isGuestMode && onLearningFilterClick && (
+                  <div
+                    className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200 mt-2"
+                    onClick={onLearningFilterClick}
+                  >
+                    <div className="flex items-center gap-2 text-sm">
+                      <ListFilter className="h-4 w-4 text-purple-400" />
+                      <span className="text-white">All categories</span>
+                    </div>
+                    <div className="ml-auto">
+                      <ChevronRight className="h-4 w-4 opacity-50" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
         </div>
@@ -503,8 +585,8 @@ export function FlashcardsSidebar({
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {categories.length > 0 ? (
-              categories.map((category) => (
+            {displayedCategories.length > 0 ? (
+              displayedCategories.map((category) => (
                 <div key={category} className="flex items-center space-x-2">
                   <Button
                     variant="ghost"
@@ -516,11 +598,17 @@ export function FlashcardsSidebar({
                     )}
                     onClick={() => onSelectCategory(category)}
                   >
+                    {!isCollapsed && masteredCategories.includes(category) && (
+                      <CheckCircle className="h-4 w-4 mr-2 text-green-400" />
+                    )}
                     <span className="relative z-10 truncate">
                       {isCollapsed ? category.charAt(0) : category}
                     </span>
                     {selectedCategory === category && (
                       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
+                    )}
+                    {masteredCategories.includes(category) && (
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 to-green-400" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Button>
@@ -559,6 +647,10 @@ export function FlashcardsSidebar({
               <p className="text-gray-400 text-center py-4">
                 {isLoadingLanguages
                   ? "Loading categories..."
+                  : learningFilter === "mastered"
+                  ? "No mastered categories yet"
+                  : learningFilter === "learning"
+                  ? "No categories in learning progress"
                   : selectedLanguage === "all"
                   ? "No categories available"
                   : selectedLanguage

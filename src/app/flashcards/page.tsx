@@ -1,11 +1,16 @@
 import { Suspense } from "react";
-import { getFlashcardsForUser, getProgressStatsForUser } from "./actions";
+import {
+  getFlashcardsForUser,
+  getProgressStatsForUser,
+  getMasteredCategoriesForUser,
+} from "./actions";
 import FlashcardsView from "./view";
 import { Loader } from "@/components/ui/loader";
 
 export default async function FlashcardsPage() {
   const { flashcards, error } = await getFlashcardsForUser();
   const progressStats = await getProgressStatsForUser();
+  const masteredCategoriesResult = await getMasteredCategoriesForUser();
 
   return (
     <Suspense
@@ -20,6 +25,9 @@ export default async function FlashcardsPage() {
         serverError={error}
         initialCategory={null}
         progressStats={progressStats}
+        masteredCategories={
+          masteredCategoriesResult.success ? masteredCategoriesResult.data : []
+        }
       />
     </Suspense>
   );

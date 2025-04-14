@@ -1,6 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { getUserFlashcardsUseCase } from "@/lib/container";
-import { getUserProgressStatsAction } from "@/app/actions/progress-actions";
+import {
+  getUserProgressStatsAction,
+  getMasteredCategoriesAction,
+} from "@/app/actions/progress-actions";
 
 export async function getFlashcardsForUser() {
   const { userId } = await auth();
@@ -9,4 +12,8 @@ export async function getFlashcardsForUser() {
 
 export async function getProgressStatsForUser() {
   return await getUserProgressStatsAction();
+}
+
+export async function getMasteredCategoriesForUser() {
+  return await getMasteredCategoriesAction();
 }
