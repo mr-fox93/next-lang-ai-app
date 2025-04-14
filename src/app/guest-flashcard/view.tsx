@@ -121,6 +121,13 @@ export default function GuestFlashcardsView({
     setShowLoginPrompt(true);
   };
 
+  const handleLearningFilterClick = () => {
+    setLoginPromptMessage(
+      "Sign in to track your learning progress and filter categories by mastery level!"
+    );
+    setShowLoginPrompt(true);
+  };
+
   const handleGenerateFlashcards = async (category: string) => {
     setIsLoading(true);
     setError(null);
@@ -358,6 +365,7 @@ export default function GuestFlashcardsView({
             isGuestMode={true}
             onLanguageSelectClick={handleLanguageSelectClick}
             onNewFlashcardsClick={handleNewFlashcardsClick}
+            onLearningFilterClick={handleLearningFilterClick}
             onFlashcardsUpdate={(updatedFlashcards) => {
               setFlashcards(updatedFlashcards);
               if (

@@ -25,6 +25,7 @@ interface FlashcardsViewProps {
     data?: UserProgressStats;
     error?: string;
   };
+  masteredCategories?: string[];
 }
 
 export default function FlashcardsView({
@@ -32,6 +33,7 @@ export default function FlashcardsView({
   serverError,
   initialCategory,
   progressStats,
+  masteredCategories = [],
 }: FlashcardsViewProps) {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
@@ -217,6 +219,7 @@ export default function FlashcardsView({
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={initialFlashcards}
+            masteredCategories={masteredCategories}
           />
         </div>
         {isMobileSidebarOpen && (
