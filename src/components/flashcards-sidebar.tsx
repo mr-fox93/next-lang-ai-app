@@ -523,7 +523,7 @@ export function FlashcardsSidebar({
                       <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
                         <div className="flex items-center gap-2">
                           <ListFilter className="h-4 w-4 text-purple-400" />
-                          <SelectValue placeholder="Filtruj postęp" />
+                          <SelectValue placeholder="Filter progress" />
                         </div>
                       </SelectTrigger>
                       <SelectContent className="bg-black/90 border-white/10 text-white">
@@ -531,7 +531,7 @@ export function FlashcardsSidebar({
                           value="all"
                           className="hover:bg-purple-500/20"
                         >
-                          Wszystkie kategorie
+                          All categories
                         </SelectItem>
                         <SelectItem
                           value="learning"
@@ -539,7 +539,7 @@ export function FlashcardsSidebar({
                         >
                           <div className="flex items-center gap-2">
                             <BookOpen className="h-4 w-4 text-blue-400" />
-                            <span>Uczę się</span>
+                            <span>Learning</span>
                           </div>
                         </SelectItem>
                         <SelectItem
@@ -548,7 +548,7 @@ export function FlashcardsSidebar({
                         >
                           <div className="flex items-center gap-2">
                             <CheckCircle className="h-4 w-4 text-green-400" />
-                            <span>Już umiem</span>
+                            <span>Mastered</span>
                           </div>
                         </SelectItem>
                       </SelectContent>
@@ -563,7 +563,7 @@ export function FlashcardsSidebar({
                   >
                     <div className="flex items-center gap-2 text-sm">
                       <ListFilter className="h-4 w-4 text-purple-400" />
-                      <span className="text-white">Wszystkie kategorie</span>
+                      <span className="text-white">All categories</span>
                     </div>
                     <div className="ml-auto">
                       <ChevronRight className="h-4 w-4 opacity-50" />
@@ -646,18 +646,18 @@ export function FlashcardsSidebar({
             ) : (
               <p className="text-gray-400 text-center py-4">
                 {isLoadingLanguages
-                  ? "Ładowanie kategorii..."
+                  ? "Loading categories..."
                   : learningFilter === "mastered"
-                  ? "Nie ma jeszcze opanowanych kategorii"
+                  ? "No mastered categories yet"
                   : learningFilter === "learning"
-                  ? "Nie ma kategorii w trakcie nauki"
+                  ? "No categories in learning progress"
                   : selectedLanguage === "all"
-                  ? "Brak dostępnych kategorii"
+                  ? "No categories available"
                   : selectedLanguage
-                  ? `Brak kategorii dla języka ${getLanguageName(
+                  ? `No categories for ${getLanguageName(
                       selectedLanguage
-                    )}`
-                  : "Brak dostępnych kategorii"}
+                    )} language`
+                  : "No categories available"}
               </p>
             )}
           </div>
