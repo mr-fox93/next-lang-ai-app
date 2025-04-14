@@ -175,3 +175,61 @@ export async function updateDailyGoalAction(newGoal: number) {
     };
   }
 }
+
+// Funkcja zwracająca kategorie gdzie wszystkie fiszki są już opanowane
+export async function getMasteredCategoriesAction() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { success: false, error: "Użytkownik nie jest zalogowany" };
+    }
+
+    // Pobieramy kategorie gdzie wszystkie fiszki mają poziom opanowania (masteryLevel) >= 5
+
+    // Najpierw pobieramy wszystkie kategorie fiszek użytkownika
+    const userCategories = await prisma.flashcard.findMany({
+      where: { userId },
+      select: { category: true },
+      distinct: ["category"],
+    });
+
+    const masteredCategories: string[] = [];
+
+    // Dla każdej kategorii sprawdzamy, czy wszystkie fiszki są opanowane
+    for (const { category } of userCategories) {
+      // Pobierz wszystkie fiszki z tej kategorii
+      const flashcardsInCategory = await prisma.flashcard.findMany({
+        where: { userId, category },
+        select: { id: true },
+      });
+
+      const flashcardIds = flashcardsInCategory.map((f) => f.id);
+
+      // Sprawdź postęp dla wszystkich fiszek w kategorii
+      const progress = await prisma.progress.findMany({
+        where: {
+          userId,
+          flashcardId: { in: flashcardIds },
+          masteryLevel: { gte: 5 }, // Zakładamy, że poziom 5 to w pełni opanowana fiszka
+        },
+      });
+
+      // Jeśli liczba fiszek z poziomem >= 5 równa się liczbie wszystkich fiszek w kategorii,
+      // oznacza to, że kategoria jest w pełni opanowana
+      if (progress.length === flashcardsInCategory.length) {
+        masteredCategories.push(category);
+      }
+    }
+
+    return {
+      success: true,
+      data: masteredCategories,
+    };
+  } catch (error) {
+    console.error("Błąd podczas pobierania opanowanych kategorii:", error);
+    return {
+      success: false,
+      error: "Wystąpił błąd podczas pobierania opanowanych kategorii",
+    };
+  }
+}
