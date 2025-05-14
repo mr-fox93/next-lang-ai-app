@@ -2,15 +2,17 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Linkedin, Shield, Languages } from "lucide-react";
+import { Shield, Languages, Mail } from "lucide-react";
 import { useCookieConsent } from "./cookie-consent";
 import { useLanguage } from "@/shared/language-context";
 import { Button } from "./ui/button";
+import { useContactModal } from "@/shared/contact-modal-context";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { openBanner } = useCookieConsent();
   const { language, setLanguage, translations } = useLanguage();
+  const { openContactModal } = useContactModal();
   
   const t = translations.footer[language];
 
@@ -27,15 +29,13 @@ export default function Footer() {
             © {currentYear} Flashcards AI. {t.allRightsReserved}.
           </p>
           <div className="flex items-center gap-6 flex-wrap justify-center">
-            <Link
-              href="https://linkedin.com/in/kamillisiecki"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={openContactModal}
               className="text-sm text-gray-500 hover:text-purple-400 transition-colors flex items-center gap-2"
             >
-              <Linkedin size={16} />
+              <Mail size={16} />
               <span>{t.contact}</span>
-            </Link>
+            </button>
             <Link
               href="/privacy-policy"
               className="text-sm text-gray-500 hover:text-purple-400 transition-colors"
