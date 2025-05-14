@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { LoadingErrorProvider } from "@/shared/ui/loading-error-provider";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
 import Footer from "@/components/footer";
+import { CookieConsentProvider } from "@/components/cookie-consent";
+import { LanguageProvider } from "@/shared/language-context";
 
 export default function RootLayout({
   children,
@@ -16,8 +18,12 @@ export default function RootLayout({
         <body>
           <ErrorBoundary>
             <LoadingErrorProvider>
-              {children}
-              <Footer />
+              <LanguageProvider>
+                <CookieConsentProvider>
+                  {children}
+                  <Footer />
+                </CookieConsentProvider>
+              </LanguageProvider>
             </LoadingErrorProvider>
           </ErrorBoundary>
           <Toaster />
