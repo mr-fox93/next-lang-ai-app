@@ -8,7 +8,7 @@ export default function Home() {
     <main className="min-h-screen bg-black antialiased relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
 
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <SparklesCore
           id="tsparticlesfullpage"
           background="transparent"
