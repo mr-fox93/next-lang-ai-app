@@ -65,5 +65,102 @@
     "privacyPolicy": "Política de Privacidad",
     "termsOfUse": "Términos de Uso",
     "cookieSettings": "Configuración de Cookies"
+  },
+  "Cookie": {
+    "title": "Política de privacidad y cookies",
+    "description": "Este sitio solo utiliza cookies necesarias para su correcto funcionamiento. Almacenamos temporalmente datos de tarjetas para usuarios no conectados y recordamos tus preferencias de cookies.",
+    "necessary": "Necesarias",
+    "necessaryDesc": "Requeridas para funciones básicas del sitio: autenticación a través de Clerk, almacenamiento de tarjetas en modo invitado y recordar preferencias de cookies.",
+    "showDetails": "Mostrar detalles",
+    "hideDetails": "Ocultar detalles",
+    "acceptAll": "Aceptar todas",
+    "onlyNecessary": "Solo necesarias"
+  },
+  "PrivacyPolicy": {
+    "title": "Política de Privacidad",
+    "backHome": "Volver al inicio",
+    "intro": {
+      "title": "1. Introducción",
+      "content": "Bienvenido a Flashcards AI. Proteger tus datos personales es importante para nosotros. Esta Política de Privacidad explica qué datos recopilamos, cómo los usamos y qué derechos tienes sobre ellos."
+    },
+    "dataCollection": {
+      "title": "2. Qué datos recopilamos",
+      "content": "Solo recopilamos datos esenciales necesarios para el funcionamiento de la aplicación:",
+      "accountData": "Datos de cuenta",
+      "accountDataDesc": "Datos de autenticación a través del servicio Clerk (dirección de correo electrónico). Estos datos son almacenados por Clerk de acuerdo con su política de privacidad.",
+      "userContent": "Contenido del usuario",
+      "userContentDesc": "Tarjetas que creas (texto original, traducción, ejemplos de uso, categorías) y estadísticas de aprendizaje (progreso en el dominio del material).",
+      "tempData": "Datos temporales",
+      "tempDataDesc": "En modo invitado, almacenamos temporalmente tus tarjetas en la memoria de tu navegador para permitirte usar la aplicación sin iniciar sesión."
+    },
+    "cookies": {
+      "title": "3. Cómo usamos las cookies",
+      "content": "Nuestro sitio solo usa cookies esenciales y tecnologías similares:",
+      "necessaryCookies": "Cookies esenciales",
+      "necessaryCookiesDesc": "Permiten funciones básicas como inicio de sesión seguro y navegación por el sitio. El servicio Clerk usa sus propias cookies para autenticación y gestión de sesiones.",
+      "localStorageTitle": "Almacenamiento local de datos",
+      "localStorageDesc": "Usamos la memoria de tu navegador para almacenar tarjetas en modo invitado y recordar tus preferencias de cookies.",
+      "noCookies": "No usamos cookies para fines de marketing, seguimiento o análisis."
+    },
+    "externalServices": {
+      "title": "4. Servicios externos",
+      "content": "Utilizamos los siguientes servicios externos:",
+      "clerk": "Clerk",
+      "clerkDesc": "Para autenticación y gestión de cuentas de usuario. Clerk puede recopilar datos como dirección de correo electrónico, IP o información del navegador de acuerdo con su propia política de privacidad.",
+      "openai": "OpenAI",
+      "openaiDesc": "Para generar contenido de tarjetas usando su API. Solo se transmiten datos necesarios para la generación de contenido; no compartimos datos personales de los usuarios.",
+      "vercel": "Vercel",
+      "vercelDesc": "Para alojar nuestra aplicación.",
+      "policy": "Cada uno de estos servicios tiene su propia política de privacidad, que puede consultarse en sus sitios web."
+    },
+    "dataStorage": {
+      "title": "5. Almacenamiento de datos",
+      "accountData": "Los datos de cuenta de usuario y progreso de aprendizaje se almacenan en una base de datos PostgreSQL con conexión segura. Conservamos estos datos mientras tengas una cuenta en nuestro servicio.",
+      "guestData": "Para usuarios no conectados, los datos de tarjetas se almacenan exclusivamente en la memoria de tu navegador y no se transmiten a nuestros servidores."
+    },
+    "changes": {
+      "title": "6. Cambios en la política de privacidad",
+      "content": "Podemos actualizar nuestra Política de Privacidad de vez en cuando. Te notificaremos sobre cambios significativos mediante una notificación en la aplicación."
+    },
+    "contact": {
+      "title": "7. Contacto",
+      "content": "Si tienes preguntas sobre nuestra Política de Privacidad, contáctanos:",
+      "email": "Email",
+      "contactUs": "Contáctanos"
+    },
+    "lastUpdate": "Última actualización"
+  },
+  "Terms": {
+    "title": "Términos de Uso",
+    "backHome": "Volver al inicio",
+    "intro": {
+      "title": "1. Introducción",
+      "content": "Bienvenido a Flashcards AI. Al usar nuestra aplicación, aceptas estos Términos de Uso. La aplicación está diseñada para crear y aprender con tarjetas de idiomas usando inteligencia artificial."
+    },
+    "accounts": {
+      "title": "2. Cuentas de usuario",
+      "content": "Para usar toda la funcionalidad de la aplicación, debes crear una cuenta. Eres responsable de mantener la confidencialidad de tus credenciales de inicio de sesión y cualquier actividad realizada a través de tu cuenta."
+    },
+    "allowedUse": {
+      "title": "3. Uso permitido",
+      "content": "Puedes usar la aplicación solo para fines legales. Aceptas no:",
+      "item1": "Violar derechos de propiedad intelectual o privacidad de otros",
+      "item2": "Usar la aplicación para spam, fraude o actividades dañinas",
+      "item3": "Realizar acciones que podrían interrumpir el funcionamiento adecuado de la aplicación"
+    },
+    "userContent": {
+      "title": "4. Contenido del usuario",
+      "content": "Conservas los derechos de tus tarjetas y otro contenido que creas en la aplicación. Nos otorgas una licencia no exclusiva para usar este contenido para proporcionar el servicio."
+    },
+    "changes": {
+      "title": "5. Cambios en el servicio",
+      "content": "Nos reservamos el derecho de modificar, suspender o interrumpir el servicio sin previo aviso. También podemos actualizar estos Términos de Uso. El uso continuado de la aplicación después de los cambios significa la aceptación de los nuevos términos."
+    },
+    "contact": {
+      "title": "6. Contacto",
+      "content": "Si tienes preguntas sobre estos Términos de Uso, contáctanos:",
+      "email": "Email"
+    },
+    "lastUpdate": "Última actualización"
   }
 } 

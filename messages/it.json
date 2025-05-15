@@ -65,5 +65,102 @@
     "privacyPolicy": "Politica sulla Privacy",
     "termsOfUse": "Termini di Utilizzo",
     "cookieSettings": "Impostazioni Cookie"
+  },
+  "Cookie": {
+    "title": "Politica sulla privacy e cookie",
+    "description": "Questo sito utilizza solo i cookie necessari per il corretto funzionamento. Memorizziamo temporaneamente i dati delle flashcard per gli utenti non loggati e ricordiamo le tue preferenze sui cookie.",
+    "necessary": "Necessari",
+    "necessaryDesc": "Richiesti per le funzioni di base del sito: autenticazione tramite Clerk, archiviazione delle flashcard in modalità ospite e memorizzazione delle preferenze sui cookie.",
+    "showDetails": "Mostra dettagli",
+    "hideDetails": "Nascondi dettagli",
+    "acceptAll": "Accetta tutti",
+    "onlyNecessary": "Solo necessari"
+  },
+  "PrivacyPolicy": {
+    "title": "Politica sulla Privacy",
+    "backHome": "Torna alla Home",
+    "intro": {
+      "title": "1. Introduzione",
+      "content": "Benvenuto in Flashcards AI. La protezione dei tuoi dati personali è importante per noi. Questa Politica sulla Privacy spiega quali dati raccogliamo, come li utilizziamo e quali diritti hai su di essi."
+    },
+    "dataCollection": {
+      "title": "2. Quali dati raccogliamo",
+      "content": "Raccogliamo solo i dati essenziali necessari per il funzionamento dell'applicazione:",
+      "accountData": "Dati dell'account",
+      "accountDataDesc": "Dati di autenticazione tramite il servizio Clerk (indirizzo email). Questi dati sono archiviati da Clerk in conformità con la loro politica sulla privacy.",
+      "userContent": "Contenuto utente",
+      "userContentDesc": "Le flashcard che crei (testo originale, traduzione, esempi di utilizzo, categorie) e le statistiche di apprendimento (progressi nella padronanza del materiale).",
+      "tempData": "Dati temporanei",
+      "tempDataDesc": "In modalità ospite, memorizziamo temporaneamente le tue flashcard nella memoria del browser per consentirti di utilizzare l'applicazione senza accedere."
+    },
+    "cookies": {
+      "title": "3. Come utilizziamo i cookie",
+      "content": "Il nostro sito utilizza solo cookie essenziali e tecnologie simili:",
+      "necessaryCookies": "Cookie essenziali",
+      "necessaryCookiesDesc": "Abilitano funzioni di base come l'accesso sicuro e la navigazione sul sito. Il servizio Clerk utilizza i propri cookie per l'autenticazione e la gestione delle sessioni.",
+      "localStorageTitle": "Archiviazione dati locale",
+      "localStorageDesc": "Utilizziamo la memoria del tuo browser per archiviare flashcard in modalità ospite e ricordare le tue preferenze sui cookie.",
+      "noCookies": "Non utilizziamo alcun cookie per finalità di marketing, tracciamento o analisi."
+    },
+    "externalServices": {
+      "title": "4. Servizi esterni",
+      "content": "Utilizziamo i seguenti servizi esterni:",
+      "clerk": "Clerk",
+      "clerkDesc": "Per l'autenticazione e la gestione degli account utente. Clerk può raccogliere dati come indirizzo email, IP o informazioni sul browser in conformità con la propria politica sulla privacy.",
+      "openai": "OpenAI",
+      "openaiDesc": "Per generare contenuti delle flashcard utilizzando la loro API. Vengono trasmessi solo i dati necessari per la generazione di contenuti; non condividiamo i dati personali degli utenti.",
+      "vercel": "Vercel",
+      "vercelDesc": "Per l'hosting della nostra applicazione.",
+      "policy": "Ciascuno di questi servizi ha la propria politica sulla privacy, che può essere consultata sui rispettivi siti web."
+    },
+    "dataStorage": {
+      "title": "5. Archiviazione dei dati",
+      "accountData": "I dati dell'account utente e i progressi di apprendimento sono archiviati in un database PostgreSQL con connessione sicura. Conserviamo questi dati finché hai un account sul nostro servizio.",
+      "guestData": "Per gli utenti non loggati, i dati delle flashcard sono archiviati esclusivamente nella memoria del tuo browser e non vengono trasmessi ai nostri server."
+    },
+    "changes": {
+      "title": "6. Modifiche alla politica sulla privacy",
+      "content": "Potremmo aggiornare la nostra Politica sulla Privacy di tanto in tanto. Ti informeremo di eventuali modifiche significative tramite notifica in-app."
+    },
+    "contact": {
+      "title": "7. Contatto",
+      "content": "Se hai domande sulla nostra Politica sulla Privacy, contattaci:",
+      "email": "Email",
+      "contactUs": "Contattaci"
+    },
+    "lastUpdate": "Ultimo aggiornamento"
+  },
+  "Terms": {
+    "title": "Termini di Utilizzo",
+    "backHome": "Torna alla Home",
+    "intro": {
+      "title": "1. Introduzione",
+      "content": "Benvenuto in Flashcards AI. Utilizzando la nostra applicazione, accetti questi Termini di Utilizzo. L'applicazione è progettata per creare e imparare con flashcard linguistiche utilizzando l'intelligenza artificiale."
+    },
+    "accounts": {
+      "title": "2. Account utente",
+      "content": "Per utilizzare tutte le funzionalità dell'applicazione, devi creare un account. Sei responsabile della riservatezza delle tue credenziali di accesso e di qualsiasi attività svolta tramite il tuo account."
+    },
+    "allowedUse": {
+      "title": "3. Uso consentito",
+      "content": "Puoi utilizzare l'applicazione solo per scopi legali. Accetti di non:",
+      "item1": "Violare i diritti di proprietà intellettuale o la privacy altrui",
+      "item2": "Utilizzare l'applicazione per spam, frode o attività dannose",
+      "item3": "Intraprendere azioni che potrebbero interrompere il corretto funzionamento dell'applicazione"
+    },
+    "userContent": {
+      "title": "4. Contenuto utente",
+      "content": "Mantieni i diritti sulle tue flashcard e altri contenuti che crei nell'applicazione. Ci concedi una licenza non esclusiva per utilizzare questi contenuti per fornire il servizio."
+    },
+    "changes": {
+      "title": "5. Modifiche al servizio",
+      "content": "Ci riserviamo il diritto di modificare, sospendere o interrompere il servizio senza preavviso. Potremmo anche aggiornare questi Termini di Utilizzo. L'uso continuato dell'applicazione dopo le modifiche significa l'accettazione dei nuovi termini."
+    },
+    "contact": {
+      "title": "6. Contatto",
+      "content": "Se hai domande su questi Termini di Utilizzo, contattaci:",
+      "email": "Email"
+    },
+    "lastUpdate": "Ultimo aggiornamento"
   }
 } 
