@@ -91,7 +91,7 @@ export default function Hero() {
         if (result.success && result.flashcards) {
           guestFlashcardsStorage.addFlashcards(result.flashcards);
           setUserInput("");
-          router.push("/guest-flashcard");
+          router.push("guest-flashcard");
         } else {
           setErrorMessage(result.error || "Error generating flashcards");
         }
