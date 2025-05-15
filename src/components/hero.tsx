@@ -72,7 +72,7 @@ export default function Hero() {
           });
 
           setTimeout(() => {
-            router.push("/flashcards");
+            router.push("flashcards");
           }, 100);
         } else {
           setErrorMessage(result.error || "Error generating flashcards");

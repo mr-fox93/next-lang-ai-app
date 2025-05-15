@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import {
   Star,
@@ -314,7 +314,7 @@ export function ProgressDashboard({
                 </p>
                 <Button
                   className="mt-4 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-none"
-                  onClick={() => router.push("/flashcards")}
+                  onClick={() => router.push("flashcards")}
                 >
                   Create Flashcards
                 </Button>
@@ -331,7 +331,7 @@ export function ProgressDashboard({
                         {category.name}
                       </CardTitle>
                       <Link
-                        href={`/flashcards?category=${encodeURIComponent(
+                        href={`flashcards?category=${encodeURIComponent(
                           category.name
                         )}`}
                       >
@@ -399,7 +399,7 @@ export function ProgressDashboard({
           </div>
 
           <div className="mt-8 mb-12">
-            <Link href="/flashcards">
+            <Link href="flashcards">
               <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-none">
                 Continue Learning <ChevronRight className="ml-2 h-4 w-4" />
               </Button>

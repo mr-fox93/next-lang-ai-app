@@ -1,34 +1,6 @@
-import { Suspense } from "react";
-import {
-  getFlashcardsForUser,
-  getProgressStatsForUser,
-  getMasteredCategoriesForUser,
-} from "./actions";
-import FlashcardsView from "./view";
-import { Loader } from "@/components/ui/loader";
+import { redirect } from 'next/navigation';
 
-export default async function FlashcardsPage() {
-  const { flashcards, error } = await getFlashcardsForUser();
-  const progressStats = await getProgressStatsForUser();
-  const masteredCategoriesResult = await getMasteredCategoriesForUser();
-
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          <Loader />
-        </div>
-      }
-    >
-      <FlashcardsView
-        initialFlashcards={flashcards}
-        serverError={error}
-        initialCategory={null}
-        progressStats={progressStats}
-        masteredCategories={
-          masteredCategoriesResult.success ? masteredCategoriesResult.data : []
-        }
-      />
-    </Suspense>
-  );
+export default function FlashcardsRedirectPage() {
+  // Redirect to the English version by default
+  redirect('/en/flashcards');
 }

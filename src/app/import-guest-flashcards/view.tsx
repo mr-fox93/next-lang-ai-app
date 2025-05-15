@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/navigation';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -80,7 +80,7 @@ export default function ImportGuestFlashcardsView() {
   };
 
   const handleComplete = () => {
-    router.push("/flashcards");
+    router.push('flashcards');
   };
 
   if (error) {
@@ -106,7 +106,7 @@ export default function ImportGuestFlashcardsView() {
 
           <CardFooter className="flex justify-center">
             <Button
-              onClick={() => router.push("/flashcards")}
+              onClick={() => router.push('flashcards')}
               className="bg-purple-600 hover:bg-purple-500 text-white"
             >
               Go to Flashcards

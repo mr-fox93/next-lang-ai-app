@@ -105,7 +105,7 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center justify-center space-x-8">
-          <NavLink href="/flashcards">{t('flashcards')}</NavLink>
+          <NavLink href="flashcards">{t('flashcards')}</NavLink>
           <NavLink href="#how-it-works" onClick={scrollToHowItWorks}>
             {t('howItWorks')}
           </NavLink>
@@ -198,7 +198,7 @@ export default function Navbar() {
           <div className="flex flex-col items-center justify-start px-6 py-10">
             <div className="flex flex-col items-center w-full">
               <Link
-                href="/flashcards"
+                href="flashcards"
                 className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -297,6 +297,15 @@ function NavLink({
   children: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
 }) {
+  if (!href.startsWith('#')) {
+    return (
+      <Link href={href} className="text-gray-300 hover:text-white transition-colors relative group">
+        {children}
+        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all group-hover:w-full" />
+      </Link>
+    );
+  }
+  
   return (
     <a
       href={href}
