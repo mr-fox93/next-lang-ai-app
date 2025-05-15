@@ -8,12 +8,12 @@ import FlashcardsView from "../../flashcards/view";
 import { Loader } from "@/components/ui/loader";
 import { setRequestLocale } from 'next-intl/server';
 
-export default async function FlashcardsPage({ 
-  params: { locale } 
-}: { 
-  params: { locale: string } 
-}) {
-  setRequestLocale(locale);
+type Props = {
+  params: { locale: string }
+}
+
+export default async function FlashcardsPage({ params }: Props) {
+  setRequestLocale(params.locale);
 
   const { flashcards, error } = await getFlashcardsForUser();
   const progressStats = await getProgressStatsForUser();
