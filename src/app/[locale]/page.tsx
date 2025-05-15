@@ -12,8 +12,7 @@ type PageProps = {
 
 export default async function Home({ params }: PageProps) {
   // Enable static rendering
-  const { locale } = await Promise.resolve(params);
-  setRequestLocale(locale);
+  setRequestLocale(params.locale);
 
   return (
     <main className="min-h-screen bg-black antialiased relative overflow-hidden">
