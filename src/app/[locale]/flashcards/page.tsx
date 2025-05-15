@@ -13,13 +13,12 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export default async function FlashcardsPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function FlashcardsPage({ params }: { params: Promise<{ locale: string }> }) {
+  // Await the params to get the locale
+  const { locale } = await params;
+  
   // Enable static rendering
-  setRequestLocale(params.locale);
+  setRequestLocale(locale);
 
   const { flashcards, error } = await getFlashcardsForUser();
   const progressStats = await getProgressStatsForUser();

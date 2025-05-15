@@ -4,15 +4,12 @@ import HowItWorks from "@/components/how-it-works";
 import Navbar from "@/components/navbar";
 import { SparklesCore } from "@/components/sparkles";
 
-type PageProps = {
-  params: {
-    locale: string;
-  };
-};
-
-export default async function Home({ params }: PageProps) {
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  // Await the params to get the locale
+  const { locale } = await params;
+  
   // Enable static rendering
-  setRequestLocale(params.locale);
+  setRequestLocale(locale);
 
   return (
     <main className="min-h-screen bg-black antialiased relative overflow-hidden">

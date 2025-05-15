@@ -22,10 +22,12 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  // Await the params to get the locale
+  const { locale } = await params;
+  
   // Ensure that the incoming `locale` is valid
-  const locale = params.locale;
   if (!hasLocale(locales, locale)) {
     notFound();
   }
