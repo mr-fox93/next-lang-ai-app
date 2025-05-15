@@ -65,5 +65,102 @@
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
     "cookieSettings": "Cookie Settings"
+  },
+  "Cookie": {
+    "title": "Privacy Policy & Cookies",
+    "description": "This site only uses necessary cookies for proper functioning. We temporarily store flashcard data for non-logged in users and remember your cookie preferences.",
+    "necessary": "Necessary",
+    "necessaryDesc": "Required for basic site functions: authentication via Clerk, storing flashcards in guest mode, and remembering cookie consent preferences.",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "acceptAll": "Accept all",
+    "onlyNecessary": "Only necessary"
+  },
+  "PrivacyPolicy": {
+    "title": "Privacy Policy",
+    "backHome": "Back to Home",
+    "intro": {
+      "title": "1. Introduction",
+      "content": "Welcome to Flashcards AI. Protecting your personal data is important to us. This Privacy Policy explains what data we collect, how we use it, and what rights you have regarding it."
+    },
+    "dataCollection": {
+      "title": "2. What data we collect",
+      "content": "We only collect essential data needed for the application to function:",
+      "accountData": "Account data",
+      "accountDataDesc": "Authentication data via Clerk service (email address). This data is stored by Clerk in accordance with their privacy policy.",
+      "userContent": "User content",
+      "userContentDesc": "Flashcards you create (original text, translation, usage examples, categories) and learning statistics (progress in mastering the material).",
+      "tempData": "Temporary data",
+      "tempDataDesc": "In guest mode, we temporarily store your flashcards in your browser's memory to allow you to use the application without logging in."
+    },
+    "cookies": {
+      "title": "3. How we use cookies",
+      "content": "Our site only uses essential cookies and similar technologies:",
+      "necessaryCookies": "Essential cookies",
+      "necessaryCookiesDesc": "Enable basic functions such as secure login and site navigation. The Clerk service uses its own cookies for authentication and session management.",
+      "localStorageTitle": "Local data storage",
+      "localStorageDesc": "We use your browser's memory to store flashcards in guest mode and remember your cookie preferences.",
+      "noCookies": "We do not use any cookies for marketing, tracking, or analytics purposes."
+    },
+    "externalServices": {
+      "title": "4. External services",
+      "content": "We use the following external services:",
+      "clerk": "Clerk",
+      "clerkDesc": "For authentication and user account management. Clerk may collect data such as email address, IP, or browser information in accordance with their own privacy policy.",
+      "openai": "OpenAI",
+      "openaiDesc": "For generating flashcard content using their API. Only data necessary for content generation is transmitted; we do not share users' personal data.",
+      "vercel": "Vercel",
+      "vercelDesc": "For hosting our application.",
+      "policy": "Each of these services has its own privacy policy, which can be found on their websites."
+    },
+    "dataStorage": {
+      "title": "5. Data storage",
+      "accountData": "User account and learning progress data are stored in a PostgreSQL database with secured connection. We store this data as long as you have an account on our service.",
+      "guestData": "For non-logged in users, flashcard data is stored exclusively in your browser's memory and is not transmitted to our servers."
+    },
+    "changes": {
+      "title": "6. Changes to the privacy policy",
+      "content": "We may update our Privacy Policy from time to time. We will notify you of any significant changes via in-app notification."
+    },
+    "contact": {
+      "title": "7. Contact",
+      "content": "If you have questions about our Privacy Policy, please contact us:",
+      "email": "Email",
+      "contactUs": "Contact Us"
+    },
+    "lastUpdate": "Last updated"
+  },
+  "Terms": {
+    "title": "Terms of Use",
+    "backHome": "Back to Home",
+    "intro": {
+      "title": "1. Introduction",
+      "content": "Welcome to Flashcards AI. By using our application, you accept these Terms of Use. The application is designed for creating and learning with language flashcards using artificial intelligence."
+    },
+    "accounts": {
+      "title": "2. User accounts",
+      "content": "To use the full functionality of the application, you must create an account. You are responsible for maintaining the confidentiality of your login credentials and any activities performed through your account."
+    },
+    "allowedUse": {
+      "title": "3. Allowed use",
+      "content": "You may use the application only for lawful purposes. You agree not to:",
+      "item1": "Violate intellectual property rights or privacy of others",
+      "item2": "Use the application for spam, fraud, or harmful activities",
+      "item3": "Take actions that could disrupt the proper functioning of the application"
+    },
+    "userContent": {
+      "title": "4. User content",
+      "content": "You retain rights to your flashcards and other content you create in the application. You grant us a non-exclusive license to use this content to provide the service."
+    },
+    "changes": {
+      "title": "5. Changes to the service",
+      "content": "We reserve the right to modify, suspend, or discontinue the service without prior notice. We may also update these Terms of Use. Continued use of the application after changes means acceptance of the new terms."
+    },
+    "contact": {
+      "title": "6. Contact",
+      "content": "If you have questions about these Terms of Use, please contact us:",
+      "email": "Email"
+    },
+    "lastUpdate": "Last updated"
   }
 } 
