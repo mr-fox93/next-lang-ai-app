@@ -11,7 +11,7 @@ import {
 } from "@/components/language-settings";
 import { useState, useEffect } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/navigation';
 import {
   handleGuestFlashcardGeneration,
   generateFlashcardsAction,
@@ -20,6 +20,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { toast } from "@/components/ui/use-toast";
+import { useTranslations } from 'next-intl';
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -35,6 +36,7 @@ export default function Hero() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
+  const t = useTranslations('Hero');
 
   useEffect(() => {
     console.log("Auth state changed:", isSignedIn);
@@ -64,9 +66,8 @@ export default function Hero() {
         if (result.success) {
           setUserInput("");
           toast({
-            title: "Success!",
-            description:
-              "Flashcards have been generated and saved to your account.",
+            title: t('success'),
+            description: t('successMessage'),
             variant: "success",
           });
 
@@ -119,10 +120,10 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 px-4 md:px-0">
-              Transform Your Learning with
+              {t('title')}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                 {" "}
-                Flashcards AI
+                {t('brandName')}
               </span>
             </h1>
           </motion.div>
@@ -133,8 +134,7 @@ export default function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-gray-400 text-lg md:text-xl mb-8 max-w-2xl mx-auto px-4 md:px-0"
           >
-            Enter any text or scenario and let our AI create perfect flashcards
-            for your learning journey.
+            {t('subtitle')}
           </motion.p>
 
           <LanguageSettings onChange={setLanguageSettings} />
@@ -179,7 +179,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
               <span className="relative flex items-center justify-center gap-2">
                 <LayoutTemplate className="h-6 w-6" />
-                {isLoading ? "Generating..." : "Generate Flashcards"}
+                {isLoading ? t('generating') : t('generateButton')}
               </span>
             </Button>
           </motion.div>

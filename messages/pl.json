@@ -1,0 +1,69 @@
+{
+  "Navbar": {
+    "flashcards": "Fiszki",
+    "howItWorks": "Jak to działa",
+    "signIn": "Zaloguj się",
+    "createAccount": "Utwórz konto",
+    "logOut": "Wyloguj się",
+    "yourAccount": "Twoje konto",
+    "manageAccount": "Zarządzaj kontem lub zaloguj się"
+  },
+  "Hero": {
+    "title": "Zmień swój sposób nauki z",
+    "subtitle": "Wprowadź dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy idealne fiszki dla Twojej nauki.",
+    "brandName": "Flashcards AI",
+    "generateButton": "Wygeneruj fiszki",
+    "generating": "Generowanie...",
+    "success": "Sukces!",
+    "successMessage": "Fiszki zostały wygenerowane i zapisane na Twoim koncie."
+  },
+  "HowItWorks": {
+    "title": "Jak to działa",
+    "subtitle": "Naucz się każdego języka w trzech prostych krokach.",
+    "step1": {
+      "title": "Krok 1: Wybierz i Utwórz",
+      "subtitle": "Rozpocznij naukę języka w kilka sekund.",
+      "selectNative": "Wybierz swój język ojczysty z lewej listy rozwijanej.",
+      "chooseTarget": "Wybierz język docelowy z prawej listy rozwijanej.",
+      "pickDifficulty": "Wybierz poziom trudności fiszek.",
+      "describeWhatToLearn": "Opisz, czego chcesz się nauczyć - bądź tak szczegółowy, jak potrzebujesz:",
+      "example1": "Mam rozmowę kwalifikacyjną na stanowisko programisty w przyszłym tygodniu",
+      "example2": "Jadę do Barcelony, potrzebuję pomocy przy zamawianiu jedzenia i kupowaniu biletów do muzeum",
+      "example3": "Zwroty na spotkania biznesowe podczas mojej podróży do Londynu",
+      "proTip": "Im więcej szczegółów podasz o swojej sytuacji, tym bardziej spersonalizowane i przydatne będą Twoje fiszki!",
+      "clickToChange": "Kliknij język, aby zmienić język interfejsu"
+    },
+    "step2": {
+      "title": "Krok 2: Ćwicz i Ucz się",
+      "subtitle": "Opanuj nowe słownictwo poprzez interaktywne ćwiczenia.",
+      "multipleChoice": "Zobacz swoją fiszkę z 4 opcjami wielokrotnego wyboru i śledź swoje postępy.",
+      "checkTranslations": "Wybieraj odpowiedzi i odwracaj karty, aby sprawdzić tłumaczenia. Zobacz swoje postępy dla każdej odpowiedzi.",
+      "listenPronunciation": "Posłuchaj poprawnej wymowy słów i przykładowych zdań w obu językach.",
+      "addMoreCards": "Dodaj więcej fiszek do istniejącej kategorii jednym kliknięciem.",
+      "filterByLanguage": "Filtruj fiszki według języka, aby skupić się na tym, czego chcesz się nauczyć.",
+      "trackProgress": "Śledź swoje postępy w nauce z kategoriami 'Uczę się' i 'Opanowane'.",
+      "nativeSpeaker": "Audio rodzimego mówcy",
+      "smartLearning": "Inteligentny system nauki",
+      "contextExamples": "Przykłady kontekstowe",
+      "filterDescription": "Filtruj fiszki według języka lub postępu nauki, aby skupić się na swojej nauce:"
+    },
+    "step3": {
+      "title": "Krok 3: Śledź i Doskonalij",
+      "subtitle": "Monitoruj swoje postępy i osiągaj cele szybciej.",
+      "seeMastered": "Zobacz, co już opanowałeś i czego jeszcze musisz się nauczyć.",
+      "setTargets": "Ustal dzienne cele nauki, które odpowiadają Twoim potrzebom.",
+      "viewCharts": "Przeglądaj wizualne wykresy postępów, aby zachować motywację.",
+      "smartRepetition": "Korzystaj z inteligentnego systemu powtórek, który dostosowuje się do Twojej nauki.",
+      "progressAnalytics": "Analityka postępów",
+      "customStudyPlans": "Spersonalizowane plany nauki",
+      "crossDeviceSync": "Synchronizacja między urządzeniami"
+    }
+  },
+  "Footer": {
+    "allRightsReserved": "Wszelkie prawa zastrzeżone",
+    "contact": "Kontakt",
+    "privacyPolicy": "Polityka Prywatności",
+    "termsOfUse": "Warunki Użytkowania",
+    "cookieSettings": "Ustawienia Cookies"
+  }
+} 

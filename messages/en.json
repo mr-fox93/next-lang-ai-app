@@ -1,0 +1,69 @@
+{
+  "Navbar": {
+    "flashcards": "Flashcards",
+    "howItWorks": "How It Works",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "logOut": "Log Out",
+    "yourAccount": "Your Account",
+    "manageAccount": "Manage your account or sign in"
+  },
+  "Hero": {
+    "title": "Transform Your Learning with",
+    "subtitle": "Enter any text or scenario and let our AI create perfect flashcards for your learning journey.",
+    "brandName": "Flashcards AI",
+    "generateButton": "Generate Flashcards",
+    "generating": "Generating...",
+    "success": "Success!",
+    "successMessage": "Flashcards have been generated and saved to your account."
+  },
+  "HowItWorks": {
+    "title": "How It Works",
+    "subtitle": "Learn any language in three simple steps.",
+    "step1": {
+      "title": "Step 1: Choose & Create",
+      "subtitle": "Start your language journey in seconds.",
+      "selectNative": "Select your native language from the left dropdown.",
+      "chooseTarget": "Choose target language from the right dropdown.",
+      "pickDifficulty": "Pick flashcard difficulty level.",
+      "describeWhatToLearn": "Describe what you want to learn - be as specific as you need:",
+      "example1": "I have a job interview for a software developer position next week",
+      "example2": "Going to Barcelona, need help ordering food and buying museum tickets",
+      "example3": "Business meeting phrases for my trip to London",
+      "proTip": "The more details you provide about your situation, the more personalized and useful your flashcards will be!",
+      "clickToChange": "Click a language to change the interface language"
+    },
+    "step2": {
+      "title": "Step 2: Practice & Learn",
+      "subtitle": "Master new vocabulary through interactive exercises.",
+      "multipleChoice": "View your flashcard with 4 multiple-choice options and track your progress.",
+      "checkTranslations": "Select answers and flip cards to check translations. See your progress for each answer.",
+      "listenPronunciation": "Listen to correct pronunciation of words and example sentences in both languages.",
+      "addMoreCards": "Add more flashcards to any existing category with a single click.",
+      "filterByLanguage": "Filter flashcards by language to focus on what you want to learn.",
+      "trackProgress": "Track your learning progress with categories for 'Learning' and 'Mastered' items.",
+      "nativeSpeaker": "Native speaker audio",
+      "smartLearning": "Smart learning system",
+      "contextExamples": "Context examples",
+      "filterDescription": "Filter your flashcards by language or progress status to focus your learning:"
+    },
+    "step3": {
+      "title": "Step 3: Track & Improve",
+      "subtitle": "Monitor your progress and reach your goals faster.",
+      "seeMastered": "See what you've mastered and what's left to learn.",
+      "setTargets": "Set daily learning targets that work for you.",
+      "viewCharts": "View visual progress charts to stay motivated.",
+      "smartRepetition": "Benefit from smart repetition that adapts to your learning.",
+      "progressAnalytics": "Progress analytics",
+      "customStudyPlans": "Custom study plans",
+      "crossDeviceSync": "Cross-device sync"
+    }
+  },
+  "Footer": {
+    "allRightsReserved": "All rights reserved",
+    "contact": "Contact",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use",
+    "cookieSettings": "Cookie Settings"
+  }
+} 
