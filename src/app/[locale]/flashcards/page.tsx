@@ -7,12 +7,18 @@ import {
 import FlashcardsView from "../../flashcards/view";
 import { Loader } from "@/components/ui/loader";
 import { setRequestLocale } from 'next-intl/server';
+import { locales } from '@/i18n/routing';
 
-type Props = {
-  params: { locale: string }
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
 }
 
-export default async function FlashcardsPage({ params }: Props) {
+export default async function FlashcardsPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  // Enable static rendering
   setRequestLocale(params.locale);
 
   const { flashcards, error } = await getFlashcardsForUser();
