@@ -12,27 +12,56 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Mail, Send, AlertCircle, CheckCircle, ArrowRight } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Mail, Send, AlertCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/shared/language-context";
+import { z } from "zod";
+import { Filter } from "bad-words";
 
 interface ContactFormModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+// Email validation schema with custom error messages
+const emailSchema = z
+  .string()
+  .email({
+    message: "Invalid email format",
+  });
+
+// Additional Polish profanities and threatening words
+const additionalProfanities = [
+  // Polish profanities (obscured with * to avoid offensiveness)
+  'k*rwa', 'ch*j', 'p*erdole', 'j*bać', 'p*zda', 'sk*rwysyn', 
+  // Threatening words
+  'zabije', 'zabiję', 'zabić', 'śmierć', 'grożę', 'groźba', 'nienawidzę', 'nienawiść'
+];
+
 export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isCheckingAI, setIsCheckingAI] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [messageError, setMessageError] = useState<string | null>(null);
   const [responseStatus, setResponseStatus] = useState<{
     success: boolean;
     message: string;
+    detail?: string;
   } | null>(null);
   const { language } = useLanguage();
+  
+  // Create enhanced filter with additional words once
+  const filter = useMemo(() => {
+    const customFilter = new Filter();
+    // Add custom words to the filter
+    customFilter.addWords(...additionalProfanities);
+    return customFilter;
+  }, []);
   
   const translations = {
     en: {
@@ -45,13 +74,16 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       cancel: "Cancel",
       send: "Send Message",
       sending: "Sending...",
+      aiChecking: "AI is checking your message...",
       thankYou: "Thank you!",
       messageSent: "Your message has been sent successfully. We'll get back to you as soon as possible.",
       backButton: "Back to site",
       error: "Error",
       errorGeneric: "There was a problem sending your message. Please try again later.",
       errorNoApiKey: "Email service is not configured properly. Please contact the administrator.",
-      errorInvalidEmail: "There was a problem with the email address. Please check and try again."
+      errorInvalidEmail: "There was a problem with the email address. Please check and try again.",
+      emailValidationError: "Please enter a valid email address.",
+      offensiveContentError: "Your message contains content that may violate our community guidelines. Please revise and focus on technical issues or feedback about the application."
     },
     pl: {
       title: "Skontaktuj się z nami",
@@ -63,22 +95,106 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       cancel: "Anuluj",
       send: "Wyślij Wiadomość",
       sending: "Wysyłanie...",
+      aiChecking: "AI sprawdza Twoją wiadomość...",
       thankYou: "Dziękujemy!",
       messageSent: "Twoja wiadomość została wysłana pomyślnie. Odpowiemy najszybciej jak to możliwe.",
       backButton: "Powrót do strony",
       error: "Błąd",
       errorGeneric: "Wystąpił problem podczas wysyłania wiadomości. Spróbuj ponownie później.",
       errorNoApiKey: "Usługa email nie jest poprawnie skonfigurowana. Skontaktuj się z administratorem.",
-      errorInvalidEmail: "Wystąpił problem z adresem email. Sprawdź go i spróbuj ponownie."
+      errorInvalidEmail: "Wystąpił problem z adresem email. Sprawdź go i spróbuj ponownie.",
+      emailValidationError: "Proszę wprowadzić poprawny adres email.",
+      offensiveContentError: "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
     }
   };
   
   const t = translations[language];
   
+  // Validate email as user types
+  useEffect(() => {
+    if (email) {
+      try {
+        emailSchema.parse(email);
+        setEmailError(null);
+      } catch {
+        setEmailError(t.emailValidationError);
+      }
+    } else {
+      setEmailError(null);
+    }
+  }, [email, t]);
+  
+  // More sophisticated content check
+  const validateMessage = (text: string): boolean => {
+    try {
+      // Check using bad-words filter
+      if (filter.isProfane(text)) {
+        setMessageError(t.offensiveContentError);
+        return false;
+      }
+      
+      // Additional checks for patterns that might evade the filter
+      // Check for patterns with numbers replacing letters (l33t speak)
+      const l33tPatterns = [
+        /[kc]+(\d|[^\w\s])*[u4]+(\d|[^\w\s])*r+(\d|[^\w\s])*[v\/]+(\d|[^\w\s])*[a@4]+/i, // k*rwa variations
+        /[fd]+(\d|[^\w\s])*[u4]+(\d|[^\w\s])*[ck]+(\d|[^\w\s])*[k]*/i, // f*ck variations
+        /[a@4]+(\d|[^\w\s])*[s$5]+(\d|[^\w\s])*[s$5]+/i, // a*s variations
+        /[b8]+(\d|[^\w\s])*[i1]+(\d|[^\w\s])*[t+]+(\d|[^\w\s])*[c]+(\d|[^\w\s])*[h]+/i, // b*tch variations
+      ];
+      
+      for (const pattern of l33tPatterns) {
+        if (pattern.test(text)) {
+          setMessageError(t.offensiveContentError);
+          return false;
+        }
+      }
+      
+      // Check for threatening content
+      const threateningPatterns = [
+        /zabij[e|ę]|zabić|śmierć|gro[żz][e|ę]|nienavwidz[e|ę]/i,
+      ];
+      
+      for (const pattern of threateningPatterns) {
+        if (pattern.test(text)) {
+          setMessageError(t.offensiveContentError);
+          return false;
+        }
+      }
+      
+      setMessageError(null);
+      return true;
+    } catch (err) {
+      console.error("Error checking content:", err);
+      return true; // Allow the message if the filter fails
+    }
+  };
+  
+  // Check message as user types
+  useEffect(() => {
+    if (message) {
+      validateMessage(message);
+    } else {
+      setMessageError(null);
+    }
+  }, [message]);
+  
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault(); // Zapobiegaj domyślnemu zamknięciu modalu
-    setIsSending(true);
-    setResponseStatus(null);
+    
+    // Validate inputs before sending
+    try {
+      emailSchema.parse(email);
+    } catch {
+      setEmailError(t.emailValidationError);
+      return;
+    }
+    
+    if (!validateMessage(message)) {
+      return;
+    }
+    
+    // Start AI moderation process
+    setIsCheckingAI(true);
     
     try {
       console.log("Sending message...");
@@ -99,8 +215,12 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       const data = await response.json();
       console.log("Response data:", data);
       
+      // AI checking is complete
+      setIsCheckingAI(false);
+      
       if (response.ok) {
         console.log("Setting success state");
+        setIsSending(true);
         setIsSent(true);
         setResponseStatus({
           success: true,
@@ -117,16 +237,27 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
           } else if (data.error.statusCode === 400 && data.error.message?.includes("email")) {
             errorMessage = t.errorInvalidEmail;
           }
+          
+          // Display detailed reason from AI moderation if available
+          const detail = data.error.detail;
+          
+          setResponseStatus({
+            success: false,
+            message: errorMessage,
+            detail: detail
+          });
+        } else {
+          setResponseStatus({
+            success: false,
+            message: errorMessage
+          });
         }
         
-        setResponseStatus({
-          success: false,
-          message: errorMessage
-        });
         setIsSent(true); // Pokaż komunikat nawet gdy jest błąd
       }
-    } catch (error) {
-      console.error("Error sending message:", error);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setIsCheckingAI(false);
       setResponseStatus({
         success: false,
         message: t.errorGeneric
@@ -142,7 +273,11 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     setName("");
     setEmail("");
     setMessage("");
+    setEmailError(null);
+    setMessageError(null);
     setIsSent(false);
+    setIsSending(false);
+    setIsCheckingAI(false);
     setResponseStatus(null);
   };
   
@@ -225,8 +360,13 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-purple-700/30 bg-purple-950/50 focus-visible:ring-purple-500 text-white placeholder:text-purple-400/50"
+                  className={`border-purple-700/30 bg-purple-950/50 focus-visible:ring-purple-500 text-white placeholder:text-purple-400/50 ${
+                    emailError ? "border-red-500 focus-visible:ring-red-500" : ""
+                  }`}
                 />
+                {emailError && (
+                  <p className="text-xs text-red-400 mt-1">{emailError}</p>
+                )}
               </div>
               <div className="grid gap-2">
                 <label htmlFor="message" className="text-sm text-purple-200">
@@ -237,8 +377,13 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={t.messagePlaceholder}
-                  className="border-purple-700/30 bg-purple-950/50 focus-visible:ring-purple-500 min-h-[120px] text-white placeholder:text-purple-400/50"
+                  className={`border-purple-700/30 bg-purple-950/50 focus-visible:ring-purple-500 min-h-[120px] text-white placeholder:text-purple-400/50 ${
+                    messageError ? "border-red-500 focus-visible:ring-red-500" : ""
+                  }`}
                 />
+                {messageError && (
+                  <p className="text-xs text-red-400 mt-1">{messageError}</p>
+                )}
               </div>
             </div>
             
@@ -251,10 +396,17 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
               </AlertDialogCancel>
               <button
                 onClick={handleSubmit}
-                disabled={isSending || !name || !email || !message}
-                className="bg-gradient-to-r from-fuchsia-600/90 to-purple-600/90 hover:from-fuchsia-500 hover:to-purple-500 text-white border-0 rounded-md px-4 py-2 shadow-md shadow-purple-900/50 flex items-center gap-2"
+                disabled={isSending || isCheckingAI || !name || !email || !message || !!emailError || !!messageError}
+                className="bg-gradient-to-r from-fuchsia-600/90 to-purple-600/90 hover:from-fuchsia-500 hover:to-purple-500 text-white border-0 rounded-md px-4 py-2 shadow-md shadow-purple-900/50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSending ? (
+                {isCheckingAI ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 animate-pulse" />
+                      {t.aiChecking}
+                    </div>
+                  </>
+                ) : isSending ? (
                   t.sending
                 ) : (
                   <>
@@ -522,6 +674,11 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                         <p className="text-sm text-rose-200/90">
                           {responseStatus.message}
                         </p>
+                        {responseStatus.detail && (
+                          <p className="mt-2 text-xs text-rose-200/80 p-2 bg-rose-950/30 rounded border border-rose-500/20">
+                            {responseStatus.detail}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
