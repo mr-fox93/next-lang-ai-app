@@ -127,7 +127,7 @@ export function ProgressDashboard({
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
   if (!isSignedIn) {
-    router.push("/sign-in");
+    router.push("sign-in");
     return null;
   }
 
