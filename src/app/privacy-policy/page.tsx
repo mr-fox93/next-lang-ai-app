@@ -6,10 +6,19 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
 import { useLanguage } from "@/shared/language-context";
+import { useState, useEffect } from "react";
+import { ContactFormModal } from "@/components/contact-form-modal";
 
 export default function PrivacyPolicy() {
   const { language, translations } = useLanguage();
   const t = translations.privacyPolicy[language];
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+
+  // Ustawiamy datę tylko po stronie klienta, aby uniknąć błędu hydratacji
+  useEffect(() => {
+    setFormattedDate(new Date().toLocaleDateString());
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -99,20 +108,30 @@ export default function PrivacyPolicy() {
               <section className="space-y-4">
                 <h2 className="text-xl font-semibold text-white">{t.contact.title}</h2>
                 <p>{t.contact.content}</p>
-                <p>
-                  {t.contact.email}: <Link href="mailto:contact@flashcardsai.com" className="text-purple-400 hover:text-purple-300">contact@flashcardsai.com</Link>
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
+                  <Button 
+                    onClick={() => setIsContactModalOpen(true)}
+                    className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                  >
+                    {language === 'pl' ? 'Napisz do nas' : 'Contact Us'}
+                  </Button>
+                </div>
               </section>
               
               <section className="pt-4">
                 <p className="text-sm text-gray-500">
-                  {t.lastUpdate}: {new Date().toLocaleDateString()}
+                  {t.lastUpdate}: {formattedDate}
                 </p>
               </section>
             </div>
           </motion.div>
         </div>
       </main>
+      
+      <ContactFormModal 
+        isOpen={isContactModalOpen} 
+        onOpenChange={setIsContactModalOpen} 
+      />
     </div>
   );
 } 

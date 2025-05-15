@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/shared/ui/error-boundary";
 import Footer from "@/components/footer";
 import { CookieConsentProvider } from "@/components/cookie-consent";
 import { LanguageProvider } from "@/shared/language-context";
+import { ContactModalProvider } from "@/shared/contact-modal-context";
 
 export default function RootLayout({
   children,
@@ -20,8 +21,10 @@ export default function RootLayout({
             <LoadingErrorProvider>
               <LanguageProvider>
                 <CookieConsentProvider>
-                  {children}
-                  <Footer />
+                  <ContactModalProvider>
+                    {children}
+                    <Footer />
+                  </ContactModalProvider>
                 </CookieConsentProvider>
               </LanguageProvider>
             </LoadingErrorProvider>
