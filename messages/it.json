@@ -1,0 +1,188 @@
+{
+  "Navbar": {
+    "flashcards": "Flashcard",
+    "howItWorks": "Come funziona",
+    "signIn": "Accedi",
+    "createAccount": "Crea account",
+    "logOut": "Disconnetti",
+    "yourAccount": "Il tuo account",
+    "manageAccount": "Gestisci il tuo account o accedi"
+  },
+  "Progress": {
+    "backToLearning": "Torna all'apprendimento",
+    "level": "Livello",
+    "flashcards": "Flashcard",
+    "mastered": "padroneggiate",
+    "inProgress": "in corso",
+    "languageMastery": "Padronanza della lingua",
+    "of": "di",
+    "flashcardsMastered": "flashcard padroneggiate",
+    "masteryDescription": "Una flashcard è considerata padroneggiata quando raggiunge il livello più alto (5/5). Ogni risposta corretta ti avvicina al raggiungimento di questo livello.",
+    "dailyActivity": "Attività giornaliera",
+    "todaysFlashcards": "Flashcard di oggi",
+    "dailyDescription": "Numero di flashcard uniche riviste oggi (contate solo una volta per flashcard). L'obiettivo si resetta a mezzanotte.",
+    "yourDailyGoal": "Il tuo obiettivo giornaliero",
+    "selectGoal": "Seleziona obiettivo",
+    "flashcardsGoal": "flashcard",
+    "progressByCategory": "Progresso per categoria",
+    "noCategories": "Non hai ancora categorie di flashcard.",
+    "createFlashcards": "Crea flashcard",
+    "untouched": "Non iniziate",
+    "continueLearning": "Continua l'apprendimento"
+  },
+  "Hero": {
+    "title": "Trasforma il tuo apprendimento con",
+    "subtitle": "Inserisci qualsiasi testo o scenario e lascia che la nostra IA crei flashcard perfette per il tuo percorso di apprendimento.",
+    "brandName": "Flashcards AI",
+    "generateButton": "Genera flashcard",
+    "generating": "Generazione in corso...",
+    "success": "Successo!",
+    "successMessage": "Le flashcard sono state generate e salvate sul tuo account."
+  },
+  "HowItWorks": {
+    "title": "Come funziona",
+    "subtitle": "Impara qualsiasi lingua in tre semplici passi.",
+    "step1": {
+      "title": "Passo 1: Scegli e Crea",
+      "subtitle": "Inizia il tuo percorso linguistico in pochi secondi.",
+      "selectNative": "Seleziona la tua lingua madre dal menu a discesa a sinistra.",
+      "chooseTarget": "Scegli la lingua di destinazione dal menu a discesa a destra.",
+      "pickDifficulty": "Scegli il livello di difficoltà delle flashcard.",
+      "describeWhatToLearn": "Descrivi cosa vuoi imparare - sii specifico quanto necessario:",
+      "example1": "Ho un colloquio di lavoro per una posizione da sviluppatore software la prossima settimana",
+      "example2": "Vado a Barcellona, ho bisogno di aiuto per ordinare cibo e comprare biglietti per i musei",
+      "example3": "Frasi per riunioni d'affari per il mio viaggio a Londra",
+      "proTip": "Più dettagli fornisci sulla tua situazione, più personalizzate e utili saranno le tue flashcard!",
+      "clickToChange": "Clicca su una lingua per cambiare la lingua dell'interfaccia"
+    },
+    "step2": {
+      "title": "Passo 2: Pratica e Impara",
+      "subtitle": "Padroneggia nuovo vocabolario attraverso esercizi interattivi.",
+      "multipleChoice": "Visualizza la tua flashcard con 4 opzioni a scelta multipla e tieni traccia dei tuoi progressi.",
+      "checkTranslations": "Seleziona le risposte e gira le carte per verificare le traduzioni. Vedi i tuoi progressi per ogni risposta.",
+      "listenPronunciation": "Ascolta la corretta pronuncia delle parole e frasi di esempio in entrambe le lingue.",
+      "addMoreCards": "Aggiungi più flashcard a qualsiasi categoria esistente con un solo clic.",
+      "filterByLanguage": "Filtra le flashcard per lingua per concentrarti su ciò che vuoi imparare.",
+      "trackProgress": "Tieni traccia dei tuoi progressi di apprendimento con categorie per elementi 'In apprendimento' e 'Padroneggiati'.",
+      "nativeSpeaker": "Audio di madrelingua",
+      "smartLearning": "Sistema di apprendimento intelligente",
+      "contextExamples": "Esempi contestuali",
+      "filterDescription": "Filtra le tue flashcard per lingua o stato di avanzamento per concentrarti sul tuo apprendimento:"
+    },
+    "step3": {
+      "title": "Passo 3: Monitora e Migliora",
+      "subtitle": "Tieni traccia dei tuoi progressi e raggiungi i tuoi obiettivi più velocemente.",
+      "seeMastered": "Vedi ciò che hai padroneggiato e ciò che devi ancora imparare.",
+      "setTargets": "Imposta obiettivi di apprendimento giornalieri adatti a te.",
+      "viewCharts": "Visualizza grafici di avanzamento per rimanere motivato.",
+      "smartRepetition": "Approfitta della ripetizione intelligente che si adatta al tuo apprendimento.",
+      "progressAnalytics": "Analisi dei progressi",
+      "customStudyPlans": "Piani di studio personalizzati",
+      "crossDeviceSync": "Sincronizzazione tra dispositivi"
+    }
+  },
+  "Footer": {
+    "allRightsReserved": "Tutti i diritti riservati",
+    "contact": "Contatto",
+    "privacyPolicy": "Politica sulla Privacy",
+    "termsOfUse": "Termini di Utilizzo",
+    "cookieSettings": "Impostazioni Cookie"
+  },
+  "Cookie": {
+    "title": "Politica sulla privacy e cookie",
+    "description": "Questo sito utilizza solo i cookie necessari per il corretto funzionamento. Memorizziamo temporaneamente i dati delle flashcard per gli utenti non loggati e ricordiamo le tue preferenze sui cookie.",
+    "necessary": "Necessari",
+    "necessaryDesc": "Richiesti per le funzioni di base del sito: autenticazione tramite Clerk, archiviazione delle flashcard in modalità ospite e memorizzazione delle preferenze sui cookie.",
+    "showDetails": "Mostra dettagli",
+    "hideDetails": "Nascondi dettagli",
+    "acceptAll": "Accetta tutti",
+    "onlyNecessary": "Solo necessari"
+  },
+  "PrivacyPolicy": {
+    "title": "Politica sulla Privacy",
+    "backHome": "Torna alla Home",
+    "intro": {
+      "title": "1. Introduzione",
+      "content": "Benvenuto in Flashcards AI. La protezione dei tuoi dati personali è importante per noi. Questa Politica sulla Privacy spiega quali dati raccogliamo, come li utilizziamo e quali diritti hai su di essi."
+    },
+    "dataCollection": {
+      "title": "2. Quali dati raccogliamo",
+      "content": "Raccogliamo solo i dati essenziali necessari per il funzionamento dell'applicazione:",
+      "accountData": "Dati dell'account",
+      "accountDataDesc": "Dati di autenticazione tramite il servizio Clerk (indirizzo email). Questi dati sono archiviati da Clerk in conformità con la loro politica sulla privacy.",
+      "userContent": "Contenuto utente",
+      "userContentDesc": "Le flashcard che crei (testo originale, traduzione, esempi di utilizzo, categorie) e le statistiche di apprendimento (progressi nella padronanza del materiale).",
+      "tempData": "Dati temporanei",
+      "tempDataDesc": "In modalità ospite, memorizziamo temporaneamente le tue flashcard nella memoria del browser per consentirti di utilizzare l'applicazione senza accedere."
+    },
+    "cookies": {
+      "title": "3. Come utilizziamo i cookie",
+      "content": "Il nostro sito utilizza solo cookie essenziali e tecnologie simili:",
+      "necessaryCookies": "Cookie essenziali",
+      "necessaryCookiesDesc": "Abilitano funzioni di base come l'accesso sicuro e la navigazione sul sito. Il servizio Clerk utilizza i propri cookie per l'autenticazione e la gestione delle sessioni.",
+      "localStorageTitle": "Archiviazione dati locale",
+      "localStorageDesc": "Utilizziamo la memoria del tuo browser per archiviare flashcard in modalità ospite e ricordare le tue preferenze sui cookie.",
+      "noCookies": "Non utilizziamo alcun cookie per finalità di marketing, tracciamento o analisi."
+    },
+    "externalServices": {
+      "title": "4. Servizi esterni",
+      "content": "Utilizziamo i seguenti servizi esterni:",
+      "clerk": "Clerk",
+      "clerkDesc": "Per l'autenticazione e la gestione degli account utente. Clerk può raccogliere dati come indirizzo email, IP o informazioni sul browser in conformità con la propria politica sulla privacy.",
+      "openai": "OpenAI",
+      "openaiDesc": "Per generare contenuti delle flashcard utilizzando la loro API. Vengono trasmessi solo i dati necessari per la generazione di contenuti; non condividiamo i dati personali degli utenti.",
+      "vercel": "Vercel",
+      "vercelDesc": "Per l'hosting della nostra applicazione.",
+      "policy": "Ciascuno di questi servizi ha la propria politica sulla privacy, che può essere consultata sui rispettivi siti web."
+    },
+    "dataStorage": {
+      "title": "5. Archiviazione dei dati",
+      "accountData": "I dati dell'account utente e i progressi di apprendimento sono archiviati in un database PostgreSQL con connessione sicura. Conserviamo questi dati finché hai un account sul nostro servizio.",
+      "guestData": "Per gli utenti non loggati, i dati delle flashcard sono archiviati esclusivamente nella memoria del tuo browser e non vengono trasmessi ai nostri server."
+    },
+    "changes": {
+      "title": "6. Modifiche alla politica sulla privacy",
+      "content": "Potremmo aggiornare la nostra Politica sulla Privacy di tanto in tanto. Ti informeremo di eventuali modifiche significative tramite notifica in-app."
+    },
+    "contact": {
+      "title": "7. Contatto",
+      "content": "Se hai domande sulla nostra Politica sulla Privacy, contattaci:",
+      "email": "Email",
+      "contactUs": "Contattaci"
+    },
+    "lastUpdate": "Ultimo aggiornamento"
+  },
+  "Terms": {
+    "title": "Termini di Utilizzo",
+    "backHome": "Torna alla Home",
+    "intro": {
+      "title": "1. Introduzione",
+      "content": "Benvenuto in Flashcards AI. Utilizzando la nostra applicazione, accetti questi Termini di Utilizzo. L'applicazione è progettata per creare e imparare con flashcard linguistiche utilizzando l'intelligenza artificiale."
+    },
+    "accounts": {
+      "title": "2. Account utente",
+      "content": "Per utilizzare tutte le funzionalità dell'applicazione, devi creare un account. Sei responsabile della riservatezza delle tue credenziali di accesso e di qualsiasi attività svolta tramite il tuo account."
+    },
+    "allowedUse": {
+      "title": "3. Uso consentito",
+      "content": "Puoi utilizzare l'applicazione solo per scopi legali. Accetti di non:",
+      "item1": "Violare i diritti di proprietà intellettuale o la privacy altrui",
+      "item2": "Utilizzare l'applicazione per spam, frode o attività dannose",
+      "item3": "Intraprendere azioni che potrebbero interrompere il corretto funzionamento dell'applicazione"
+    },
+    "userContent": {
+      "title": "4. Contenuto utente",
+      "content": "Mantieni i diritti sulle tue flashcard e altri contenuti che crei nell'applicazione. Ci concedi una licenza non esclusiva per utilizzare questi contenuti per fornire il servizio."
+    },
+    "changes": {
+      "title": "5. Modifiche al servizio",
+      "content": "Ci riserviamo il diritto di modificare, sospendere o interrompere il servizio senza preavviso. Potremmo anche aggiornare questi Termini di Utilizzo. L'uso continuato dell'applicazione dopo le modifiche significa l'accettazione dei nuovi termini."
+    },
+    "contact": {
+      "title": "6. Contatto",
+      "content": "Se hai domande su questi Termini di Utilizzo, contattaci:",
+      "email": "Email"
+    },
+    "lastUpdate": "Ultimo aggiornamento"
+  }
+} 

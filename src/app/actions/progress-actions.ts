@@ -184,34 +184,33 @@ export async function getMasteredCategoriesAction() {
       return { success: false, error: "Użytkownik nie jest zalogowany" };
     }
 
-    const userCategories = await prisma.flashcard.findMany({
-      where: { userId },
-      select: { category: true },
-      distinct: ["category"],
-    });
-
-    const masteredCategories: string[] = [];
-
-    for (const { category } of userCategories) {
-      const flashcardsInCategory = await prisma.flashcard.findMany({
-        where: { userId, category },
-        select: { id: true },
-      });
-
-      const flashcardIds = flashcardsInCategory.map((f) => f.id);
-
-      const progress = await prisma.progress.findMany({
-        where: {
-          userId,
-          flashcardId: { in: flashcardIds },
-          masteryLevel: { gte: 5 },
-        },
-      });
-
-      if (progress.length === flashcardsInCategory.length) {
-        masteredCategories.push(category);
-      }
-    }
+    // Jedno zapytanie SQL, które znajdzie wszystkie opanowane kategorie
+    type CategoryResult = { category: string; total_count: bigint; mastered_count: bigint }[];
+    
+    const categoryStats = await prisma.$queryRaw<CategoryResult>`
+      WITH category_counts AS (
+        SELECT 
+          f.category,
+          COUNT(f.id) as total_count,
+          COUNT(CASE WHEN p."masteryLevel" >= 5 THEN f.id END) as mastered_count
+        FROM "Flashcard" f
+        LEFT JOIN "Progress" p ON f.id = p."flashcardId" AND p."userId" = ${userId}
+        WHERE f."userId" = ${userId}
+        GROUP BY f.category
+      )
+      SELECT 
+        category,
+        total_count,
+        mastered_count
+      FROM category_counts
+      ORDER BY category
+    `;
+    
+    // Filtruj tylko kategorie, w których wszystkie fiszki są opanowane
+    const masteredCategories = categoryStats
+      .filter(({ total_count, mastered_count }) => 
+        Number(total_count) > 0 && Number(total_count) === Number(mastered_count))
+      .map(({ category }) => category);
 
     return {
       success: true,

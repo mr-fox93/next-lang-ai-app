@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import {
   Star,
@@ -22,7 +22,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { updateDailyGoalAction } from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { UserProgressStats } from "@/types/progress";
 import {
   Select,
@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import { useTranslations } from 'next-intl';
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
@@ -45,6 +46,7 @@ export function ProgressDashboard({
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations('Progress');
   const [stats, setStats] = useState<UserProgressStats>(initialStats);
   const [reviewedToday] = useState(initialReviewedToday);
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
@@ -127,7 +129,7 @@ export function ProgressDashboard({
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
   if (!isSignedIn) {
-    router.push("/sign-in");
+    router.push("sign-in");
     return null;
   }
 
@@ -136,13 +138,13 @@ export function ProgressDashboard({
       <header className="border-b border-white/10 p-3 bg-black">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Link href="/flashcards">
+            <Link href="flashcards">
               <Button
                 variant="outline"
                 size="sm"
                 className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-pink-600/30"
               >
-                Back to Learning
+                {t('backToLearning')}
               </Button>
             </Link>
           </div>
@@ -174,7 +176,7 @@ export function ProgressDashboard({
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">
-                  Level
+                  {t('level')}
                 </CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
                   <Award className="text-yellow-500 h-6 w-6" />{" "}
@@ -195,7 +197,7 @@ export function ProgressDashboard({
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">
-                  Flashcards
+                  {t('flashcards')}
                 </CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
                   <BookOpen className="text-blue-500 h-6 w-6" />{" "}
@@ -205,10 +207,9 @@ export function ProgressDashboard({
               <CardContent>
                 <div className="text-sm text-gray-400">
                   <span className="text-green-400">
-                    {stats.masteredFlashcards} mastered
+                    {stats.masteredFlashcards} {t('mastered')}
                   </span>{" "}
-                  • {stats.totalFlashcards - stats.masteredFlashcards} in
-                  progress
+                  • {stats.totalFlashcards - stats.masteredFlashcards} {t('inProgress')}
                 </div>
               </CardContent>
             </Card>
@@ -216,7 +217,7 @@ export function ProgressDashboard({
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">
-                  Language Mastery
+                  {t('languageMastery')}
                 </CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
                   <Star className="text-yellow-500 h-6 w-6" />{" "}
@@ -230,13 +231,11 @@ export function ProgressDashboard({
                   indicatorClassName="bg-gradient-to-r from-yellow-500 to-amber-500"
                 />
                 <p className="text-sm text-gray-400 mt-2">
-                  {stats.masteredFlashcards} of {stats.totalFlashcards}{" "}
-                  flashcards mastered
+                  {stats.masteredFlashcards} {t('of')} {stats.totalFlashcards}{" "}
+                  {t('flashcardsMastered')}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  A flashcard is considered mastered when it reaches the highest
-                  level (5/5). Each correct answer brings you closer to
-                  achieving this level.
+                  {t('masteryDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -244,7 +243,7 @@ export function ProgressDashboard({
             <Card className="bg-black/40 backdrop-blur-md border border-white/10">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">
-                  Daily Activity
+                  {t('dailyActivity')}
                 </CardDescription>
                 <CardTitle className="text-2xl flex items-center gap-2 text-white">
                   <Clock className="text-purple-500 h-6 w-6" /> {reviewedToday}{" "}
@@ -255,10 +254,10 @@ export function ProgressDashboard({
                 <div className="text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">
-                      Today&apos;s flashcards:
+                      {t('todaysFlashcards')}:
                     </span>
                     <span className="text-white font-medium">
-                      {Math.min(reviewedToday, dailyGoal)} of {dailyGoal}
+                      {Math.min(reviewedToday, dailyGoal)} {t('of')} {dailyGoal}
                     </span>
                   </div>
                   <Progress
@@ -267,13 +266,12 @@ export function ProgressDashboard({
                     indicatorClassName="bg-gradient-to-r from-purple-500 to-pink-500"
                   />
                   <p className="text-xs text-gray-500 mt-2 mb-3">
-                    Number of unique flashcards reviewed today (counted only
-                    once per flashcard). Goal resets at midnight.
+                    {t('dailyDescription')}
                   </p>
 
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-400 text-xs">
-                      Your daily goal:
+                      {t('yourDailyGoal')}:
                     </span>
                     <div className="flex-1">
                       <Select
@@ -282,12 +280,12 @@ export function ProgressDashboard({
                         disabled={isSavingGoal}
                       >
                         <SelectTrigger className="h-8 bg-black/40 border-white/10 text-white">
-                          <SelectValue placeholder="Select goal" />
+                          <SelectValue placeholder={t('selectGoal')} />
                         </SelectTrigger>
                         <SelectContent className="bg-black/90 border-white/10 text-white">
                           {[5, 10, 15, 20, 25, 30, 40, 50].map((goal) => (
                             <SelectItem key={goal} value={goal.toString()}>
-                              {goal} flashcards
+                              {goal} {t('flashcardsGoal')}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -303,20 +301,20 @@ export function ProgressDashboard({
           </div>
 
           <h2 className="text-xl font-bold text-white mb-4">
-            Progress by Category
+            {t('progressByCategory')}
           </h2>
 
           <div className="space-y-4">
             {stats.categories.length === 0 ? (
               <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-8 text-center">
                 <p className="text-gray-400">
-                  You don&apos;t have any flashcard categories yet.
+                  {t('noCategories')}
                 </p>
                 <Button
                   className="mt-4 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-none"
-                  onClick={() => router.push("/flashcards")}
+                  onClick={() => router.push("flashcards")}
                 >
-                  Create Flashcards
+                  {t('createFlashcards')}
                 </Button>
               </div>
             ) : (
@@ -331,7 +329,7 @@ export function ProgressDashboard({
                         {category.name}
                       </CardTitle>
                       <Link
-                        href={`/flashcards?category=${encodeURIComponent(
+                        href={`flashcards?category=${encodeURIComponent(
                           category.name
                         )}`}
                       >
@@ -348,7 +346,7 @@ export function ProgressDashboard({
                   <CardContent>
                     <div className="mb-2">
                       <div className="flex justify-between mb-1">
-                        <span className="text-sm text-gray-400">Mastered</span>
+                        <span className="text-sm text-gray-400">{t('mastered')}</span>
                         <span className="text-sm text-white">
                           {category.mastered} / {category.total} (
                           {category.total > 0
@@ -377,19 +375,19 @@ export function ProgressDashboard({
                     <div className="grid grid-cols-3 gap-2 text-center text-sm">
                       <div className="p-2 rounded-lg bg-green-500/20 text-green-400">
                         <div className="font-semibold">{category.mastered}</div>
-                        <div className="text-xs opacity-80">Mastered</div>
+                        <div className="text-xs opacity-80">{t('mastered')}</div>
                       </div>
                       <div className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400">
                         <div className="font-semibold">
                           {category.inProgress}
                         </div>
-                        <div className="text-xs opacity-80">In Progress</div>
+                        <div className="text-xs opacity-80">{t('inProgress')}</div>
                       </div>
                       <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
                         <div className="font-semibold">
                           {category.untouched}
                         </div>
-                        <div className="text-xs opacity-80">Untouched</div>
+                        <div className="text-xs opacity-80">{t('untouched')}</div>
                       </div>
                     </div>
                   </CardContent>
@@ -399,9 +397,9 @@ export function ProgressDashboard({
           </div>
 
           <div className="mt-8 mb-12">
-            <Link href="/flashcards">
+            <Link href="flashcards">
               <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-none">
-                Continue Learning <ChevronRight className="ml-2 h-4 w-4" />
+                {t('continueLearning')} <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>

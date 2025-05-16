@@ -1,21 +1,7 @@
-import { Suspense } from 'react';
-import { getFlashcardsForGuest, getProgressStatsForGuest } from './actions';
-import GuestFlashcardsView from './view';
-import { Loader } from "@/components/ui/loader";
+import { redirect } from 'next/navigation';
+import { getLocale } from '@/i18n/server';
 
-
-export default async function GuestFlashcardsPage() {
-  const { flashcards, error } = await getFlashcardsForGuest();
-  const progressStats = await getProgressStatsForGuest();
-  
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader /></div>}>
-      <GuestFlashcardsView 
-        initialFlashcards={flashcards} 
-        serverError={error || undefined} 
-        initialCategory={null}
-        progressStats={progressStats}
-      />
-    </Suspense>
-  );
+export default function GuestFlashcardRedirectPage() {
+  const locale = getLocale();
+  redirect(`/${locale}/guest-flashcard`);
 } 

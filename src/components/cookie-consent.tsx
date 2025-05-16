@@ -4,7 +4,7 @@ import { useState, useEffect, createContext, useContext, useCallback } from "rea
 import { X, Shield, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLanguage } from "@/shared/language-context";
+import { useTranslations } from 'next-intl';
 
 type CookieConsent = {
   necessary: boolean;
@@ -30,10 +30,9 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
   const [isOpen, setIsOpen] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [consent, setConsent] = useState<CookieConsent | null>(null);
-  const { language, translations } = useLanguage();
   
-  // Pobieramy tłumaczenia dla wybranego języka
-  const t = translations.cookie[language];
+  // Pobieramy tłumaczenia używając next-intl
+  const t = useTranslations('Cookie');
 
   // Funkcja do otwierania banera dostępna przez kontekst
   const openBanner = useCallback(() => {
@@ -100,7 +99,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2 text-white">
                     <Shield className="h-5 w-5 text-purple-400" />
-                    <h3 className="text-lg font-medium">{t.title}</h3>
+                    <h3 className="text-lg font-medium">{t('title')}</h3>
                   </div>
                   <button
                     onClick={handleClose}
@@ -111,7 +110,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
                 </div>
 
                 <div className="mt-4 text-gray-300 text-sm">
-                  <p>{t.description}</p>
+                  <p>{t('description')}</p>
                   
                   {showDetails && (
                     <motion.div
@@ -124,8 +123,8 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
                       <div className="border border-white/10 rounded-lg p-3 bg-black/30">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-white">{t.necessary}</p>
-                            <p className="text-xs text-gray-400">{t.necessaryDesc}</p>
+                            <p className="font-medium text-white">{t('necessary')}</p>
+                            <p className="text-xs text-gray-400">{t('necessaryDesc')}</p>
                           </div>
                           <div className="border border-purple-500 rounded-full p-1 bg-purple-500/20">
                             <Check className="h-4 w-4 text-purple-400" />
@@ -142,7 +141,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
                     onClick={() => setShowDetails(!showDetails)}
                     className="text-purple-400 hover:text-purple-300"
                   >
-                    {showDetails ? t.hideDetails : t.showDetails}
+                    {showDetails ? t('hideDetails') : t('showDetails')}
                   </Button>
                   
                   <div className="flex gap-2">
@@ -151,13 +150,13 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
                       onClick={handleReject}
                       className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
                     >
-                      {t.onlyNecessary}
+                      {t('onlyNecessary')}
                     </Button>
                     <Button
                       onClick={handleAccept}
                       className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400"
                     >
-                      {t.acceptAll}
+                      {t('acceptAll')}
                     </Button>
                   </div>
                 </div>
