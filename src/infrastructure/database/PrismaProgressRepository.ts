@@ -40,8 +40,15 @@ export class PrismaProgressRepository implements ProgressRepository {
       where: {
         userId
       },
-      include: {
-        flashcard: true
+      select: {
+        id: true,
+        flashcardId: true,
+        userId: true,
+        correctAnswers: true,
+        incorrectAnswers: true,
+        lastReviewed: true,
+        nextReviewDate: true,
+        masteryLevel: true
       }
     });
   }

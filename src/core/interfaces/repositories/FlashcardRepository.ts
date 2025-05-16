@@ -1,4 +1,5 @@
 import { Flashcard } from "@/core/entities/Flashcard";
+import { CategoryProgress } from "@/types/progress";
 
 export interface FlashcardRepository {
   getFlashcardsByUserId(userId: string): Promise<Flashcard[]>;
@@ -8,4 +9,11 @@ export interface FlashcardRepository {
   deleteFlashcard(id: number): Promise<boolean>;
   deleteFlashcardsByCategory(userId: string, category: string): Promise<number>;
   getUserTargetLanguages(userId: string): Promise<string[]>;
+  getUserFlashcardStats(userId: string): Promise<{
+    totalFlashcards: number;
+    masteredFlashcards: number;
+    inProgressFlashcards: number;
+    untouchedFlashcards: number;
+    categories: CategoryProgress[];
+  }>;
 } 

@@ -1,39 +1,27 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from '@clerk/nextjs/server';
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
-// Routes requiring authentication
-const isProtectedRoute = createRouteMatcher([
-  "/flashcards(.*)",
-  "/api/generate-flashcards(.*)",
-  "/api/progress(.*)",
-  "/import-guest-flashcards(.*)",
-]);
+// Create the next-intl middleware
+const handleI18nRouting = createMiddleware(routing);
 
-// Public routes - defined but not directly used in middleware
-// We keep this for documentation purposes or future use
-// To fix the lint error, we'll use commenting approach instead
+// Optional: Create a route matcher for protected routes
+// const isProtectedRoute = createRouteMatcher(['/(.*)dashboard(.*)']);
 
-/* Public routes that don't require authentication:
- * - /
- * - /sign-in
- * - /sign-up
- * - /guest-flashcard
- */
+export default clerkMiddleware((auth, req) => {
+  // Optional: Protect specific routes
+  // if (isProtectedRoute(req)) {
+  //   return auth.protect();
+  // }
 
-export default clerkMiddleware(async (auth, req) => {
-  // Check if the path requires authentication
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
-
-  // For public routes, continue without authentication
-  console.log(`Request path: ${req.nextUrl.pathname}`);
+  return handleI18nRouting(req);
 });
 
 export const config = {
+  // Match all pathnames except for
+  // - … if they start with `/api`, `/trpc`, `/_next` or `/_vercel`
+  // - … the ones containing a dot (e.g. `favicon.ico`)
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+    '/((?!api|trpc|_next|_vercel|.*\\..*).*)' // next-intl matcher
+  ]
 };

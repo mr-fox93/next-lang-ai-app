@@ -1,0 +1,188 @@
+{
+  "Navbar": {
+    "flashcards": "Fiszki",
+    "howItWorks": "Jak to działa",
+    "signIn": "Zaloguj się",
+    "createAccount": "Utwórz konto",
+    "logOut": "Wyloguj się",
+    "yourAccount": "Twoje konto",
+    "manageAccount": "Zarządzaj kontem lub zaloguj się"
+  },
+  "Progress": {
+    "backToLearning": "Powrót do nauki",
+    "level": "Poziom",
+    "flashcards": "Fiszki",
+    "mastered": "opanowane",
+    "inProgress": "w trakcie nauki",
+    "languageMastery": "Poziom znajomości języka",
+    "of": "z",
+    "flashcardsMastered": "opanowanych fiszek",
+    "masteryDescription": "Fiszka jest uznawana za opanowaną, gdy osiągnie najwyższy poziom (5/5). Każda poprawna odpowiedź przybliża Cię do osiągnięcia tego poziomu.",
+    "dailyActivity": "Dzienna aktywność",
+    "todaysFlashcards": "Dzisiejsze fiszki",
+    "dailyDescription": "Liczba unikalnych fiszek przeglądniętych dzisiaj (liczona tylko raz dla każdej fiszki). Cel resetuje się o północy.",
+    "yourDailyGoal": "Twój dzienny cel",
+    "selectGoal": "Wybierz cel",
+    "flashcardsGoal": "fiszek",
+    "progressByCategory": "Postęp według kategorii",
+    "noCategories": "Nie masz jeszcze żadnych kategorii fiszek.",
+    "createFlashcards": "Utwórz fiszki",
+    "untouched": "Nietknięte",
+    "continueLearning": "Kontynuuj naukę"
+  },
+  "Hero": {
+    "title": "Zmień swój sposób nauki z",
+    "subtitle": "Wprowadź dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy idealne fiszki dla Twojej nauki.",
+    "brandName": "Flashcards AI",
+    "generateButton": "Wygeneruj fiszki",
+    "generating": "Generowanie...",
+    "success": "Sukces!",
+    "successMessage": "Fiszki zostały wygenerowane i zapisane na Twoim koncie."
+  },
+  "HowItWorks": {
+    "title": "Jak to działa",
+    "subtitle": "Naucz się każdego języka w trzech prostych krokach.",
+    "step1": {
+      "title": "Krok 1: Wybierz i Utwórz",
+      "subtitle": "Rozpocznij naukę języka w kilka sekund.",
+      "selectNative": "Wybierz swój język ojczysty z lewej listy rozwijanej.",
+      "chooseTarget": "Wybierz język docelowy z prawej listy rozwijanej.",
+      "pickDifficulty": "Wybierz poziom trudności fiszek.",
+      "describeWhatToLearn": "Opisz, czego chcesz się nauczyć - bądź tak szczegółowy, jak potrzebujesz:",
+      "example1": "Mam rozmowę kwalifikacyjną na stanowisko programisty w przyszłym tygodniu",
+      "example2": "Jadę do Barcelony, potrzebuję pomocy przy zamawianiu jedzenia i kupowaniu biletów do muzeum",
+      "example3": "Zwroty na spotkania biznesowe podczas mojej podróży do Londynu",
+      "proTip": "Im więcej szczegółów podasz o swojej sytuacji, tym bardziej spersonalizowane i przydatne będą Twoje fiszki!",
+      "clickToChange": "Kliknij język, aby zmienić język interfejsu"
+    },
+    "step2": {
+      "title": "Krok 2: Ćwicz i Ucz się",
+      "subtitle": "Opanuj nowe słownictwo poprzez interaktywne ćwiczenia.",
+      "multipleChoice": "Zobacz swoją fiszkę z 4 opcjami wielokrotnego wyboru i śledź swoje postępy.",
+      "checkTranslations": "Wybieraj odpowiedzi i odwracaj karty, aby sprawdzić tłumaczenia. Zobacz swoje postępy dla każdej odpowiedzi.",
+      "listenPronunciation": "Posłuchaj poprawnej wymowy słów i przykładowych zdań w obu językach.",
+      "addMoreCards": "Dodaj więcej fiszek do istniejącej kategorii jednym kliknięciem.",
+      "filterByLanguage": "Filtruj fiszki według języka, aby skupić się na tym, czego chcesz się nauczyć.",
+      "trackProgress": "Śledź swoje postępy w nauce z kategoriami 'Uczę się' i 'Opanowane'.",
+      "nativeSpeaker": "Audio rodzimego mówcy",
+      "smartLearning": "Inteligentny system nauki",
+      "contextExamples": "Przykłady kontekstowe",
+      "filterDescription": "Filtruj fiszki według języka lub postępu nauki, aby skupić się na swojej nauce:"
+    },
+    "step3": {
+      "title": "Krok 3: Śledź i Doskonalij",
+      "subtitle": "Monitoruj swoje postępy i osiągaj cele szybciej.",
+      "seeMastered": "Zobacz, co już opanowałeś i czego jeszcze musisz się nauczyć.",
+      "setTargets": "Ustal dzienne cele nauki, które odpowiadają Twoim potrzebom.",
+      "viewCharts": "Przeglądaj wizualne wykresy postępów, aby zachować motywację.",
+      "smartRepetition": "Korzystaj z inteligentnego systemu powtórek, który dostosowuje się do Twojej nauki.",
+      "progressAnalytics": "Analityka postępów",
+      "customStudyPlans": "Spersonalizowane plany nauki",
+      "crossDeviceSync": "Synchronizacja między urządzeniami"
+    }
+  },
+  "Footer": {
+    "allRightsReserved": "Wszelkie prawa zastrzeżone",
+    "contact": "Kontakt",
+    "privacyPolicy": "Polityka Prywatności",
+    "termsOfUse": "Warunki Użytkowania",
+    "cookieSettings": "Ustawienia Cookies"
+  },
+  "Cookie": {
+    "title": "Polityka prywatności i pliki cookie",
+    "description": "Ta strona wykorzystuje wyłącznie niezbędne pliki cookie do prawidłowego funkcjonowania. Przechowujemy tymczasowo dane fiszek dla niezalogowanych użytkowników oraz zapamiętujemy Twoje preferencje dotyczące plików cookie.",
+    "necessary": "Niezbędne",
+    "necessaryDesc": "Wymagane do działania podstawowych funkcji serwisu: uwierzytelnianie przez Clerk, przechowywanie fiszek w trybie gościa oraz zapamiętanie decyzji dotyczących plików cookie.",
+    "showDetails": "Pokaż szczegóły",
+    "hideDetails": "Ukryj szczegóły",
+    "acceptAll": "Akceptuję wszystkie",
+    "onlyNecessary": "Tylko niezbędne"
+  },
+  "PrivacyPolicy": {
+    "title": "Polityka Prywatności",
+    "backHome": "Powrót do strony głównej",
+    "intro": {
+      "title": "1. Wprowadzenie",
+      "content": "Witamy w Flashcards AI. Ochrona Twoich danych osobowych jest dla nas ważna. Niniejsza Polityka Prywatności wyjaśnia, jakie dane zbieramy, jak je wykorzystujemy i jakie masz prawa w związku z nimi."
+    },
+    "dataCollection": {
+      "title": "2. Jakie dane zbieramy",
+      "content": "Zbieramy tylko niezbędne dane potrzebne do funkcjonowania aplikacji:",
+      "accountData": "Dane konta",
+      "accountDataDesc": "Dane uwierzytelniające za pośrednictwem usługi Clerk (adres e-mail). Dane te są przechowywane przez Clerk zgodnie z ich polityką prywatności.",
+      "userContent": "Treści użytkownika",
+      "userContentDesc": "Fiszki, które tworzysz (tekst oryginalny, tłumaczenie, przykłady użycia, kategorie) oraz statystyki nauki (postępy w opanowaniu materiału).",
+      "tempData": "Dane tymczasowe",
+      "tempDataDesc": "W trybie gościa przechowujemy tymczasowo Twoje fiszki w pamięci przeglądarki, aby umożliwić korzystanie z aplikacji bez konieczności logowania."
+    },
+    "cookies": {
+      "title": "3. Jak wykorzystujemy pliki cookie",
+      "content": "Nasza strona wykorzystuje tylko niezbędne pliki cookie i podobne technologie:",
+      "necessaryCookies": "Niezbędne pliki cookie",
+      "necessaryCookiesDesc": "Umożliwiają podstawowe funkcje, takie jak bezpieczne logowanie i nawigację po stronie. Usługa Clerk używa własnych plików cookie do uwierzytelniania i zarządzania sesją.",
+      "localStorageTitle": "Lokalne przechowywanie danych",
+      "localStorageDesc": "Używamy pamięci Twojej przeglądarki do przechowywania fiszek w trybie gościa oraz zapamiętania Twoich preferencji dotyczących plików cookie.",
+      "noCookies": "Nie używamy żadnych plików cookie do celów marketingowych, śledzenia czy analityki."
+    },
+    "externalServices": {
+      "title": "4. Usługi zewnętrzne",
+      "content": "Korzystamy z następujących usług zewnętrznych:",
+      "clerk": "Clerk",
+      "clerkDesc": "Do uwierzytelniania i zarządzania kontami użytkowników. Clerk może zbierać dane takie jak adres e-mail, IP czy informacje o przeglądarce zgodnie z ich własną polityką prywatności.",
+      "openai": "OpenAI",
+      "openaiDesc": "Do generowania treści fiszek za pomocą API. Przesyłane są tylko dane potrzebne do generowania treści, nie przekazujemy danych osobowych użytkowników.",
+      "vercel": "Vercel",
+      "vercelDesc": "Do hostingu naszej aplikacji.",
+      "policy": "Każda z tych usług ma własną politykę prywatności, z którą można zapoznać się na ich stronach internetowych."
+    },
+    "dataStorage": {
+      "title": "5. Przechowywanie danych",
+      "accountData": "Dane związane z kontem użytkownika i postępami nauki są przechowywane w bazie danych PostgreSQL, której połączenie jest zabezpieczone. Dane te przechowujemy tak długo, jak długo posiadasz konto w naszym serwisie.",
+      "guestData": "W przypadku użytkowników niezalogowanych, dane fiszek są przechowywane wyłącznie w pamięci Twojej przeglądarki i nie są przesyłane na nasze serwery."
+    },
+    "changes": {
+      "title": "6. Zmiany w polityce prywatności",
+      "content": "Możemy aktualizować naszą Politykę Prywatności od czasu do czasu. O wszelkich istotnych zmianach poinformujemy za pomocą powiadomienia w aplikacji."
+    },
+    "contact": {
+      "title": "7. Kontakt",
+      "content": "Jeśli masz pytania dotyczące naszej Polityki Prywatności, skontaktuj się z nami:",
+      "email": "Email",
+      "contactUs": "Napisz do nas"
+    },
+    "lastUpdate": "Ostatnia aktualizacja"
+  },
+  "Terms": {
+    "title": "Warunki Użytkowania",
+    "backHome": "Powrót do strony głównej",
+    "intro": {
+      "title": "1. Wprowadzenie",
+      "content": "Witamy w Flashcards AI. Korzystając z naszej aplikacji, akceptujesz niniejsze Warunki Użytkowania. Aplikacja służy do tworzenia i nauki z fiszek językowych z wykorzystaniem sztucznej inteligencji."
+    },
+    "accounts": {
+      "title": "2. Konta użytkowników",
+      "content": "Aby korzystać z pełnej funkcjonalności aplikacji, musisz utworzyć konto. Jesteś odpowiedzialny za zachowanie poufności swoich danych logowania i wszelkie działania wykonywane za pośrednictwem Twojego konta."
+    },
+    "allowedUse": {
+      "title": "3. Dozwolone użycie",
+      "content": "Możesz korzystać z aplikacji wyłącznie do celów zgodnych z prawem. Zobowiązujesz się nie:",
+      "item1": "Naruszać praw własności intelektualnej lub prywatności innych osób",
+      "item2": "Wykorzystywać aplikacji do celów spamowych, oszustw lub działań szkodliwych",
+      "item3": "Podejmować działań, które mogłyby zakłócić prawidłowe funkcjonowanie aplikacji"
+    },
+    "userContent": {
+      "title": "4. Treści użytkownika",
+      "content": "Zachowujesz prawa do swoich fiszek i innych treści, które tworzysz w aplikacji. Udzielasz nam niewyłącznej licencji na korzystanie z tych treści w celu świadczenia usługi."
+    },
+    "changes": {
+      "title": "5. Zmiany w usłudze",
+      "content": "Zastrzegamy sobie prawo do modyfikowania, zawieszania lub przerywania świadczenia usługi bez uprzedniego powiadomienia. Możemy również aktualizować niniejsze Warunki Użytkowania. Dalsze korzystanie z aplikacji po wprowadzeniu zmian oznacza akceptację nowych warunków."
+    },
+    "contact": {
+      "title": "6. Kontakt",
+      "content": "W przypadku pytań dotyczących niniejszych Warunków Użytkowania, prosimy o kontakt:",
+      "email": "Email"
+    },
+    "lastUpdate": "Ostatnia aktualizacja"
+  }
+} 
