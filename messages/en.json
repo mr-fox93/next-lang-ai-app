@@ -8,6 +8,28 @@
     "yourAccount": "Your Account",
     "manageAccount": "Manage your account or sign in"
   },
+  "Progress": {
+    "backToLearning": "Back to Learning",
+    "level": "Level",
+    "flashcards": "Flashcards",
+    "mastered": "mastered",
+    "inProgress": "in progress",
+    "languageMastery": "Language Mastery",
+    "of": "of",
+    "flashcardsMastered": "flashcards mastered",
+    "masteryDescription": "A flashcard is considered mastered when it reaches the highest level (5/5). Each correct answer brings you closer to achieving this level.",
+    "dailyActivity": "Daily Activity",
+    "todaysFlashcards": "Today's flashcards",
+    "dailyDescription": "Number of unique flashcards reviewed today (counted only once per flashcard). Goal resets at midnight.",
+    "yourDailyGoal": "Your daily goal",
+    "selectGoal": "Select goal",
+    "flashcardsGoal": "flashcards",
+    "progressByCategory": "Progress by Category",
+    "noCategories": "You don't have any flashcard categories yet.",
+    "createFlashcards": "Create Flashcards",
+    "untouched": "Untouched",
+    "continueLearning": "Continue Learning"
+  },
   "Hero": {
     "title": "Transform Your Learning with",
     "subtitle": "Enter any text or scenario and let our AI create perfect flashcards for your learning journey.",

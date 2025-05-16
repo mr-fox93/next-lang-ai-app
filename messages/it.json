@@ -8,6 +8,28 @@
     "yourAccount": "Il tuo account",
     "manageAccount": "Gestisci il tuo account o accedi"
   },
+  "Progress": {
+    "backToLearning": "Torna all'apprendimento",
+    "level": "Livello",
+    "flashcards": "Flashcard",
+    "mastered": "padroneggiate",
+    "inProgress": "in corso",
+    "languageMastery": "Padronanza della lingua",
+    "of": "di",
+    "flashcardsMastered": "flashcard padroneggiate",
+    "masteryDescription": "Una flashcard è considerata padroneggiata quando raggiunge il livello più alto (5/5). Ogni risposta corretta ti avvicina al raggiungimento di questo livello.",
+    "dailyActivity": "Attività giornaliera",
+    "todaysFlashcards": "Flashcard di oggi",
+    "dailyDescription": "Numero di flashcard uniche riviste oggi (contate solo una volta per flashcard). L'obiettivo si resetta a mezzanotte.",
+    "yourDailyGoal": "Il tuo obiettivo giornaliero",
+    "selectGoal": "Seleziona obiettivo",
+    "flashcardsGoal": "flashcard",
+    "progressByCategory": "Progresso per categoria",
+    "noCategories": "Non hai ancora categorie di flashcard.",
+    "createFlashcards": "Crea flashcard",
+    "untouched": "Non iniziate",
+    "continueLearning": "Continua l'apprendimento"
+  },
   "Hero": {
     "title": "Trasforma il tuo apprendimento con",
     "subtitle": "Inserisci qualsiasi testo o scenario e lascia che la nostra IA crei flashcard perfette per il tuo percorso di apprendimento.",

@@ -8,6 +8,28 @@
     "yourAccount": "Twoje konto",
     "manageAccount": "Zarządzaj kontem lub zaloguj się"
   },
+  "Progress": {
+    "backToLearning": "Powrót do nauki",
+    "level": "Poziom",
+    "flashcards": "Fiszki",
+    "mastered": "opanowane",
+    "inProgress": "w trakcie nauki",
+    "languageMastery": "Poziom znajomości języka",
+    "of": "z",
+    "flashcardsMastered": "opanowanych fiszek",
+    "masteryDescription": "Fiszka jest uznawana za opanowaną, gdy osiągnie najwyższy poziom (5/5). Każda poprawna odpowiedź przybliża Cię do osiągnięcia tego poziomu.",
+    "dailyActivity": "Dzienna aktywność",
+    "todaysFlashcards": "Dzisiejsze fiszki",
+    "dailyDescription": "Liczba unikalnych fiszek przeglądniętych dzisiaj (liczona tylko raz dla każdej fiszki). Cel resetuje się o północy.",
+    "yourDailyGoal": "Twój dzienny cel",
+    "selectGoal": "Wybierz cel",
+    "flashcardsGoal": "fiszek",
+    "progressByCategory": "Postęp według kategorii",
+    "noCategories": "Nie masz jeszcze żadnych kategorii fiszek.",
+    "createFlashcards": "Utwórz fiszki",
+    "untouched": "Nietknięte",
+    "continueLearning": "Kontynuuj naukę"
+  },
   "Hero": {
     "title": "Zmień swój sposób nauki z",
     "subtitle": "Wprowadź dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy idealne fiszki dla Twojej nauki.",

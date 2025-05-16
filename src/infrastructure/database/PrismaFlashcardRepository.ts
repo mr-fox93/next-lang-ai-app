@@ -1,6 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
+import { CategoryProgress } from "@/types/progress";
 
 export class PrismaFlashcardRepository implements FlashcardRepository {
   private prisma: PrismaClient;
@@ -108,6 +109,88 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     } catch (error) {
       console.error("Get user languages database error:", error);
       return [];
+    }
+  }
+  
+  async getUserFlashcardStats(userId: string): Promise<{
+    totalFlashcards: number;
+    masteredFlashcards: number;
+    inProgressFlashcards: number;
+    untouchedFlashcards: number;
+    categories: CategoryProgress[];
+  }> {
+    try {
+      // 1. Pobierz ogólne liczby fiszek z różnymi poziomami
+      type StatsResult = {
+        total: bigint;
+        mastered: bigint;
+        in_progress: bigint;
+        untouched: bigint;
+      }[];
+
+      const overallStats = await this.prisma.$queryRaw<StatsResult>`
+        SELECT
+          COUNT(f.id) as total,
+          COUNT(CASE WHEN p."masteryLevel" >= 4 THEN 1 END) as mastered,
+          COUNT(CASE WHEN p."masteryLevel" BETWEEN 1 AND 3 THEN 1 END) as in_progress,
+          COUNT(CASE WHEN p."masteryLevel" IS NULL OR p."masteryLevel" = 0 THEN 1 END) as untouched
+        FROM "Flashcard" f
+        LEFT JOIN "Progress" p ON f.id = p."flashcardId" AND p."userId" = ${userId}
+        WHERE f."userId" = ${userId}
+      `;
+
+      // 2. Pobierz statystyki dla każdej kategorii
+      type CategoryStatsResult = {
+        category: string;
+        total: bigint;
+        mastered: bigint;
+        in_progress: bigint;
+        untouched: bigint;
+        avg_mastery: number;
+      }[];
+
+      const categoryStats = await this.prisma.$queryRaw<CategoryStatsResult>`
+        SELECT
+          f.category,
+          COUNT(f.id) as total,
+          COUNT(CASE WHEN p."masteryLevel" >= 4 THEN 1 END) as mastered,
+          COUNT(CASE WHEN p."masteryLevel" BETWEEN 1 AND 3 THEN 1 END) as in_progress,
+          COUNT(CASE WHEN p."masteryLevel" IS NULL OR p."masteryLevel" = 0 THEN 1 END) as untouched,
+          COALESCE(AVG(p."masteryLevel"), 0)::float as avg_mastery
+        FROM "Flashcard" f
+        LEFT JOIN "Progress" p ON f.id = p."flashcardId" AND p."userId" = ${userId}
+        WHERE f."userId" = ${userId}
+        GROUP BY f.category
+        ORDER BY f.category
+      `;
+
+      // 3. Formatuj dane wyjściowe
+      const categories: CategoryProgress[] = categoryStats.map(cat => ({
+        name: cat.category,
+        total: Number(cat.total),
+        mastered: Number(cat.mastered),
+        inProgress: Number(cat.in_progress),
+        untouched: Number(cat.untouched),
+        averageMasteryLevel: cat.avg_mastery
+      }));
+
+      return {
+        totalFlashcards: Number(overallStats[0]?.total || 0),
+        masteredFlashcards: Number(overallStats[0]?.mastered || 0),
+        inProgressFlashcards: Number(overallStats[0]?.in_progress || 0),
+        untouchedFlashcards: Number(overallStats[0]?.untouched || 0),
+        categories
+      };
+    } catch (error) {
+      console.error("Error fetching flashcard stats:", error);
+      // Zwróć dane domyślne w przypadku błędu
+      return {
+        totalFlashcards: 0,
+        masteredFlashcards: 0,
+        inProgressFlashcards: 0,
+        untouchedFlashcards: 0,
+        categories: []
+      };
     }
   }
 } 

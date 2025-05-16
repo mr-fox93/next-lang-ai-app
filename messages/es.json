@@ -8,6 +8,28 @@
     "yourAccount": "Tu cuenta",
     "manageAccount": "Gestiona tu cuenta o inicia sesión"
   },
+  "Progress": {
+    "backToLearning": "Volver al aprendizaje",
+    "level": "Nivel",
+    "flashcards": "Tarjetas",
+    "mastered": "dominadas",
+    "inProgress": "en progreso",
+    "languageMastery": "Dominio del idioma",
+    "of": "de",
+    "flashcardsMastered": "tarjetas dominadas",
+    "masteryDescription": "Una tarjeta se considera dominada cuando alcanza el nivel más alto (5/5). Cada respuesta correcta te acerca más a lograr este nivel.",
+    "dailyActivity": "Actividad diaria",
+    "todaysFlashcards": "Tarjetas de hoy",
+    "dailyDescription": "Número de tarjetas únicas revisadas hoy (contadas solo una vez por tarjeta). El objetivo se reinicia a medianoche.",
+    "yourDailyGoal": "Tu objetivo diario",
+    "selectGoal": "Seleccionar objetivo",
+    "flashcardsGoal": "tarjetas",
+    "progressByCategory": "Progreso por categoría",
+    "noCategories": "Aún no tienes categorías de tarjetas.",
+    "createFlashcards": "Crear tarjetas",
+    "untouched": "Sin tocar",
+    "continueLearning": "Continuar aprendiendo"
+  },
   "Hero": {
     "title": "Transforma tu aprendizaje con",
     "subtitle": "Introduce cualquier texto o escenario y deja que nuestra IA cree tarjetas perfectas para tu proceso de aprendizaje.",
