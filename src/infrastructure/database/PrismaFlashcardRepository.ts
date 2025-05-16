@@ -2,6 +2,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
 import { CategoryProgress } from "@/types/progress";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export class PrismaFlashcardRepository implements FlashcardRepository {
   private prisma: PrismaClient;
@@ -146,7 +147,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
         mastered: bigint;
         in_progress: bigint;
         untouched: bigint;
-        avg_mastery: number;
+        avg_mastery: number | Decimal | null; // Obsługuje różne typy zwracane przez SQL
       }[];
 
       const categoryStats = await this.prisma.$queryRaw<CategoryStatsResult>`
@@ -156,7 +157,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
           COUNT(CASE WHEN p."masteryLevel" >= 4 THEN 1 END) as mastered,
           COUNT(CASE WHEN p."masteryLevel" BETWEEN 1 AND 3 THEN 1 END) as in_progress,
           COUNT(CASE WHEN p."masteryLevel" IS NULL OR p."masteryLevel" = 0 THEN 1 END) as untouched,
-          COALESCE(AVG(p."masteryLevel"), 0)::float as avg_mastery
+          COALESCE(AVG(CAST(p."masteryLevel" AS FLOAT)), 0) as avg_mastery
         FROM "Flashcard" f
         LEFT JOIN "Progress" p ON f.id = p."flashcardId" AND p."userId" = ${userId}
         WHERE f."userId" = ${userId}
@@ -164,15 +165,28 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
         ORDER BY f.category
       `;
 
-      // 3. Formatuj dane wyjściowe
-      const categories: CategoryProgress[] = categoryStats.map(cat => ({
-        name: cat.category,
-        total: Number(cat.total),
-        mastered: Number(cat.mastered),
-        inProgress: Number(cat.in_progress),
-        untouched: Number(cat.untouched),
-        averageMasteryLevel: cat.avg_mastery
-      }));
+      // 3. Formatuj dane wyjściowe - konwertuj wszystkie wartości na natywne typy JS
+      const categories: CategoryProgress[] = categoryStats.map(cat => {
+        // Zapewniamy, że avg_mastery jest zawsze liczbą
+        let avgMastery: number;
+        if (typeof cat.avg_mastery === 'number') {
+          avgMastery = cat.avg_mastery;
+        } else if (cat.avg_mastery === null) {
+          avgMastery = 0;
+        } else {
+          // Obsługa różnych typów, które mogą się pojawić (np. Decimal)
+          avgMastery = Number(cat.avg_mastery.toString());
+        }
+
+        return {
+          name: cat.category,
+          total: Number(cat.total),
+          mastered: Number(cat.mastered),
+          inProgress: Number(cat.in_progress),
+          untouched: Number(cat.untouched),
+          averageMasteryLevel: avgMastery
+        };
+      });
 
       return {
         totalFlashcards: Number(overallStats[0]?.total || 0),

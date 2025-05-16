@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
+import { getLocale } from '@/i18n/server';
 
 export default function TermsOfServicePage() {
-  // Redirect to the English version by default
-  redirect('/en/terms');
+  const locale = getLocale();
+  redirect(`/${locale}/terms`);
 } 
