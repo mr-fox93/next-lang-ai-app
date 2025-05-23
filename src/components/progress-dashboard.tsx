@@ -52,6 +52,36 @@ export function ProgressDashboard({
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  // Sprawdź demo mode SYNCHRONICZNIE podczas inicjalizacji
+  const checkDemoModeSync = () => {
+    if (typeof document !== 'undefined') {
+      const cookies = document.cookie.split(';');
+      const demoModeCookie = cookies.find(cookie => 
+        cookie.trim().startsWith('demo_mode=')
+      );
+      return demoModeCookie?.split('=')[1] === 'true';
+    }
+    return false;
+  };
+  
+  const [isDemoMode, setIsDemoMode] = useState(checkDemoModeSync);
+
+  // Sprawdź czy to demo mode (backup sprawdzenie)
+  useEffect(() => {
+    const checkDemoMode = () => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const demoModeCookie = cookies.find(cookie => 
+          cookie.trim().startsWith('demo_mode=')
+        );
+        const isDemo = demoModeCookie?.split('=')[1] === 'true';
+        setIsDemoMode(isDemo);
+      }
+    };
+    
+    checkDemoMode();
+  }, []);
 
   useEffect(() => {
     const originalStyles = {
@@ -79,7 +109,7 @@ export function ProgressDashboard({
     const newGoal = parseInt(value, 10);
     setDailyGoal(newGoal);
 
-    if (isSignedIn) {
+    if (isSignedIn || isDemoMode) {
       setIsSavingGoal(true);
       setErrorMessage(null);
       try {
@@ -128,7 +158,8 @@ export function ProgressDashboard({
 
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
-  if (!isSignedIn) {
+  // Sprawdź czy user jest zalogowany LUB w demo mode
+  if (!isSignedIn && !isDemoMode) {
     router.push("sign-in");
     return null;
   }
@@ -149,6 +180,7 @@ export function ProgressDashboard({
             </Link>
           </div>
           <div className="flex items-center space-x-2">
+            {/* Pokaż UserButton tylko dla prawdziwych userów, nie dla demo */}
             {isSignedIn && (
               <>
                 <UserButton />
@@ -156,6 +188,12 @@ export function ProgressDashboard({
                   {user?.fullName}
                 </span>
               </>
+            )}
+            {/* Pokaż informację o demo mode */}
+            {isDemoMode && !isSignedIn && (
+              <span className="text-green-400 font-medium text-sm">
+                DEMO MODE
+              </span>
             )}
           </div>
         </div>
