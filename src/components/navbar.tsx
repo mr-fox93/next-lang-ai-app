@@ -112,6 +112,13 @@ export default function Navbar() {
             {t('flashcards')}
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all group-hover:w-full" />
           </Link>
+          <Link 
+            href="demo" 
+            className="text-gray-300 hover:text-white transition-colors relative group"
+          >
+            {t('tryDemo')}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all group-hover:w-full" />
+          </Link>
           <a
             href="#how-it-works"
             onClick={scrollToHowItWorks}
@@ -214,6 +221,13 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('flashcards')}
+              </Link>
+              <Link 
+                href="demo" 
+                className="w-full border-b border-white/10 py-6 text-center text-xl font-medium text-gray-300 hover:text-white transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {t('tryDemo')}
               </Link>
               <a
                 href="#how-it-works"

@@ -159,7 +159,7 @@ export class GenerateFlashcardsUseCase {
           "flashcardResponse"
         ),
         temperature: 0.1,
-        max_tokens: 500,
+        max_tokens: 1500,
       });
 
       const parsedData = FlashCardSchema.parse(

@@ -1,33 +1,38 @@
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { PrismaProgressRepository } from "@/infrastructure/database/PrismaProgressRepository";
 import { PrismaUserRepository } from "@/infrastructure/database/PrismaUserRepository";
+import { LocalStorageDemoProgressRepository } from "@/infrastructure/repositories/LocalStorageDemoProgressRepository";
 import { GetUserFlashcardsUseCase } from "@/core/useCases/flashcards/GetUserFlashcards";
 import { GenerateFlashcardsUseCase } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { UpdateFlashcardProgressUseCase } from "@/core/useCases/flashcards/UpdateFlashcardProgress";
 import { GetUserProgressStatsUseCase } from "@/core/useCases/progress/GetUserProgressStats";
+import { GetDemoFlashcards } from "@/core/useCases/demo/GetDemoFlashcards";
+import { UpdateDemoProgress } from "@/core/useCases/demo/UpdateDemoProgress";
+import { GetDemoProgress, ClearDemoProgress } from "@/core/useCases/demo/GetDemoProgress";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
 import { ProgressRepository } from "@/core/interfaces/repositories/ProgressRepository";
 import { UserRepository } from "@/core/interfaces/repositories/UserRepository";
+import { DemoProgressRepository } from "@/core/interfaces/repositories/DemoProgressRepository";
 
-// Prosty kontener DI
+// Prosty kontener DI z lazy initialization
 class Container {
   private static instance: Container;
   private services: Map<string, unknown> = new Map();
+  private factories: Map<string, () => unknown> = new Map();
 
   private constructor() {
-    // Inicjalizacja repozytoriów
-    this.services.set('FlashcardRepository', new PrismaFlashcardRepository());
-    this.services.set('ProgressRepository', new PrismaProgressRepository());
-    this.services.set('UserRepository', new PrismaUserRepository());
+    // Zarejestruj fabryki dla repozytoriów
+    this.factories.set('FlashcardRepository', () => new PrismaFlashcardRepository());
+    this.factories.set('ProgressRepository', () => new PrismaProgressRepository());
+    this.factories.set('UserRepository', () => new PrismaUserRepository());
+    this.factories.set('DemoProgressRepository', () => new LocalStorageDemoProgressRepository());
     
-    // Inicjalizacja przypadków użycia
-    this.services.set(
-      'GetUserFlashcardsUseCase', 
+    // Zarejestruj fabryki dla przypadków użycia
+    this.factories.set('GetUserFlashcardsUseCase', () => 
       new GetUserFlashcardsUseCase(this.get('FlashcardRepository'))
     );
     
-    this.services.set(
-      'GenerateFlashcardsUseCase',
+    this.factories.set('GenerateFlashcardsUseCase', () =>
       new GenerateFlashcardsUseCase(
         this.get('FlashcardRepository'),
         this.get('ProgressRepository'),
@@ -35,19 +40,34 @@ class Container {
       )
     );
     
-    this.services.set(
-      'UpdateFlashcardProgressUseCase',
+    this.factories.set('UpdateFlashcardProgressUseCase', () =>
       new UpdateFlashcardProgressUseCase(
         this.get('ProgressRepository')
       )
     );
     
-    this.services.set(
-      'GetUserProgressStatsUseCase',
+    this.factories.set('GetUserProgressStatsUseCase', () =>
       new GetUserProgressStatsUseCase(
         this.get('FlashcardRepository'),
         this.get('ProgressRepository')
       )
+    );
+
+    // Demo Use Cases
+    this.factories.set('GetDemoFlashcards', () =>
+      new GetDemoFlashcards(this.get('GetUserFlashcardsUseCase'))
+    );
+
+    this.factories.set('UpdateDemoProgress', () =>
+      new UpdateDemoProgress(this.get('DemoProgressRepository'))
+    );
+
+    this.factories.set('GetDemoProgress', () =>
+      new GetDemoProgress(this.get('DemoProgressRepository'))
+    );
+
+    this.factories.set('ClearDemoProgress', () =>
+      new ClearDemoProgress(this.get('DemoProgressRepository'))
     );
   }
 
@@ -59,10 +79,24 @@ class Container {
   }
 
   get<T>(serviceName: string): T {
-    if (!this.services.has(serviceName)) {
+    // Sprawdź czy serwis już istnieje w cache
+    if (this.services.has(serviceName)) {
+      return this.services.get(serviceName) as T;
+    }
+
+    // Jeśli nie, sprawdź czy mamy fabrykę
+    if (!this.factories.has(serviceName)) {
       throw new Error(`Service ${serviceName} not found in container`);
     }
-    return this.services.get(serviceName) as T;
+
+    // Utwórz serwis za pomocą fabryki
+    const factory = this.factories.get(serviceName)!;
+    const service = factory();
+    
+    // Zapisz w cache dla przyszłych użyć
+    this.services.set(serviceName, service);
+    
+    return service as T;
   }
 }
 
@@ -78,6 +112,9 @@ export const getProgressRepository = (): ProgressRepository =>
 export const getUserRepository = (): UserRepository =>
   container.get('UserRepository');
 
+export const getDemoProgressRepository = (): DemoProgressRepository =>
+  container.get('DemoProgressRepository');
+
 export const getUserFlashcardsUseCase = (): GetUserFlashcardsUseCase => 
   container.get('GetUserFlashcardsUseCase');
   
@@ -89,3 +126,16 @@ export const getUpdateFlashcardProgressUseCase = (): UpdateFlashcardProgressUseC
   
 export const getUserProgressStatsUseCase = (): GetUserProgressStatsUseCase =>
   container.get('GetUserProgressStatsUseCase'); 
+
+// Demo Use Case helpers
+export const getDemoFlashcardsUseCase = (): GetDemoFlashcards =>
+  container.get('GetDemoFlashcards');
+
+export const getUpdateDemoProgressUseCase = (): UpdateDemoProgress =>
+  container.get('UpdateDemoProgress');
+
+export const getDemoProgressUseCase = (): GetDemoProgress =>
+  container.get('GetDemoProgress');
+
+export const getClearDemoProgressUseCase = (): ClearDemoProgress =>
+  container.get('ClearDemoProgress'); 

@@ -56,7 +56,7 @@ export default function Hero() {
         console.log("Generating flashcards as authenticated user:", user.id);
 
         const result = await generateFlashcardsAction({
-          count: 5,
+          count: 10,
           message: userInput,
           level: languageSettings.difficultyLevel,
           sourceLanguage: languageSettings.sourceLanguage,
