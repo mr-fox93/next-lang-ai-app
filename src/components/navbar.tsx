@@ -69,6 +69,15 @@ export default function Navbar() {
     setLangMenuOpen(false);
   };
 
+  const handleTryDemo = () => {
+    // Ustaw cookie demo mode
+    document.cookie = "demo_mode=true; path=/; max-age=86400"; // 24 godziny
+    // Zamknij mobile menu jeśli jest otwarte
+    setMobileMenuOpen(false);
+    // Przekieruj na flashcards
+    router.push("/flashcards");
+  };
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -174,6 +183,9 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center space-x-3">
+              <Button onClick={handleTryDemo} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all">
+                <span className="relative">TRY DEMO</span>
+              </Button>
               <Link href="sign-in">
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity relative overflow-hidden group">
                   <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -272,6 +284,9 @@ export default function Navbar() {
                   </>
                 ) : (
                   <div className="flex flex-col space-y-3 w-full">
+                    <Button onClick={handleTryDemo} className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all">
+                      <span className="relative">TRY DEMO</span>
+                    </Button>
                     <Link href="sign-in" className="w-full">
                       <Button className="w-full h-12 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
