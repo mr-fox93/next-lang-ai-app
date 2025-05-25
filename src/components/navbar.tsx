@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
+import { DemoModeLoader } from "@/components/ui/demo-mode-loader";
 import type React from "react";
 
 type Locale = 'en' | 'pl' | 'es' | 'it';
@@ -23,6 +24,7 @@ export default function Navbar() {
   const { user, isSignedIn } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const t = useTranslations('Navbar');
   const router = useRouter();
   const pathname = usePathname();
@@ -70,12 +72,19 @@ export default function Navbar() {
   };
 
   const handleTryDemo = () => {
+    // Pokaż loader
+    setIsDemoLoading(true);
+    
     // Ustaw cookie demo mode
     document.cookie = "demo_mode=true; path=/; max-age=86400"; // 24 godziny
+    
     // Zamknij mobile menu jeśli jest otwarte
     setMobileMenuOpen(false);
-    // Przekieruj na flashcards
-    router.push("/flashcards");
+    
+    // Symuluj krótkie opóźnienie dla lepszego UX, potem przekieruj
+    setTimeout(() => {
+      router.push("/flashcards");
+    }, 1500); // 1.5 sekundy na pokazanie loadera
   };
 
   // Close menu when clicking outside
@@ -310,6 +319,9 @@ export default function Navbar() {
           </div>
         </div>
       )}
+      
+      {/* Demo Mode Loader */}
+      {isDemoLoading && <DemoModeLoader />}
     </div>
   );
 }

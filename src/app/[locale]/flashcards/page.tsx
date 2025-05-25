@@ -20,9 +20,16 @@ export default async function FlashcardsPage({ params }: { params: Promise<{ loc
   // Enable static rendering
   setRequestLocale(locale);
 
-  const { flashcards, error } = await getFlashcardsForUser();
-  const progressStats = await getProgressStatsForUser();
-  const masteredCategoriesResult = await getMasteredCategoriesForUser();
+  // Równoległe wykonywanie zapytań dla lepszej wydajności
+  const [
+    { flashcards, error },
+    progressStats,
+    masteredCategoriesResult
+  ] = await Promise.all([
+    getFlashcardsForUser(),
+    getProgressStatsForUser(),
+    getMasteredCategoriesForUser(),
+  ]);
 
   return (
     <Suspense
