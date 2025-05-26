@@ -25,6 +25,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const t = useTranslations('Navbar');
   const router = useRouter();
   const pathname = usePathname();
@@ -38,6 +39,26 @@ export default function Navbar() {
   // Set mounted state on client side
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Check demo mode on client side
+  useEffect(() => {
+    const checkDemoMode = () => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const demoModeCookie = cookies.find(cookie => 
+          cookie.trim().startsWith('demo_mode=')
+        );
+        const isDemo = demoModeCookie?.split('=')[1] === 'true';
+        setIsDemoMode(isDemo);
+      }
+    };
+    
+    checkDemoMode();
+    
+    // Check periodically in case cookie changes
+    const interval = setInterval(checkDemoMode, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const toggleMobileMenu = () => {
@@ -85,6 +106,17 @@ export default function Navbar() {
     setTimeout(() => {
       router.push("/flashcards");
     }, 1500); // 1.5 sekundy na pokazanie loadera
+  };
+
+  const handleExitDemo = () => {
+    // Usuń cookie demo mode
+    document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
+    // Zamknij mobile menu jeśli jest otwarte
+    setMobileMenuOpen(false);
+    
+    // Przekieruj do strony głównej
+    router.push("/");
   };
 
   // Close menu when clicking outside
@@ -190,10 +222,22 @@ export default function Navbar() {
                 </Button>
               </SignOutButton>
             </>
+          ) : isDemoMode ? (
+            <div className="flex items-center space-x-3">
+              <div className="relative overflow-hidden group bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-lg px-3 py-1.5">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative text-green-400 font-medium text-sm">DEMO MODE</span>
+              </div>
+              <Button onClick={handleExitDemo} className="w-full h-12 border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors">
+                Exit Demo
+              </Button>
+            </div>
           ) : (
             <div className="flex items-center space-x-3">
-              <Button onClick={handleTryDemo} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all">
-                <span className="relative">TRY DEMO</span>
+              <Button onClick={handleTryDemo} className="relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative font-medium">✨ TRY DEMO</span>
               </Button>
               <Link href="sign-in">
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity relative overflow-hidden group">
@@ -291,10 +335,24 @@ export default function Navbar() {
                       </Button>
                     </SignOutButton>
                   </>
+                ) : isDemoMode ? (
+                  <div className="flex flex-col space-y-3 w-full">
+                    <div className="text-center mb-4">
+                      <div className="inline-block relative overflow-hidden group bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-lg px-4 py-2">
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="relative text-green-400 font-medium">DEMO MODE</span>
+                      </div>
+                    </div>
+                    <Button onClick={handleExitDemo} className="w-full h-12 border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors">
+                      Exit Demo
+                    </Button>
+                  </div>
                 ) : (
                   <div className="flex flex-col space-y-3 w-full">
-                    <Button onClick={handleTryDemo} className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all">
-                      <span className="relative">TRY DEMO</span>
+                    <Button onClick={handleTryDemo} className="w-full h-12 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                      <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative font-medium">✨ TRY DEMO</span>
                     </Button>
                     <Link href="sign-in" className="w-full">
                       <Button className="w-full h-12 relative overflow-hidden group">

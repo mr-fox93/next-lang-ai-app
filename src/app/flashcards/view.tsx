@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
-import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Grid, Maximize2, LogOut, PanelLeftOpen } from "lucide-react";
+import { Grid, Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
-import { ProgressPreview } from "@/components/progress-preview";
+import { TopBar } from "@/components/ui/top-bar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -51,8 +50,6 @@ export default function FlashcardsView({
   const [error, setError] = useState<string | null>(serverError || null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
   const router = useRouter();
 
   useEffect(() => {
@@ -82,20 +79,6 @@ export default function FlashcardsView({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNext = (known: boolean) => {
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.push("/");
-    } catch (error) {
-      console.error("Sign out error:", error);
-      setError(
-        error instanceof Error
-          ? `Sign out failed: ${error.message}`
-          : "An unexpected error occurred during sign out"
-      );
-    }
   };
 
   const handleGenerateFlashcards = async (category: string) => {
@@ -172,31 +155,11 @@ export default function FlashcardsView({
 
   return (
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center p-3 border-b border-white/10 flex-shrink-0">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden text-white bg-purple-700/80 border-purple-500 hover:bg-purple-600 hover:border-purple-400 mr-2"
-            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          >
-            <PanelLeftOpen className="h-5 w-5" />
-          </Button>
-          {isSignedIn && (
-            <>
-              <UserButton />
-              <span className="text-white font-medium">{user?.fullName}</span>
-              <Button
-                variant="ghost"
-                className="text-white"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+      <TopBar 
+        variant="authenticated"
+        onMobileSidebarToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        progressStats={progressStats}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         <div
@@ -308,8 +271,6 @@ export default function FlashcardsView({
           )}
         </main>
       </div>
-
-      <ProgressPreview progressStats={progressStats} />
     </div>
   );
 }
