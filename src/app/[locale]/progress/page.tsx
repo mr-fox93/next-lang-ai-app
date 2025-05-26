@@ -4,9 +4,12 @@ import {
   getReviewedTodayCountAction,
 } from "@/app/actions/progress-actions";
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { setRequestLocale } from 'next-intl/server';
 import { locales } from '@/i18n/routing';
+
+// Force dynamic rendering because we use cookies for demo mode
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

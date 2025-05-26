@@ -9,6 +9,9 @@ import { Loader } from "@/components/ui/loader";
 import { setRequestLocale } from 'next-intl/server';
 import { locales } from '@/i18n/routing';
 
+// Force dynamic rendering because we use cookies for demo mode
+export const dynamic = 'force-dynamic';
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
@@ -20,9 +23,16 @@ export default async function FlashcardsPage({ params }: { params: Promise<{ loc
   // Enable static rendering
   setRequestLocale(locale);
 
-  const { flashcards, error } = await getFlashcardsForUser();
-  const progressStats = await getProgressStatsForUser();
-  const masteredCategoriesResult = await getMasteredCategoriesForUser();
+  // Równoległe wykonywanie zapytań dla lepszej wydajności
+  const [
+    { flashcards, error },
+    progressStats,
+    masteredCategoriesResult
+  ] = await Promise.all([
+    getFlashcardsForUser(),
+    getProgressStatsForUser(),
+    getMasteredCategoriesForUser(),
+  ]);
 
   return (
     <Suspense

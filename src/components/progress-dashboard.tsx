@@ -1,38 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { useUser, UserButton } from "@clerk/nextjs";
-import {
-  Star,
-  Award,
-  BookOpen,
-  ArrowUpRight,
-  ChevronRight,
-  Clock,
-} from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { updateDailyGoalAction } from "@/app/actions/progress-actions";
-import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Award, BookOpen, ChevronRight, Star, Clock, ArrowUpRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { UserProgressStats } from "@/types/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { updateDailyGoalAction } from "@/app/actions/progress-actions";
+import { useToast } from "@/components/ui/use-toast";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useTranslations } from 'next-intl';
+import { ProgressTopBar } from "@/components/ui/progress-top-bar";
+import { useDemoMode } from "@/hooks";
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
@@ -43,7 +26,7 @@ export function ProgressDashboard({
   initialStats,
   initialReviewedToday,
 }: ProgressDashboardProps) {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations('Progress');
@@ -52,6 +35,8 @@ export function ProgressDashboard({
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  const { isDemoMode, isLoading } = useDemoMode();
 
   useEffect(() => {
     const originalStyles = {
@@ -79,7 +64,7 @@ export function ProgressDashboard({
     const newGoal = parseInt(value, 10);
     setDailyGoal(newGoal);
 
-    if (isSignedIn) {
+    if (isSignedIn || isDemoMode) {
       setIsSavingGoal(true);
       setErrorMessage(null);
       try {
@@ -128,38 +113,24 @@ export function ProgressDashboard({
 
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
-  if (!isSignedIn) {
+  // Show loading while checking demo mode
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  // Sprawdź czy user jest zalogowany LUB w demo mode (tylko po sprawdzeniu)
+  if (!isSignedIn && !isDemoMode) {
     router.push("sign-in");
     return null;
   }
 
   return (
     <div className="min-h-screen bg-black overflow-hidden">
-      <header className="border-b border-white/10 p-3 bg-black">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Link href="flashcards">
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-pink-600/30"
-              >
-                {t('backToLearning')}
-              </Button>
-            </Link>
-          </div>
-          <div className="flex items-center space-x-2">
-            {isSignedIn && (
-              <>
-                <UserButton />
-                <span className="text-white font-medium hidden sm:inline-block">
-                  {user?.fullName}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <ProgressTopBar />
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 bg-black overflow-y-auto">
         {errorMessage && (

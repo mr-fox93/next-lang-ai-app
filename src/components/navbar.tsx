@@ -8,7 +8,9 @@ import { useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
+import { DemoModeLoader } from "@/components/ui/demo-mode-loader";
 import type React from "react";
+import { useDemoMode } from '@/hooks';
 
 type Locale = 'en' | 'pl' | 'es' | 'it';
 
@@ -23,6 +25,8 @@ export default function Navbar() {
   const { user, isSignedIn } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const { isDemoMode, exitDemoMode } = useDemoMode();
   const t = useTranslations('Navbar');
   const router = useRouter();
   const pathname = usePathname();
@@ -67,6 +71,33 @@ export default function Navbar() {
   const changeLanguage = (locale: Locale) => {
     router.push(pathname, { locale });
     setLangMenuOpen(false);
+  };
+
+  const handleTryDemo = () => {
+    // Pokaż loader
+    setIsDemoLoading(true);
+    
+    // Ustaw cookie demo mode
+    document.cookie = "demo_mode=true; path=/; max-age=86400"; // 24 godziny
+    
+    // Zamknij mobile menu jeśli jest otwarte
+    setMobileMenuOpen(false);
+    
+    // Symuluj krótkie opóźnienie dla lepszego UX, potem przekieruj
+    setTimeout(() => {
+      router.push("/flashcards");
+    }, 1500); // 1.5 sekundy na pokazanie loadera
+  };
+
+  const handleExitDemo = () => {
+    // Use hook function to exit demo mode
+    exitDemoMode();
+    
+    // Zamknij mobile menu jeśli jest otwarte
+    setMobileMenuOpen(false);
+    
+    // Przekieruj do strony głównej
+    router.push("/");
   };
 
   // Close menu when clicking outside
@@ -172,8 +203,23 @@ export default function Navbar() {
                 </Button>
               </SignOutButton>
             </>
+          ) : isDemoMode ? (
+            <div className="flex items-center space-x-3">
+              <div className="relative overflow-hidden group bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-lg px-3 py-1.5">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative text-green-400 font-medium text-sm">DEMO MODE</span>
+              </div>
+              <Button onClick={handleExitDemo} className="w-full h-12 border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors">
+                Exit Demo
+              </Button>
+            </div>
           ) : (
             <div className="flex items-center space-x-3">
+              <Button onClick={handleTryDemo} className="relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative font-medium">✨ TRY DEMO</span>
+              </Button>
               <Link href="sign-in">
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity relative overflow-hidden group">
                   <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -270,8 +316,25 @@ export default function Navbar() {
                       </Button>
                     </SignOutButton>
                   </>
+                ) : isDemoMode ? (
+                  <div className="flex flex-col space-y-3 w-full">
+                    <div className="text-center mb-4">
+                      <div className="inline-block relative overflow-hidden group bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-lg px-4 py-2">
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="relative text-green-400 font-medium">DEMO MODE</span>
+                      </div>
+                    </div>
+                    <Button onClick={handleExitDemo} className="w-full h-12 border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors">
+                      Exit Demo
+                    </Button>
+                  </div>
                 ) : (
                   <div className="flex flex-col space-y-3 w-full">
+                    <Button onClick={handleTryDemo} className="w-full h-12 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                      <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative font-medium">✨ TRY DEMO</span>
+                    </Button>
                     <Link href="sign-in" className="w-full">
                       <Button className="w-full h-12 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
@@ -295,6 +358,9 @@ export default function Navbar() {
           </div>
         </div>
       )}
+      
+      {/* Demo Mode Loader */}
+      {isDemoLoading && <DemoModeLoader />}
     </div>
   );
 }

@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import { Grid, Maximize2, PlusCircle, Save, PanelLeftOpen } from "lucide-react";
+import { Grid, Maximize2, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
-import { ProgressPreview } from "@/components/progress-preview";
+import { TopBar } from "@/components/ui/top-bar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -45,8 +45,7 @@ export default function GuestFlashcardsView({
   );
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -84,6 +83,18 @@ export default function GuestFlashcardsView({
       window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setIsSidebarCollapsed(isMobile);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNext = () => {
     if (currentCardIndex < categoryCards.length - 1) {
@@ -298,58 +309,15 @@ export default function GuestFlashcardsView({
         message={loginPromptMessage}
       />
 
-      <div className="flex justify-between items-center p-3 border-b border-white/10 flex-shrink-0">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden text-white bg-purple-700/80 border-purple-500 hover:bg-purple-600 hover:border-purple-400 mr-2"
-            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          >
-            <PanelLeftOpen className="h-5 w-5" />
-          </Button>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            animate={{
-              boxShadow: [
-                "0 0 0 rgba(168, 85, 247, 0.4)",
-                "0 0 10px rgba(168, 85, 247, 0.7)",
-                "0 0 0 rgba(168, 85, 247, 0.4)",
-              ],
-            }}
-            transition={{
-              boxShadow: {
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "loop",
-                ease: "easeInOut",
-              },
-            }}
-          >
-            <Button
-              variant="outline"
-              className="text-white border-purple-500 hover:bg-purple-500/20 bg-gradient-to-r from-purple-500/10 to-purple-500/0"
-              onClick={handleImportAndSignIn}
-              disabled={isImporting}
-            >
-              <Save className="w-4 h-4 mr-2 text-purple-400" />
-              {isImporting ? "Importing..." : "Log in to save flashcards"}
-            </Button>
-          </motion.div>
-        </div>
-        <div className="flex-1"></div>
-      </div>
-
       <div className="flex flex-1 overflow-hidden relative">
         <div
           className={`
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           md:relative md:transform-none
           ${
-            isMobileSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
+            isSidebarCollapsed
+              ? "-translate-x-full md:translate-x-0"
+              : "translate-x-0"
           }
         `}
         >
@@ -357,12 +325,15 @@ export default function GuestFlashcardsView({
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);
-              setIsMobileSidebarOpen(false);
+              // On mobile, collapse sidebar after selecting category
+              if (window.innerWidth < 768) {
+                setIsSidebarCollapsed(true);
+              }
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={flashcards}
-            isGuestMode={true}
+            variant="guest"
             onLanguageSelectClick={handleLanguageSelectClick}
             onNewFlashcardsClick={handleNewFlashcardsClick}
             onLearningFilterClick={handleLearningFilterClick}
@@ -384,12 +355,16 @@ export default function GuestFlashcardsView({
                 }
               }
             }}
+            onImportAndSignIn={handleImportAndSignIn}
+            isImporting={isImporting}
           />
         </div>
-        {isMobileSidebarOpen && (
+        
+        {/* Mobile overlay - only show when sidebar is not collapsed on mobile */}
+        {!isSidebarCollapsed && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={() => setIsSidebarCollapsed(true)}
           />
         )}
 
@@ -475,9 +450,12 @@ export default function GuestFlashcardsView({
         </main>
       </div>
 
-      <ProgressPreview
+      <TopBar 
+        variant="guest"
+        onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        onImportAndSignIn={handleImportAndSignIn}
+        isImporting={isImporting}
         progressStats={progressStats}
-        isGuestMode={true}
         onProgressClick={handleProgressClick}
       />
     </div>
