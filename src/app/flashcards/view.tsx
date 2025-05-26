@@ -44,13 +44,28 @@ export default function FlashcardsView({
   );
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  // Start with collapsed state, will be updated based on screen size
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+
+  // Set initial sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setIsSidebarCollapsed(isMobile);
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Listen for resize events
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
@@ -157,7 +172,7 @@ export default function FlashcardsView({
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
       <TopBar 
         variant="authenticated"
-        onMobileSidebarToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         progressStats={progressStats}
       />
 
@@ -167,9 +182,9 @@ export default function FlashcardsView({
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           md:relative md:transform-none
           ${
-            isMobileSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
+            isSidebarCollapsed
+              ? "-translate-x-full md:translate-x-0"
+              : "translate-x-0"
           }
         `}
         >
@@ -177,7 +192,10 @@ export default function FlashcardsView({
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);
-              setIsMobileSidebarOpen(false);
+              // On mobile, collapse sidebar after selecting category
+              if (window.innerWidth < 768) {
+                setIsSidebarCollapsed(true);
+              }
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -191,10 +209,12 @@ export default function FlashcardsView({
             }}
           />
         </div>
-        {isMobileSidebarOpen && (
+        
+        {/* Mobile overlay - only show when sidebar is not collapsed on mobile */}
+        {!isSidebarCollapsed && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={() => setIsSidebarCollapsed(true)}
           />
         )}
 

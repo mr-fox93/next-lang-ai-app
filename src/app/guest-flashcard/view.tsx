@@ -45,8 +45,7 @@ export default function GuestFlashcardsView({
   );
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -84,6 +83,18 @@ export default function GuestFlashcardsView({
       window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setIsSidebarCollapsed(isMobile);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNext = () => {
     if (currentCardIndex < categoryCards.length - 1) {
@@ -304,9 +315,9 @@ export default function GuestFlashcardsView({
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           md:relative md:transform-none
           ${
-            isMobileSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
+            isSidebarCollapsed
+              ? "-translate-x-full md:translate-x-0"
+              : "translate-x-0"
           }
         `}
         >
@@ -314,7 +325,10 @@ export default function GuestFlashcardsView({
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);
-              setIsMobileSidebarOpen(false);
+              // On mobile, collapse sidebar after selecting category
+              if (window.innerWidth < 768) {
+                setIsSidebarCollapsed(true);
+              }
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -345,10 +359,12 @@ export default function GuestFlashcardsView({
             isImporting={isImporting}
           />
         </div>
-        {isMobileSidebarOpen && (
+        
+        {/* Mobile overlay - only show when sidebar is not collapsed on mobile */}
+        {!isSidebarCollapsed && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={() => setIsSidebarCollapsed(true)}
           />
         )}
 
@@ -436,7 +452,7 @@ export default function GuestFlashcardsView({
 
       <TopBar 
         variant="guest"
-        onMobileSidebarToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         onImportAndSignIn={handleImportAndSignIn}
         isImporting={isImporting}
         progressStats={progressStats}

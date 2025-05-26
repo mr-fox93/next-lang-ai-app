@@ -464,11 +464,12 @@ export function FlashcardsSidebar({
 
       <motion.div
         className={cn(
-          "h-full bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col",
-          isCollapsed ? "w-[60px]" : "w-[280px]"
+          "h-full bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col transition-all duration-200",
+          // On mobile: completely hide when collapsed, on desktop: show narrow version
+          isCollapsed 
+            ? "w-0 md:w-[60px]" 
+            : "w-[280px]"
         )}
-        animate={{ width: isCollapsed ? 60 : 280 }}
-        transition={{ duration: 0.2 }}
       >
         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
           {!isCollapsed && (
@@ -484,7 +485,7 @@ export function FlashcardsSidebar({
             variant="ghost"
             size="icon"
             onClick={onToggleCollapse}
-            className="text-white hover:bg-purple-500/20 transition-all duration-300 hover:text-purple-400 md:flex ml-auto"
+            className="text-white hover:bg-purple-500/20 transition-all duration-300 hover:text-purple-400 flex ml-auto"
           >
             {isCollapsed ? (
               <ChevronRight className="h-5 w-5" />
