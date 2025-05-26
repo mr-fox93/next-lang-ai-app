@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { PanelLeftOpen, LogOut, Save } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ProgressPreview } from "@/components/progress-preview";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { UserProgressStats } from "@/types/progress";
+import { useDemoMode } from "@/hooks";
 
 export type TopBarVariant = "authenticated" | "demo" | "guest";
 
@@ -38,33 +39,7 @@ export function TopBar({
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
-  const [isDemoMode, setIsDemoMode] = useState(false);
-
-  // Memoized demo mode checker function
-  const checkDemoMode = useCallback(() => {
-    if (typeof document === 'undefined') return false;
-    
-    const cookies = document.cookie.split(';');
-    const demoModeCookie = cookies.find(cookie => 
-      cookie.trim().startsWith('demo_mode=')
-    );
-    return demoModeCookie?.split('=')[1] === 'true';
-  }, []);
-
-  // Check demo mode on client side with proper cleanup
-  useEffect(() => {
-    // Initial check
-    setIsDemoMode(checkDemoMode());
-    
-    // Periodic check with cleanup
-    const interval = setInterval(() => {
-      setIsDemoMode(checkDemoMode());
-    }, 1000);
-    
-    return () => {
-      clearInterval(interval);
-    };
-  }, [checkDemoMode]);
+  const { isDemoMode, exitDemoMode } = useDemoMode();
 
   // Memoized handlers to prevent unnecessary re-renders
   const handleSignOut = useCallback(async () => {
@@ -77,15 +52,15 @@ export function TopBar({
   }, [signOut, router]);
 
   const handleExitDemo = useCallback(() => {
-    // Remove demo mode cookie
-    document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Use hook function to exit demo mode
+    exitDemoMode();
     
     // Redirect to home page
     router.push("/");
     
     // Call external handler if provided
     onExitDemo?.();
-  }, [router, onExitDemo]);
+  }, [router, onExitDemo, exitDemoMode]);
 
   // Memoized user section to prevent unnecessary re-renders
   const userSection = useMemo(() => {

@@ -1,35 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useDemoMode } from "@/hooks";
 
 export function ProgressTopBar() {
   const { isSignedIn, user } = useUser();
   const t = useTranslations('Progress');
-  const [isDemoMode, setIsDemoMode] = useState(false);
-
-  // Check demo mode on client side
-  useEffect(() => {
-    const checkDemoMode = () => {
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        const demoModeCookie = cookies.find(cookie => 
-          cookie.trim().startsWith('demo_mode=')
-        );
-        const isDemo = demoModeCookie?.split('=')[1] === 'true';
-        setIsDemoMode(isDemo);
-      }
-    };
-    
-    checkDemoMode();
-    
-    // Check periodically in case cookie changes
-    const interval = setInterval(checkDemoMode, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const { isDemoMode } = useDemoMode();
 
   return (
     <header className="border-b border-white/10 p-3 bg-black">

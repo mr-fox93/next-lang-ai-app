@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { DemoModeLoader } from "@/components/ui/demo-mode-loader";
 import type React from "react";
+import { useDemoMode } from '@/hooks';
 
 type Locale = 'en' | 'pl' | 'es' | 'it';
 
@@ -25,7 +26,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const { isDemoMode, exitDemoMode } = useDemoMode();
   const t = useTranslations('Navbar');
   const router = useRouter();
   const pathname = usePathname();
@@ -39,26 +40,6 @@ export default function Navbar() {
   // Set mounted state on client side
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  // Check demo mode on client side
-  useEffect(() => {
-    const checkDemoMode = () => {
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        const demoModeCookie = cookies.find(cookie => 
-          cookie.trim().startsWith('demo_mode=')
-        );
-        const isDemo = demoModeCookie?.split('=')[1] === 'true';
-        setIsDemoMode(isDemo);
-      }
-    };
-    
-    checkDemoMode();
-    
-    // Check periodically in case cookie changes
-    const interval = setInterval(checkDemoMode, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const toggleMobileMenu = () => {
@@ -109,8 +90,8 @@ export default function Navbar() {
   };
 
   const handleExitDemo = () => {
-    // Usuń cookie demo mode
-    document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Use hook function to exit demo mode
+    exitDemoMode();
     
     // Zamknij mobile menu jeśli jest otwarte
     setMobileMenuOpen(false);

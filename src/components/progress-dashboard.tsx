@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useTranslations } from 'next-intl';
 import { ProgressTopBar } from "@/components/ui/progress-top-bar";
+import { useDemoMode } from "@/hooks";
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
@@ -35,35 +36,7 @@ export function ProgressDashboard({
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  // Sprawdź demo mode SYNCHRONICZNIE podczas inicjalizacji
-  const checkDemoModeSync = () => {
-    if (typeof document !== 'undefined') {
-      const cookies = document.cookie.split(';');
-      const demoModeCookie = cookies.find(cookie => 
-        cookie.trim().startsWith('demo_mode=')
-      );
-      return demoModeCookie?.split('=')[1] === 'true';
-    }
-    return false;
-  };
-  
-  const [isDemoMode, setIsDemoMode] = useState(checkDemoModeSync);
-
-  // Sprawdź czy to demo mode (backup sprawdzenie)
-  useEffect(() => {
-    const checkDemoMode = () => {
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        const demoModeCookie = cookies.find(cookie => 
-          cookie.trim().startsWith('demo_mode=')
-        );
-        const isDemo = demoModeCookie?.split('=')[1] === 'true';
-        setIsDemoMode(isDemo);
-      }
-    };
-    
-    checkDemoMode();
-  }, []);
+  const { isDemoMode } = useDemoMode();
 
   useEffect(() => {
     const originalStyles = {

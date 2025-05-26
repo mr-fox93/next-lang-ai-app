@@ -15,10 +15,11 @@ import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
+import { useDemoMode } from "@/hooks";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
-  serverError?: string;
+  serverError?: string | null;
   initialCategory?: string | null;
   progressStats?: {
     success: boolean;
@@ -50,31 +51,11 @@ export default function FlashcardsView({
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
 
   const router = useRouter();
-
-  // Check demo mode on client side
-  useEffect(() => {
-    const checkDemoMode = () => {
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        const demoModeCookie = cookies.find(cookie => 
-          cookie.trim().startsWith('demo_mode=')
-        );
-        const isDemo = demoModeCookie?.split('=')[1] === 'true';
-        setIsDemoMode(isDemo);
-      }
-    };
-    
-    checkDemoMode();
-    
-    // Check periodically in case cookie changes
-    const interval = setInterval(checkDemoMode, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const { isDemoMode, exitDemoMode } = useDemoMode();
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
@@ -226,8 +207,8 @@ export default function FlashcardsView({
         onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         progressStats={progressStats}
         onExitDemo={() => {
-          // Remove demo mode cookie
-          document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          // Use hook function to exit demo mode
+          exitDemoMode();
           router.push("/");
         }}
       />
@@ -261,8 +242,8 @@ export default function FlashcardsView({
             onNewFlashcardsClick={isDemoMode ? () => handleDemoModeAction("newFlashcards") : undefined}
             onDemoModeAction={isDemoMode ? handleDemoModeAction : undefined}
             onExitDemo={() => {
-              // Remove demo mode cookie
-              document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              // Use hook function to exit demo mode
+              exitDemoMode();
               router.push("/");
             }}
           />
