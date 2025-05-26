@@ -69,6 +69,8 @@ interface FlashcardsSidebarProps {
   onExitDemo?: () => void;
   onImportAndSignIn?: () => void;
   isImporting?: boolean;
+  // Demo mode callbacks
+  onDemoModeAction?: (actionType: string) => void;
 }
 
 export function FlashcardsSidebar({
@@ -87,6 +89,8 @@ export function FlashcardsSidebar({
   onExitDemo,
   onImportAndSignIn,
   isImporting,
+  // Demo mode callbacks
+  onDemoModeAction,
 }: FlashcardsSidebarProps) {
   const t = useTranslations('Sidebar');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -114,8 +118,18 @@ export function FlashcardsSidebar({
 
   // Memoized language fetcher
   const fetchLanguages = useCallback(async () => {
-    if (isGuestMode) {
+    if (variant === "guest") {
       setSelectedLanguage("all");
+      return;
+    }
+
+    if (variant === "demo") {
+      // In demo mode, extract languages from flashcards
+      const uniqueLanguages = [...new Set(flashcards.map(card => card.targetLanguage))];
+      setLanguages(uniqueLanguages);
+      if (!selectedLanguage) {
+        setSelectedLanguage("all");
+      }
       return;
     }
 
@@ -136,7 +150,7 @@ export function FlashcardsSidebar({
     } finally {
       setIsLoadingLanguages(false);
     }
-  }, [isGuestMode, selectedLanguage]);
+  }, [variant, selectedLanguage, flashcards]);
 
   useEffect(() => {
     fetchLanguages();
@@ -211,15 +225,29 @@ export function FlashcardsSidebar({
   // Memoized handlers
   const handleDeleteCategory = useCallback((category: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Check if in demo mode
+    if (variant === "demo" && onDemoModeAction) {
+      onDemoModeAction("deleteCategory");
+      return;
+    }
+    
     setCategoryToDelete(category);
     setIsDeleteDialogOpen(true);
-  }, []);
+  }, [variant, onDemoModeAction]);
 
   const handleGenerateClick = useCallback((category: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Check if in demo mode
+    if (variant === "demo" && onDemoModeAction) {
+      onDemoModeAction("generateMore");
+      return;
+    }
+    
     setCategoryToGenerate(category);
     setIsGenerateDialogOpen(true);
-  }, []);
+  }, [variant, onDemoModeAction]);
 
   const closeDeleteDialog = useCallback(() => {
     setIsDeleteDialogOpen(false);
@@ -303,7 +331,7 @@ export function FlashcardsSidebar({
   }, [categoryToDelete, isGuestMode, closeDeleteDialog, router, toast, t, onFlashcardsUpdate, fetchLanguages]);
 
   const handleLanguageChange = useCallback((value: string) => {
-    if (isGuestMode && onLanguageSelectClick) {
+    if (variant === "guest" && onLanguageSelectClick) {
       onLanguageSelectClick();
       return;
     }
@@ -327,7 +355,7 @@ export function FlashcardsSidebar({
         onSelectCategory("");
       }
     }
-  }, [isGuestMode, onLanguageSelectClick, flashcards, selectedCategory, onSelectCategory]);
+  }, [variant, onLanguageSelectClick, flashcards, selectedCategory, onSelectCategory]);
 
   const handleGenerateMoreFlashcards = useCallback(async () => {
     if (!categoryToGenerate) return;
@@ -557,9 +585,9 @@ export function FlashcardsSidebar({
           )}
 
           {!isCollapsed &&
-            (isGuestMode || languages.length > 0 || isLoadingLanguages) && (
+            (variant === "guest" || languages.length > 0 || isLoadingLanguages) && (
               <div className="space-y-2 mt-2">
-                {isGuestMode ? (
+                {variant === "guest" ? (
                   <div
                     className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200"
                     onClick={onLanguageSelectClick}
@@ -604,7 +632,7 @@ export function FlashcardsSidebar({
                   </Select>
                 )}
 
-                {!isGuestMode && (
+                {variant !== "guest" && (
                   <div>
                     <Select
                       value={learningFilter}
@@ -646,7 +674,7 @@ export function FlashcardsSidebar({
                   </div>
                 )}
 
-                {isGuestMode && onLearningFilterClick && (
+                {variant === "guest" && onLearningFilterClick && (
                   <div
                     className="w-full bg-black/20 border border-white/10 text-white rounded-md h-10 flex items-center px-3 cursor-pointer hover:bg-purple-500/10 transition-colors duration-200 mt-2"
                     onClick={onLearningFilterClick}

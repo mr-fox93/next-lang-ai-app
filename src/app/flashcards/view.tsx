@@ -14,6 +14,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { LoginPromptPopup } from "@/components/login-prompt-popup";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -49,8 +50,31 @@ export default function FlashcardsView({
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [loginPromptMessage, setLoginPromptMessage] = useState("");
 
   const router = useRouter();
+
+  // Check demo mode on client side
+  useEffect(() => {
+    const checkDemoMode = () => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const demoModeCookie = cookies.find(cookie => 
+          cookie.trim().startsWith('demo_mode=')
+        );
+        const isDemo = demoModeCookie?.split('=')[1] === 'true';
+        setIsDemoMode(isDemo);
+      }
+    };
+    
+    checkDemoMode();
+    
+    // Check periodically in case cookie changes
+    const interval = setInterval(checkDemoMode, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
@@ -97,6 +121,13 @@ export default function FlashcardsView({
   };
 
   const handleGenerateFlashcards = async (category: string) => {
+    // Check if in demo mode and show login prompt
+    if (isDemoMode) {
+      setLoginPromptMessage("Sign in to generate new flashcards and unlock unlimited access to all features!");
+      setShowLoginPrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -162,6 +193,26 @@ export default function FlashcardsView({
     }
   };
 
+  // Handler for demo mode actions that should show login prompt
+  const handleDemoModeAction = (actionType: string) => {
+    let message = "";
+    switch (actionType) {
+      case "newFlashcards":
+        message = "Sign in to create new flashcards and save your progress!";
+        break;
+      case "generateMore":
+        message = "Sign in to generate more flashcards for this category!";
+        break;
+      case "deleteCategory":
+        message = "Sign in to manage your flashcard categories!";
+        break;
+      default:
+        message = "Sign in to unlock all features including saving flashcards, tracking progress, and generating new content!";
+    }
+    setLoginPromptMessage(message);
+    setShowLoginPrompt(true);
+  };
+
   const categoryCards = selectedCategory
     ? initialFlashcards.filter((card) => card.category === selectedCategory)
     : initialFlashcards;
@@ -171,9 +222,14 @@ export default function FlashcardsView({
   return (
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
       <TopBar 
-        variant="authenticated"
+        variant={isDemoMode ? "demo" : "authenticated"}
         onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         progressStats={progressStats}
+        onExitDemo={() => {
+          // Remove demo mode cookie
+          document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          router.push("/");
+        }}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -200,8 +256,10 @@ export default function FlashcardsView({
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={initialFlashcards}
-            variant="authenticated"
+            variant={isDemoMode ? "demo" : "authenticated"}
             masteredCategories={masteredCategories}
+            onNewFlashcardsClick={isDemoMode ? () => handleDemoModeAction("newFlashcards") : undefined}
+            onDemoModeAction={isDemoMode ? handleDemoModeAction : undefined}
             onExitDemo={() => {
               // Remove demo mode cookie
               document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
@@ -297,6 +355,13 @@ export default function FlashcardsView({
           )}
         </main>
       </div>
+
+      {/* Login Prompt Popup */}
+      <LoginPromptPopup
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        message={loginPromptMessage}
+      />
     </div>
   );
 }
