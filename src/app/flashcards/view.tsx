@@ -2,23 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
-import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Grid, Maximize2, LogOut, PanelLeftOpen } from "lucide-react";
+import { Grid, Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
-import { ProgressPreview } from "@/components/progress-preview";
+import { TopBar } from "@/components/ui/top-bar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { LoginPromptPopup } from "@/components/login-prompt-popup";
+import { useDemoMode } from "@/hooks";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
-  serverError?: string;
+  serverError?: string | null;
   initialCategory?: string | null;
   progressStats?: {
     success: boolean;
@@ -45,15 +46,31 @@ export default function FlashcardsView({
   );
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  // Start with collapsed state, will be updated based on screen size
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
   const [error, setError] = useState<string | null>(serverError || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [loginPromptMessage, setLoginPromptMessage] = useState("");
 
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
   const router = useRouter();
+  const { isDemoMode, exitDemoMode } = useDemoMode();
+
+  // Set initial sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setIsSidebarCollapsed(isMobile);
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Listen for resize events
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (initialFlashcards.length > 0 && !selectedCategory && !categoryFromUrl) {
@@ -84,21 +101,14 @@ export default function FlashcardsView({
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.push("/");
-    } catch (error) {
-      console.error("Sign out error:", error);
-      setError(
-        error instanceof Error
-          ? `Sign out failed: ${error.message}`
-          : "An unexpected error occurred during sign out"
-      );
-    }
-  };
-
   const handleGenerateFlashcards = async (category: string) => {
+    // Check if in demo mode and show login prompt
+    if (isDemoMode) {
+      setLoginPromptMessage("Sign in to generate new flashcards and unlock unlimited access to all features!");
+      setShowLoginPrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -164,6 +174,26 @@ export default function FlashcardsView({
     }
   };
 
+  // Handler for demo mode actions that should show login prompt
+  const handleDemoModeAction = (actionType: string) => {
+    let message = "";
+    switch (actionType) {
+      case "newFlashcards":
+        message = "Sign in to create new flashcards and save your progress!";
+        break;
+      case "generateMore":
+        message = "Sign in to generate more flashcards for this category!";
+        break;
+      case "deleteCategory":
+        message = "Sign in to manage your flashcard categories!";
+        break;
+      default:
+        message = "Sign in to unlock all features including saving flashcards, tracking progress, and generating new content!";
+    }
+    setLoginPromptMessage(message);
+    setShowLoginPrompt(true);
+  };
+
   const categoryCards = selectedCategory
     ? initialFlashcards.filter((card) => card.category === selectedCategory)
     : initialFlashcards;
@@ -172,31 +202,16 @@ export default function FlashcardsView({
 
   return (
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center p-3 border-b border-white/10 flex-shrink-0">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden text-white bg-purple-700/80 border-purple-500 hover:bg-purple-600 hover:border-purple-400 mr-2"
-            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-          >
-            <PanelLeftOpen className="h-5 w-5" />
-          </Button>
-          {isSignedIn && (
-            <>
-              <UserButton />
-              <span className="text-white font-medium">{user?.fullName}</span>
-              <Button
-                variant="ghost"
-                className="text-white"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+      <TopBar 
+        variant={isDemoMode ? "demo" : "authenticated"}
+        onMobileSidebarToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        progressStats={progressStats}
+        onExitDemo={() => {
+          // Use hook function to exit demo mode
+          exitDemoMode();
+          router.push("/");
+        }}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         <div
@@ -204,9 +219,9 @@ export default function FlashcardsView({
           fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           md:relative md:transform-none
           ${
-            isMobileSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
+            isSidebarCollapsed
+              ? "-translate-x-full md:translate-x-0"
+              : "translate-x-0"
           }
         `}
         >
@@ -214,18 +229,31 @@ export default function FlashcardsView({
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);
-              setIsMobileSidebarOpen(false);
+              // On mobile, collapse sidebar after selecting category
+              if (window.innerWidth < 768) {
+                setIsSidebarCollapsed(true);
+              }
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={initialFlashcards}
+            variant={isDemoMode ? "demo" : "authenticated"}
             masteredCategories={masteredCategories}
+            onNewFlashcardsClick={isDemoMode ? () => handleDemoModeAction("newFlashcards") : undefined}
+            onDemoModeAction={isDemoMode ? handleDemoModeAction : undefined}
+            onExitDemo={() => {
+              // Use hook function to exit demo mode
+              exitDemoMode();
+              router.push("/");
+            }}
           />
         </div>
-        {isMobileSidebarOpen && (
+        
+        {/* Mobile overlay - only show when sidebar is not collapsed on mobile */}
+        {!isSidebarCollapsed && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={() => setIsSidebarCollapsed(true)}
           />
         )}
 
@@ -309,7 +337,12 @@ export default function FlashcardsView({
         </main>
       </div>
 
-      <ProgressPreview progressStats={progressStats} />
+      {/* Login Prompt Popup */}
+      <LoginPromptPopup
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        message={loginPromptMessage}
+      />
     </div>
   );
 }
