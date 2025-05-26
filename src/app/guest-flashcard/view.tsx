@@ -319,7 +319,7 @@ export default function GuestFlashcardsView({
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={flashcards}
-            isGuestMode={true}
+            variant="guest"
             onLanguageSelectClick={handleLanguageSelectClick}
             onNewFlashcardsClick={handleNewFlashcardsClick}
             onLearningFilterClick={handleLearningFilterClick}

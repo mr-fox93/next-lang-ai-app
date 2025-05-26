@@ -182,6 +182,7 @@ export default function FlashcardsView({
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={initialFlashcards}
+            variant="authenticated"
             masteredCategories={masteredCategories}
           />
         </div>

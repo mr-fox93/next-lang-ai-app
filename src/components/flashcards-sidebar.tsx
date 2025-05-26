@@ -16,7 +16,8 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Flashcard } from "@/core/entities/Flashcard";
 import {
   AlertDialog,
@@ -48,13 +49,15 @@ import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
 
+export type SidebarVariant = "authenticated" | "demo" | "guest";
+
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
   onSelectCategory: (category: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   flashcards: Flashcard[];
-  isGuestMode?: boolean;
+  variant?: SidebarVariant;
   onLanguageSelectClick?: () => void;
   onNewFlashcardsClick?: () => void;
   onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
@@ -68,13 +71,14 @@ export function FlashcardsSidebar({
   isCollapsed,
   onToggleCollapse,
   flashcards,
-  isGuestMode = false,
+  variant = "authenticated",
   onLanguageSelectClick,
   onNewFlashcardsClick,
   onFlashcardsUpdate,
   masteredCategories = [],
   onLearningFilterClick,
 }: FlashcardsSidebarProps) {
+  const t = useTranslations('Sidebar');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -95,6 +99,10 @@ export function FlashcardsSidebar({
   const router = useRouter();
   const { toast } = useToast();
 
+  // Determine if component is in guest mode
+  const isGuestMode = variant === "guest" || variant === "demo";
+
+  // Memoized language fetcher
   const fetchLanguages = useCallback(async () => {
     if (isGuestMode) {
       setSelectedLanguage("all");
@@ -136,7 +144,8 @@ export function FlashcardsSidebar({
     }
   }, [languages, flashcards, selectedLanguage]);
 
-  const getLanguageName = (languageCode: string): string => {
+  // Memoized language name getter
+  const getLanguageName = useCallback((languageCode: string): string => {
     const languageNames: Record<string, string> = {
       en: "English",
       pl: "Polski",
@@ -152,18 +161,24 @@ export function FlashcardsSidebar({
     };
 
     return languageNames[languageCode] || languageCode;
-  };
+  }, []);
 
-  const filteredFlashcards =
+  // Memoized filtered flashcards
+  const filteredFlashcards = useMemo(() => 
     selectedLanguage && selectedLanguage !== "all"
       ? flashcards.filter((card) => card.targetLanguage === selectedLanguage)
-      : flashcards;
+      : flashcards,
+    [flashcards, selectedLanguage]
+  );
 
-  const categories = [
-    ...new Set(filteredFlashcards.map((card) => card.category)),
-  ];
+  // Memoized categories
+  const categories = useMemo(() => 
+    [...new Set(filteredFlashcards.map((card) => card.category))],
+    [filteredFlashcards]
+  );
 
-  const getFilteredCategoriesByLearningStatus = () => {
+  // Memoized filtered categories by learning status
+  const getFilteredCategoriesByLearningStatus = useCallback(() => {
     if (learningFilter === "all") {
       return categories;
     } else if (learningFilter === "mastered") {
@@ -176,28 +191,32 @@ export function FlashcardsSidebar({
       );
     }
     return categories;
-  };
+  }, [learningFilter, categories, masteredCategories]);
 
-  const displayedCategories = getFilteredCategoriesByLearningStatus();
+  const displayedCategories = useMemo(() => 
+    getFilteredCategoriesByLearningStatus(),
+    [getFilteredCategoriesByLearningStatus]
+  );
 
-  const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
+  // Memoized handlers
+  const handleDeleteCategory = useCallback((category: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setCategoryToDelete(category);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
-  const handleGenerateClick = (category: string, e: React.MouseEvent) => {
+  const handleGenerateClick = useCallback((category: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setCategoryToGenerate(category);
     setIsGenerateDialogOpen(true);
-  };
+  }, []);
 
-  const closeDeleteDialog = () => {
+  const closeDeleteDialog = useCallback(() => {
     setIsDeleteDialogOpen(false);
     setCategoryToDelete(null);
-  };
+  }, []);
 
-  const confirmDeleteCategory = async () => {
+  const confirmDeleteCategory = useCallback(async () => {
     if (!categoryToDelete) return;
 
     setIsDeleting(true);
@@ -212,8 +231,11 @@ export function FlashcardsSidebar({
         router.refresh();
 
         toast({
-          title: "Category deleted",
-          description: `Successfully deleted category "${categoryToDelete}" with ${deletedCount} flashcards.`,
+          title: t('categoryDeleted'),
+          description: t('categoryDeletedSuccess', { 
+            category: categoryToDelete, 
+            count: deletedCount.toString()
+          }),
           variant: "success",
           duration: 1000,
         });
@@ -231,17 +253,20 @@ export function FlashcardsSidebar({
           await fetchLanguages();
 
           toast({
-            title: "Category deleted",
-            description: `Successfully deleted category "${categoryToDelete}" with ${result.deletedCount} flashcards.`,
+            title: t('categoryDeleted'),
+            description: t('categoryDeletedSuccess', { 
+              category: categoryToDelete, 
+              count: (result.deletedCount || 0).toString()
+            }),
             variant: "success",
             duration: 1000,
           });
         } else {
-          setErrorMessage(result.error || "Failed to delete category");
+          setErrorMessage(result.error || t('failedToDeleteCategory'));
 
           toast({
-            title: "Error",
-            description: result.error || "Failed to delete category",
+            title: t('error'),
+            description: result.error || t('failedToDeleteCategory'),
             variant: "destructive",
             duration: 1000,
           });
@@ -257,7 +282,7 @@ export function FlashcardsSidebar({
       setErrorMessage(errorMessage);
 
       toast({
-        title: "Error",
+        title: t('error'),
         description: errorMessage,
         variant: "destructive",
         duration: 1000,
@@ -265,9 +290,9 @@ export function FlashcardsSidebar({
     } finally {
       setIsDeleting(false);
     }
-  };
+  }, [categoryToDelete, isGuestMode, closeDeleteDialog, router, toast, t, onFlashcardsUpdate, fetchLanguages]);
 
-  const handleLanguageChange = (value: string) => {
+  const handleLanguageChange = useCallback((value: string) => {
     if (isGuestMode && onLanguageSelectClick) {
       onLanguageSelectClick();
       return;
@@ -292,9 +317,9 @@ export function FlashcardsSidebar({
         onSelectCategory("");
       }
     }
-  };
+  }, [isGuestMode, onLanguageSelectClick, flashcards, selectedCategory, onSelectCategory]);
 
-  const handleGenerateMoreFlashcards = async () => {
+  const handleGenerateMoreFlashcards = useCallback(async () => {
     if (!categoryToGenerate) return;
 
     setIsGenerating(true);
@@ -337,17 +362,20 @@ export function FlashcardsSidebar({
           }
 
           toast({
-            title: "Flashcards Added",
-            description: `Successfully added ${result.flashcards.length} new flashcards to the "${categoryToGenerate}" category.`,
+            title: t('flashcardsAdded'),
+            description: t('flashcardsAddedSuccess', { 
+              count: result.flashcards.length, 
+              category: categoryToGenerate 
+            }),
             variant: "success",
             duration: 1000,
           });
         } else {
-          setErrorMessage(result.error || "Failed to generate new flashcards");
+          setErrorMessage(result.error || t('failedToGenerateFlashcards'));
 
           toast({
-            title: "Error",
-            description: result.error || "Failed to generate new flashcards",
+            title: t('error'),
+            description: result.error || t('failedToGenerateFlashcards'),
             variant: "destructive",
             duration: 1000,
           });
@@ -366,17 +394,17 @@ export function FlashcardsSidebar({
           router.refresh();
 
           toast({
-            title: "Flashcards Added",
-            description: `Successfully added new flashcards to the "${categoryToGenerate}" category.`,
+            title: t('flashcardsAdded'),
+            description: t('addedNewFlashcards', { category: categoryToGenerate }),
             variant: "success",
             duration: 1000,
           });
         } else {
-          setErrorMessage(result.error || "Failed to generate new flashcards");
+          setErrorMessage(result.error || t('failedToGenerateFlashcards'));
 
           toast({
-            title: "Error",
-            description: result.error || "Failed to generate new flashcards",
+            title: t('error'),
+            description: result.error || t('failedToGenerateFlashcards'),
             variant: "destructive",
             duration: 1000,
           });
@@ -392,7 +420,7 @@ export function FlashcardsSidebar({
       setErrorMessage(errorMessage);
 
       toast({
-        title: "Error",
+        title: t('error'),
         description: errorMessage,
         variant: "destructive",
         duration: 1000,
@@ -401,12 +429,24 @@ export function FlashcardsSidebar({
       setIsGenerating(false);
       setGeneratingCategory(null);
     }
-  };
+  }, [categoryToGenerate, isGuestMode, flashcards, onFlashcardsUpdate, toast, t, router]);
 
-  const closeGenerateDialog = () => {
+  const closeGenerateDialog = useCallback(() => {
     setIsGenerateDialogOpen(false);
     setCategoryToGenerate(null);
-  };
+  }, []);
+
+  // Memoized empty state message
+  const emptyStateMessage = useMemo(() => {
+    if (isLoadingLanguages) return t('loadingCategories');
+    if (learningFilter === "mastered") return t('noMasteredCategories');
+    if (learningFilter === "learning") return t('noLearningCategories');
+    if (selectedLanguage === "all") return t('noCategoriesAvailable');
+    if (selectedLanguage) {
+      return t('noCategoriesForLanguage', { language: getLanguageName(selectedLanguage) });
+    }
+    return t('noCategoriesAvailable');
+  }, [isLoadingLanguages, learningFilter, selectedLanguage, t, getLanguageName]);
 
   return (
     <div className="relative h-screen overflow-hidden">
@@ -427,7 +467,7 @@ export function FlashcardsSidebar({
               animate={{ opacity: 1 }}
               className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70"
             >
-              Categories
+              {t('categories')}
             </motion.h2>
           )}
           <Button
@@ -452,7 +492,7 @@ export function FlashcardsSidebar({
               onClick={onNewFlashcardsClick}
             >
               <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
-              {!isCollapsed && <span>New Flashcards</span>}
+              {!isCollapsed && <span>{t('newFlashcards')}</span>}
             </Button>
           ) : (
             <Link href="/" className="block w-full">
@@ -461,7 +501,7 @@ export function FlashcardsSidebar({
                 className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 group flex items-center justify-center rounded-md"
               >
                 <PlusCircle className="h-4 w-4 mr-2 group-hover:text-purple-300" />
-                {!isCollapsed && <span>New Flashcards</span>}
+                {!isCollapsed && <span>{t('newFlashcards')}</span>}
               </Button>
             </Link>
           )}
@@ -476,7 +516,7 @@ export function FlashcardsSidebar({
                   >
                     <div className="flex items-center gap-2 text-sm">
                       <Globe className="h-4 w-4 text-purple-400" />
-                      <span className="text-white">All languages</span>
+                      <span className="text-white">{t('allLanguages')}</span>
                     </div>
                     <div className="ml-auto">
                       <ChevronRight className="h-4 w-4 opacity-50" />
@@ -491,7 +531,7 @@ export function FlashcardsSidebar({
                     <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-purple-400" />
-                        <SelectValue placeholder="Change language" />
+                        <SelectValue placeholder={t('changeLanguage')} />
                       </div>
                     </SelectTrigger>
                     <SelectContent className="bg-black/90 border-white/10 text-white">
@@ -499,7 +539,7 @@ export function FlashcardsSidebar({
                         value="all"
                         className="hover:bg-purple-500/20"
                       >
-                        All languages
+                        {t('allLanguages')}
                       </SelectItem>
                       {languages.map((lang) => (
                         <SelectItem
@@ -523,7 +563,7 @@ export function FlashcardsSidebar({
                       <SelectTrigger className="w-full bg-black/20 border-white/10 text-white">
                         <div className="flex items-center gap-2">
                           <ListFilter className="h-4 w-4 text-purple-400" />
-                          <SelectValue placeholder="Filter progress" />
+                          <SelectValue placeholder={t('filterProgress')} />
                         </div>
                       </SelectTrigger>
                       <SelectContent className="bg-black/90 border-white/10 text-white">
@@ -531,7 +571,7 @@ export function FlashcardsSidebar({
                           value="all"
                           className="hover:bg-purple-500/20"
                         >
-                          All categories
+                          {t('allCategories')}
                         </SelectItem>
                         <SelectItem
                           value="learning"
@@ -539,7 +579,7 @@ export function FlashcardsSidebar({
                         >
                           <div className="flex items-center gap-2">
                             <BookOpen className="h-4 w-4 text-blue-400" />
-                            <span>Learning</span>
+                            <span>{t('learning')}</span>
                           </div>
                         </SelectItem>
                         <SelectItem
@@ -548,7 +588,7 @@ export function FlashcardsSidebar({
                         >
                           <div className="flex items-center gap-2">
                             <CheckCircle className="h-4 w-4 text-green-400" />
-                            <span>Mastered</span>
+                            <span>{t('mastered')}</span>
                           </div>
                         </SelectItem>
                       </SelectContent>
@@ -563,7 +603,7 @@ export function FlashcardsSidebar({
                   >
                     <div className="flex items-center gap-2 text-sm">
                       <ListFilter className="h-4 w-4 text-purple-400" />
-                      <span className="text-white">All categories</span>
+                      <span className="text-white">{t('allCategories')}</span>
                     </div>
                     <div className="ml-auto">
                       <ChevronRight className="h-4 w-4 opacity-50" />
@@ -620,14 +660,14 @@ export function FlashcardsSidebar({
                         size="icon"
                         className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-green-400 hover:bg-green-500/10"
                         onClick={(e) => handleGenerateClick(category, e)}
-                        title="Add more flashcards to this category"
+                        title={t('addMoreFlashcards')}
                         disabled={
                           isGenerating || generatingCategory === category
                         }
                       >
                         <Plus className="h-4 w-4" />
                         {generatingCategory === category && (
-                          <span className="sr-only">Generating...</span>
+                          <span className="sr-only">{t('generating')}</span>
                         )}
                       </Button>
                       <Button
@@ -635,7 +675,7 @@ export function FlashcardsSidebar({
                         size="icon"
                         className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
                         onClick={(e) => handleDeleteCategory(category, e)}
-                        title="Delete category"
+                        title={t('deleteCategory')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -645,19 +685,7 @@ export function FlashcardsSidebar({
               ))
             ) : (
               <p className="text-gray-400 text-center py-4">
-                {isLoadingLanguages
-                  ? "Loading categories..."
-                  : learningFilter === "mastered"
-                  ? "No mastered categories yet"
-                  : learningFilter === "learning"
-                  ? "No categories in learning progress"
-                  : selectedLanguage === "all"
-                  ? "No categories available"
-                  : selectedLanguage
-                  ? `No categories for ${getLanguageName(
-                      selectedLanguage
-                    )} language`
-                  : "No categories available"}
+                {emptyStateMessage}
               </p>
             )}
           </div>
@@ -671,11 +699,10 @@ export function FlashcardsSidebar({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete category &quot;{categoryToDelete}&quot;?
+              {t('deleteCategoryTitle', { category: categoryToDelete || '' })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              All flashcards in this category will be permanently deleted. This
-              action cannot be undone.
+              {t('deleteCategoryDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -683,13 +710,13 @@ export function FlashcardsSidebar({
               onClick={closeDeleteDialog}
               disabled={isDeleting}
             >
-              Cancel
+              {t('cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteCategory}
               disabled={isDeleting}
             >
-              {isDeleting ? "Deleting..." : "Delete category"}
+              {isDeleting ? t('deleting') : t('deleteButton')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
