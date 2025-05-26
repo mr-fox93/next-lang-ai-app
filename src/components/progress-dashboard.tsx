@@ -15,7 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useTranslations } from 'next-intl';
 import { ProgressTopBar } from "@/components/ui/progress-top-bar";
-import { useDemoMode } from "@/hooks";
+import { useDemoMode, enhanceStatsWithDemoProgress, getReviewedTodayCount, setDemoDailyGoal } from "@/hooks/useDemoMode";
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
@@ -31,7 +31,7 @@ export function ProgressDashboard({
   const { toast } = useToast();
   const t = useTranslations('Progress');
   const [stats, setStats] = useState<UserProgressStats>(initialStats);
-  const [reviewedToday] = useState(initialReviewedToday);
+  const [reviewedToday, setReviewedToday] = useState(initialReviewedToday);
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,6 +60,23 @@ export function ProgressDashboard({
     };
   }, []);
 
+  // Enhance stats with demo progress if in demo mode
+  useEffect(() => {
+    if (isDemoMode) {
+      const enhancedStats = enhanceStatsWithDemoProgress(initialStats);
+      setStats(enhancedStats);
+      setDailyGoal(enhancedStats.dailyGoal || 10);
+      
+      // Get reviewed today count from localStorage
+      const demoReviewedToday = getReviewedTodayCount();
+      setReviewedToday(demoReviewedToday);
+    } else {
+      setStats(initialStats);
+      setReviewedToday(initialReviewedToday);
+      setDailyGoal(initialStats.dailyGoal || 10);
+    }
+  }, [isDemoMode, initialStats, initialReviewedToday]);
+
   const handleDailyGoalChange = async (value: string) => {
     const newGoal = parseInt(value, 10);
     setDailyGoal(newGoal);
@@ -68,22 +85,33 @@ export function ProgressDashboard({
       setIsSavingGoal(true);
       setErrorMessage(null);
       try {
-        const result = await updateDailyGoalAction(newGoal);
-        if (result.success) {
+        if (isDemoMode) {
+          // Save to localStorage for demo mode
+          setDemoDailyGoal(newGoal);
+          setStats({ ...stats, dailyGoal: newGoal });
           toast({
             title: "Saved",
             description: "Your daily goal has been updated",
           });
-          if (stats) {
-            setStats({ ...stats, dailyGoal: newGoal });
-          }
         } else {
-          setErrorMessage(result.error || "Failed to update daily goal");
-          toast({
-            title: "Error",
-            description: result.error || "Failed to update daily goal",
-            variant: "destructive",
-          });
+          // Save to server for normal mode
+          const result = await updateDailyGoalAction(newGoal);
+          if (result.success) {
+            toast({
+              title: "Saved",
+              description: "Your daily goal has been updated",
+            });
+            if (stats) {
+              setStats({ ...stats, dailyGoal: newGoal });
+            }
+          } else {
+            setErrorMessage(result.error || "Failed to update daily goal");
+            toast({
+              title: "Error",
+              description: result.error || "Failed to update daily goal",
+              variant: "destructive",
+            });
+          }
         }
       } catch (error) {
         console.error("Daily goal update error:", error);
