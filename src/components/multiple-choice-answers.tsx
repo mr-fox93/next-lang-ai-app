@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { SuccessStarAnimation } from "@/components/success-star-animation";
+import { useDemoMode, updateDemoProgress } from "@/hooks/useDemoMode";
 
 interface MultipleChoiceAnswersProps {
   card: FlashCard | Flashcard;
@@ -30,6 +31,7 @@ export function MultipleChoiceAnswers({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showSuccessStar, setShowSuccessStar] = useState(false);
   const { toast } = useToast();
+  const { isDemoMode } = useDemoMode();
 
   const correctAnswer = isFlipped ? card.translate_text : card.origin_text;
 
@@ -98,6 +100,14 @@ export function MultipleChoiceAnswers({
 
     if (flashcardId) {
       try {
+        // If in demo mode, save to localStorage instead of server
+        if (isDemoMode) {
+          updateDemoProgress(flashcardId, isCorrect);
+          // No need to show success message for demo mode
+          return;
+        }
+
+        // Normal mode - save to server
         const result = await updateFlashcardProgressAction({
           flashcardId,
           isCorrect,
