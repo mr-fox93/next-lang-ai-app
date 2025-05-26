@@ -12,6 +12,7 @@ import {
   BookOpen,
   CheckCircle,
   ListFilter,
+  Save,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,7 @@ import {
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 export type SidebarVariant = "authenticated" | "demo" | "guest";
 
@@ -63,6 +65,10 @@ interface FlashcardsSidebarProps {
   onFlashcardsUpdate?: (updatedFlashcards: Flashcard[]) => void;
   masteredCategories?: string[];
   onLearningFilterClick?: () => void;
+  // Mobile-specific props
+  onExitDemo?: () => void;
+  onImportAndSignIn?: () => void;
+  isImporting?: boolean;
 }
 
 export function FlashcardsSidebar({
@@ -77,6 +83,10 @@ export function FlashcardsSidebar({
   onFlashcardsUpdate,
   masteredCategories = [],
   onLearningFilterClick,
+  // Mobile-specific props
+  onExitDemo,
+  onImportAndSignIn,
+  isImporting,
 }: FlashcardsSidebarProps) {
   const t = useTranslations('Sidebar');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -483,6 +493,45 @@ export function FlashcardsSidebar({
             )}
           </Button>
         </div>
+
+        {/* Mobile Controls Section - only visible on mobile and when not collapsed */}
+        {!isCollapsed && (
+          <div className="md:hidden border-b border-white/10 bg-black/10">
+            <div className="p-3 space-y-3">
+              {/* Language Switcher for Mobile */}
+              <div className="flex items-center justify-center">
+                <div className="w-full">
+                  <LanguageSwitcher />
+                </div>
+              </div>
+
+              {/* Mobile Action Buttons */}
+              <div className="flex flex-col space-y-2">
+                {/* Exit Demo Button for Mobile */}
+                {(variant === "demo" || variant === "authenticated") && onExitDemo && (
+                  <Button
+                    onClick={onExitDemo}
+                    className="w-full border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors text-sm py-2"
+                  >
+                    Exit Demo
+                  </Button>
+                )}
+
+                {/* Import and Sign In Button for Mobile */}
+                {variant === "guest" && onImportAndSignIn && (
+                  <Button
+                    onClick={onImportAndSignIn}
+                    disabled={isImporting}
+                    className="w-full text-white border-purple-500 hover:bg-purple-500/20 bg-gradient-to-r from-purple-500/10 to-purple-500/0 text-sm py-2"
+                  >
+                    <Save className="w-4 h-4 mr-2 text-purple-400" />
+                    {isImporting ? "Importing..." : "Log in to save"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="p-2 border-b border-white/10">
           {isGuestMode && onNewFlashcardsClick ? (

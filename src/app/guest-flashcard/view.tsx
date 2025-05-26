@@ -341,6 +341,8 @@ export default function GuestFlashcardsView({
                 }
               }
             }}
+            onImportAndSignIn={handleImportAndSignIn}
+            isImporting={isImporting}
           />
         </div>
         {isMobileSidebarOpen && (

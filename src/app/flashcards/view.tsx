@@ -184,6 +184,11 @@ export default function FlashcardsView({
             flashcards={initialFlashcards}
             variant="authenticated"
             masteredCategories={masteredCategories}
+            onExitDemo={() => {
+              // Remove demo mode cookie
+              document.cookie = "demo_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              router.push("/");
+            }}
           />
         </div>
         {isMobileSidebarOpen && (

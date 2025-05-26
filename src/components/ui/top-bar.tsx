@@ -192,16 +192,30 @@ export function TopBar({
           >
             <PanelLeftOpen className="h-5 w-5" />
           </Button>
-          {userSection}
+          
+          {/* Mobile: Show only DEMO MODE indicator */}
+          <div className="md:hidden">
+            {(variant === "demo" || (variant === "authenticated" && isDemoMode && !isSignedIn)) && (
+              <div className="relative overflow-hidden group bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-lg px-2 py-1">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative text-green-400 font-medium text-xs">DEMO</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Desktop: Show full user section */}
+          <div className="hidden md:flex md:items-center md:space-x-4">
+            {userSection}
+          </div>
         </div>
       </div>
 
-      {/* Language Switcher positioned next to Progress Preview */}
-      <div className="fixed top-2 right-[240px] z-10">
+      {/* Desktop only: Language Switcher positioned next to Progress Preview */}
+      <div className="hidden md:block fixed top-2 right-[240px] z-10">
         <LanguageSwitcher />
       </div>
 
-      {/* Progress Preview */}
+      {/* Progress Preview - visible on all devices */}
       <ProgressPreview 
         progressStats={progressStats}
         isGuestMode={variant === "guest"}
