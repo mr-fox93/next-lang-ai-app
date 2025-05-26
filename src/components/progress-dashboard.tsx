@@ -36,7 +36,7 @@ export function ProgressDashboard({
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  const { isDemoMode } = useDemoMode();
+  const { isDemoMode, isLoading } = useDemoMode();
 
   useEffect(() => {
     const originalStyles = {
@@ -113,7 +113,16 @@ export function ProgressDashboard({
 
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
-  // Sprawdź czy user jest zalogowany LUB w demo mode
+  // Show loading while checking demo mode
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  // Sprawdź czy user jest zalogowany LUB w demo mode (tylko po sprawdzeniu)
   if (!isSignedIn && !isDemoMode) {
     router.push("sign-in");
     return null;

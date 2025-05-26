@@ -7,6 +7,7 @@ import { demoModeService } from '@/core/useCases/session';
  */
 export function useDemoMode() {
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkDemoMode = useCallback(() => {
     if (typeof document === 'undefined') return false;
@@ -14,6 +15,7 @@ export function useDemoMode() {
     const cookies = document.cookie;
     const isDemo = demoModeService.isDemoMode(cookies);
     setIsDemoMode(isDemo);
+    setIsLoading(false);
     return isDemo;
   }, []);
 
@@ -22,7 +24,14 @@ export function useDemoMode() {
     checkDemoMode();
     
     // Periodic check for cookie changes
-    const interval = setInterval(checkDemoMode, 1000);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie;
+        const isDemo = demoModeService.isDemoMode(cookies);
+        setIsDemoMode(isDemo);
+        // Po pierwszym sprawdzeniu nie ustawiamy już isLoading na true
+      }
+    }, 1000);
     
     return () => clearInterval(interval);
   }, [checkDemoMode]);
@@ -35,6 +44,7 @@ export function useDemoMode() {
 
   return {
     isDemoMode,
+    isLoading,
     checkDemoMode,
     exitDemoMode,
   };
