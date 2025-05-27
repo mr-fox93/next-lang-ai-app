@@ -215,5 +215,17 @@
       "email": "Email"
     },
     "lastUpdate": "Last updated"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "No flashcards available. Create new flashcards to start learning.",
+    "startLearningButton": "Start learning now by generating what you want",
+    "welcomeTitle": "Welcome to Languito!",
+    "welcomeSubtitle": "Your account has been created successfully! 🎉",
+    "welcomeDescription": "You're now ready to start your language learning journey. Let's create your first set of interactive flashcards!",
+    "generateFirstFlashcards": "Generate Your First Flashcards",
+    "accessLater": "You can always access this from the main page later",
+    "unlimitedFlashcards": "Generate unlimited flashcards in any language",
+    "trackProgress": "Track your progress and mastery levels",
+    "syncDevices": "Sync across all your devices automatically"
   }
 } 
