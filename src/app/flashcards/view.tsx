@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import { Grid, Maximize2 } from "lucide-react";
+import { Grid, Maximize2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
@@ -15,7 +15,10 @@ import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
+import { WelcomeNewUserModal } from "@/components/welcome-new-user-modal";
 import { useDemoMode } from "@/hooks";
+import { useUser } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -53,9 +56,12 @@ export default function FlashcardsView({
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptMessage, setLoginPromptMessage] = useState("");
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   const router = useRouter();
   const { isDemoMode, exitDemoMode } = useDemoMode();
+  const { isSignedIn } = useUser();
+  const t = useTranslations('Flashcards');
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
@@ -95,6 +101,18 @@ export default function FlashcardsView({
       window.history.pushState({}, "", newUrl);
     }
   }, [selectedCategory]);
+
+  // Check if user is new (no flashcards and signed in, not in demo mode)
+  useEffect(() => {
+    if (isSignedIn && !isDemoMode && initialFlashcards.length === 0) {
+      // Check if we've already shown the welcome modal for this session
+      const hasShownWelcome = sessionStorage.getItem('hasShownWelcomeModal');
+      if (!hasShownWelcome) {
+        setShowWelcomeModal(true);
+        sessionStorage.setItem('hasShownWelcomeModal', 'true');
+      }
+    }
+  }, [isSignedIn, isDemoMode, initialFlashcards.length]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNext = (known: boolean) => {
@@ -313,7 +331,7 @@ export default function FlashcardsView({
                       ) : (
                         <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
                           <p className="text-gray-400">
-                            Brak dostępnych fiszek dla tej kategorii.
+                            {t('noFlashcardsTitle')}
                           </p>
                         </div>
                       )
@@ -329,9 +347,28 @@ export default function FlashcardsView({
             </>
           ) : (
             <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
-              <p className="text-gray-400">
-                Brak dostępnych fiszek. Utwórz nowe fiszki, aby rozpocząć naukę.
-              </p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center max-w-lg mx-auto px-4 relative z-10"
+              >
+                <h2 className="text-2xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 leading-relaxed">
+                  {t('noFlashcardsTitle')}
+                </h2>
+
+                <div className="flex justify-center">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      onClick={() => router.push("/")}
+                      className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-lg px-8 py-4 rounded-lg shadow-lg shadow-purple-500/20 font-medium inline-flex items-center justify-center"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      {t('startLearningButton')}
+                    </Button>
+                  </motion.div>
+                </div>
+              </motion.div>
             </div>
           )}
         </main>
@@ -342,6 +379,12 @@ export default function FlashcardsView({
         isOpen={showLoginPrompt}
         onClose={() => setShowLoginPrompt(false)}
         message={loginPromptMessage}
+      />
+
+      {/* Welcome Modal */}
+      <WelcomeNewUserModal
+        isOpen={showWelcomeModal}
+        onClose={() => setShowWelcomeModal(false)}
       />
     </div>
   );

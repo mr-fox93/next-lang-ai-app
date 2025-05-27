@@ -215,5 +215,17 @@
       "email": "Email"
     },
     "lastUpdate": "Ultimo aggiornamento"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "Nessuna scheda disponibile. Crea nuove schede per iniziare a imparare.",
+    "startLearningButton": "Inizia a imparare ora generando quello che vuoi",
+    "welcomeTitle": "Benvenuto in Languito!",
+    "welcomeSubtitle": "Il tuo account è stato creato con successo! 🎉",
+    "welcomeDescription": "Ora sei pronto per iniziare il tuo viaggio di apprendimento delle lingue. Creiamo il tuo primo set di schede interattive!",
+    "generateFirstFlashcards": "Genera le tue prime schede",
+    "accessLater": "Puoi sempre accedere a questo dalla pagina principale",
+    "unlimitedFlashcards": "Genera schede illimitate in qualsiasi lingua",
+    "trackProgress": "Traccia i tuoi progressi e livelli di padronanza",
+    "syncDevices": "Sincronizza automaticamente su tutti i tuoi dispositivi"
   }
 } 

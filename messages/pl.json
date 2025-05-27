@@ -215,5 +215,17 @@
       "email": "Email"
     },
     "lastUpdate": "Ostatnia aktualizacja"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "Brak dostępnych fiszek. Utwórz nowe fiszki, aby rozpocząć naukę.",
+    "startLearningButton": "Rozpocznij naukę już teraz generując to co chcesz",
+    "welcomeTitle": "Witamy w Languito!",
+    "welcomeSubtitle": "Twoje konto zostało pomyślnie utworzone! 🎉",
+    "welcomeDescription": "Jesteś teraz gotowy, aby rozpocząć swoją podróż w nauce języków. Stwórzmy Twój pierwszy zestaw interaktywnych fiszek!",
+    "generateFirstFlashcards": "Wygeneruj swoje pierwsze fiszki",
+    "accessLater": "Zawsze możesz uzyskać do tego dostęp ze strony głównej",
+    "unlimitedFlashcards": "Generuj nieograniczoną liczbę fiszek w dowolnym języku",
+    "trackProgress": "Śledź swoje postępy i poziomy opanowania",
+    "syncDevices": "Synchronizuj automatycznie na wszystkich swoich urządzeniach"
   }
 } 

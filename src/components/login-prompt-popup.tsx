@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
 interface LoginPromptPopupProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export function LoginPromptPopup({
 }: LoginPromptPopupProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(isOpen);
+  const { isDemoMode, exitDemoMode } = useDemoMode();
 
   useEffect(() => {
     setIsVisible(isOpen);
@@ -46,20 +48,32 @@ export function LoginPromptPopup({
 
   const handleSignIn = () => {
     try {
-      // Ustawienie wartości w sessionStorage potrzebnych do importu fiszek
-      sessionStorage.setItem("flashcardsToImport", "true");
-      sessionStorage.setItem("directRedirectAfterImport", "true");
-      // Zmiana przekierowania na stronę importu fiszek
-      router.push("/sign-in?redirect=/import-guest-flashcards");
+      if (isDemoMode) {
+        // Demo mode flow - exit demo and redirect to sign-in
+        exitDemoMode();
+        router.push("/sign-in");
+      } else {
+        // Guest mode flow - import flashcards
+        sessionStorage.setItem("flashcardsToImport", "true");
+        sessionStorage.setItem("directRedirectAfterImport", "true");
+        router.push("/sign-in?redirect=/import-guest-flashcards");
+      }
     } catch (error) {
-      console.error("Error preparing for import:", error);
+      console.error("Error preparing for sign in:", error);
     }
     onClose();
   };
 
   const handleSignUp = () => {
-    window.location.href =
-      "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
+    if (isDemoMode) {
+      // Demo mode flow - exit demo and redirect to sign-up
+      exitDemoMode();
+      window.location.href = "https://nearby-mackerel-82.accounts.dev/sign-up";
+    } else {
+      // Guest mode flow - import flashcards
+      window.location.href =
+        "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
+    }
     onClose();
   };
 
