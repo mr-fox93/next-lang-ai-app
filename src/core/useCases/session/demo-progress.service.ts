@@ -6,6 +6,7 @@
 
 export interface DemoProgress {
   flashcardId: number;
+  category: string;
   correctAnswers: number;
   incorrectAnswers: number;
   masteryLevel: number;
@@ -14,7 +15,7 @@ export interface DemoProgress {
 
 export interface DemoProgressService {
   getProgress(): Record<number, DemoProgress>;
-  updateProgress(flashcardId: number, isCorrect: boolean): void;
+  updateProgress(flashcardId: number, category: string, isCorrect: boolean): void;
   getReviewedTodayCount(): number;
   getDailyGoal(): number;
   setDailyGoal(goal: number): void;
@@ -40,12 +41,13 @@ class LocalStorageDemoProgressService implements DemoProgressService {
     }
   }
 
-  updateProgress(flashcardId: number, isCorrect: boolean): void {
+  updateProgress(flashcardId: number, category: string, isCorrect: boolean): void {
     if (!this.isClient()) return;
     
     const allProgress = this.getProgress();
     const current = allProgress[flashcardId] || {
       flashcardId,
+      category,
       correctAnswers: 0,
       incorrectAnswers: 0,
       masteryLevel: 0,

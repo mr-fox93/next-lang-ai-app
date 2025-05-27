@@ -15,7 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useTranslations } from 'next-intl';
 import { ProgressTopBar } from "@/components/ui/progress-top-bar";
-import { useDemoMode, enhanceStatsWithDemoProgress, getReviewedTodayCount, setDemoDailyGoal } from "@/hooks/useDemoMode";
+import { useDemoMode, useDemoProgressUpdates, setDemoDailyGoal } from "@/hooks/useDemoMode";
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
@@ -37,6 +37,9 @@ export function ProgressDashboard({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const { isDemoMode, isLoading } = useDemoMode();
+  
+  // Use the new hook for demo progress updates
+  const demoProgressData = useDemoProgressUpdates(initialStats);
 
   useEffect(() => {
     const originalStyles = {
@@ -60,22 +63,18 @@ export function ProgressDashboard({
     };
   }, []);
 
-  // Enhance stats with demo progress if in demo mode
+  // Update stats based on demo mode
   useEffect(() => {
     if (isDemoMode) {
-      const enhancedStats = enhanceStatsWithDemoProgress(initialStats);
-      setStats(enhancedStats);
-      setDailyGoal(enhancedStats.dailyGoal || 10);
-      
-      // Get reviewed today count from localStorage
-      const demoReviewedToday = getReviewedTodayCount();
-      setReviewedToday(demoReviewedToday);
+      setStats(demoProgressData.stats);
+      setDailyGoal(demoProgressData.stats.dailyGoal || 10);
+      setReviewedToday(demoProgressData.reviewedToday);
     } else {
       setStats(initialStats);
       setReviewedToday(initialReviewedToday);
       setDailyGoal(initialStats.dailyGoal || 10);
     }
-  }, [isDemoMode, initialStats, initialReviewedToday]);
+  }, [isDemoMode, initialStats, initialReviewedToday, demoProgressData]);
 
   const handleDailyGoalChange = async (value: string) => {
     const newGoal = parseInt(value, 10);
