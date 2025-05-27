@@ -102,7 +102,7 @@ export function MultipleChoiceAnswers({
       try {
         // If in demo mode, save to localStorage instead of server
         if (isDemoMode) {
-          updateDemoProgress(flashcardId, isCorrect);
+          updateDemoProgress(flashcardId, card.category, isCorrect);
           // No need to show success message for demo mode
           return;
         }

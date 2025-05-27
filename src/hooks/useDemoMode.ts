@@ -52,13 +52,66 @@ export function useDemoMode() {
   };
 }
 
+/**
+ * Hook for listening to demo progress changes
+ * Uses custom event instead of polling for better performance
+ */
+export function useDemoProgressUpdates(initialStats: UserProgressStats) {
+  const [stats, setStats] = useState<UserProgressStats>(initialStats);
+  const [reviewedToday, setReviewedToday] = useState(0);
+
+  const updateStats = useCallback(() => {
+    const enhancedStats = enhanceStatsWithDemoProgress(initialStats);
+    setStats(enhancedStats);
+    
+    const demoReviewedToday = getReviewedTodayCount();
+    setReviewedToday(demoReviewedToday);
+  }, [initialStats]);
+
+  useEffect(() => {
+    // Initial update
+    updateStats();
+
+    // Listen for custom demo progress events
+    const handleDemoProgressUpdate = () => {
+      updateStats();
+    };
+
+    // Listen for storage events (changes from other tabs)
+    window.addEventListener('storage', handleDemoProgressUpdate);
+    
+    // Listen for custom events (same-tab changes)
+    window.addEventListener('demoProgressUpdate', handleDemoProgressUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleDemoProgressUpdate);
+      window.removeEventListener('demoProgressUpdate', handleDemoProgressUpdate);
+    };
+  }, [updateStats]);
+
+  return { stats, reviewedToday };
+}
+
 // Re-export demo progress service functions for convenience
 export const getDemoProgress = () => demoProgressService.getProgress();
-export const updateDemoProgress = (flashcardId: number, isCorrect: boolean) => 
-  demoProgressService.updateProgress(flashcardId, isCorrect);
+export const updateDemoProgress = (flashcardId: number, category: string, isCorrect: boolean) => {
+  demoProgressService.updateProgress(flashcardId, category, isCorrect);
+  
+  // Dispatch custom event to notify components
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('demoProgressUpdate'));
+  }
+};
 export const getReviewedTodayCount = () => demoProgressService.getReviewedTodayCount();
 export const getDemoDailyGoal = () => demoProgressService.getDailyGoal();
-export const setDemoDailyGoal = (goal: number) => demoProgressService.setDailyGoal(goal);
+export const setDemoDailyGoal = (goal: number) => {
+  demoProgressService.setDailyGoal(goal);
+  
+  // Dispatch custom event to notify components
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('demoProgressUpdate'));
+  }
+};
 
 // Enhanced stats calculation using the service
 export function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): UserProgressStats {
@@ -73,16 +126,14 @@ export function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): Us
   
   // Enhance categories with localStorage progress
   const enhancedCategories: CategoryProgress[] = serverStats.categories.map(category => {
+    // Find progress entries for this specific category
+    const categoryProgress = Object.values(progress).filter(p => p.category === category.name);
+    
     let mastered = 0;
     let inProgress = 0;
     let totalMasteryLevel = 0;
-    let progressCount = 0;
     
-    // Count progress for this category
-    // Note: This is simplified since we don't store category in progress
-    // In a real implementation, we'd need to store category info or flashcard IDs
-    Object.values(progress).forEach(p => {
-      progressCount++;
+    categoryProgress.forEach(p => {
       totalMasteryLevel += p.masteryLevel;
       
       if (p.masteryLevel >= 5) {
@@ -92,22 +143,19 @@ export function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): Us
       }
     });
     
-    // Distribute progress proportionally across categories
-    const categoryRatio = category.total / serverStats.totalFlashcards;
-    const categoryMastered = Math.round(mastered * categoryRatio);
-    const categoryInProgress = Math.round(inProgress * categoryRatio);
-    const categoryUntouched = category.total - categoryMastered - categoryInProgress;
+    const untouched = category.total - mastered - inProgress;
+    const averageMasteryLevel = categoryProgress.length > 0 ? totalMasteryLevel / categoryProgress.length : 0;
     
-    totalMastered += categoryMastered;
-    totalInProgress += categoryInProgress;
-    totalUntouched += categoryUntouched;
+    totalMastered += mastered;
+    totalInProgress += inProgress;
+    totalUntouched += untouched;
     
     return {
       ...category,
-      mastered: categoryMastered,
-      inProgress: categoryInProgress,
-      untouched: Math.max(0, categoryUntouched),
-      averageMasteryLevel: progressCount > 0 ? totalMasteryLevel / progressCount : 0,
+      mastered,
+      inProgress,
+      untouched: Math.max(0, untouched),
+      averageMasteryLevel,
     };
   });
   
@@ -137,12 +185,9 @@ export function getMasteredCategoriesFromDemo(serverStats: UserProgressStats): s
     .filter(category => {
       // Find all flashcards in this category and check if all are mastered
       const categoryFlashcards = Object.values(progress).filter(p => 
-        // We need to match by category somehow - this is a limitation
-        // For now, we'll use a simple heuristic
-        p.masteryLevel >= 5
+        p.category === category.name && p.masteryLevel >= 5
       );
       
-      // This is simplified - in real implementation we'd need category info in progress
       return category.total > 0 && categoryFlashcards.length >= category.total;
     })
     .map(category => category.name);
