@@ -8,18 +8,12 @@ import {
 } from "@/lib/container";
 import prisma from "@/lib/prisma";
 import { ProgressActionResult } from "@/types/progress";
-import { cookies } from "next/headers";
 import { CategoryProgress } from "@/types/progress";
+import { isDemoMode } from "@/lib/demo-helpers";
 
 interface UpdateProgressActionParams {
   flashcardId: number;
   isCorrect: boolean;
-}
-
-// Helper function to check if in demo mode
-async function isDemoMode(): Promise<boolean> {
-  const cookieStore = await cookies();
-  return cookieStore.get('demo_mode')?.value === 'true';
 }
 
 // Helper function to get demo progress from localStorage (client-side only)

@@ -10,19 +10,13 @@ import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFla
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { getFlashcardsPrompt } from "@/lib/prompts";
 import { PrismaClient } from "@prisma/client";
-import { cookies } from "next/headers";
+import { isDemoMode } from "@/lib/demo-helpers";
 import { 
   ImportableFlashcard, 
   FlashcardGenerationResponse, 
   GenerateFlashcardsActionParams,
   AIFlashcardGenerator 
 } from "@/types/flashcard";
-
-// Helper function to check if in demo mode
-async function isDemoMode(): Promise<boolean> {
-  const cookieStore = await cookies();
-  return cookieStore.get('demo_mode')?.value === 'true';
-}
 
 export async function generateFlashcardsAction(
   params: GenerateFlashcardsActionParams
