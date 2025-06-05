@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { generateMoreGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface GuestFlashcardsViewProps {
-  initialFlashcards: Flashcard[];
+  initialFlashcards?: Flashcard[];
   serverError?: string;
   initialCategory?: string | null;
   progressStats?: {
@@ -30,7 +30,7 @@ interface GuestFlashcardsViewProps {
 }
 
 export default function GuestFlashcardsView({
-  initialFlashcards,
+  initialFlashcards = [],
   serverError,
   initialCategory,
   progressStats,
