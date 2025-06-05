@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Flashcard } from "@/core/entities/Flashcard";
@@ -36,7 +36,7 @@ import {
   generateMoreFlashcardsAction,
   generateMoreGuestFlashcardsAction,
 } from "@/app/actions/flashcard-actions";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useToast } from "@/components/ui/use-toast";
 import {

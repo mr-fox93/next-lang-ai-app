@@ -5,7 +5,7 @@ import { useUser, UserButton, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { PanelLeftOpen, LogOut, Save } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ProgressPreview } from "@/components/progress-preview";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { UserProgressStats } from "@/types/progress";

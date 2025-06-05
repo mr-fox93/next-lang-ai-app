@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
-import { Button } from "@/components/ui/button";
-import { Grid, Maximize2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Flashcard } from "@/core/entities/Flashcard";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
+import { Grid, Maximize2, Sparkles } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { TopBar } from "@/components/ui/top-bar";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
@@ -17,7 +19,6 @@ import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { WelcomeNewUserModal } from "@/components/welcome-new-user-modal";
 import { useDemoMode } from "@/hooks";
-import { useUser } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 
 interface FlashcardsViewProps {

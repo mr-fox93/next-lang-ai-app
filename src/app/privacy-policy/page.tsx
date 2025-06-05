@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getLocale } from '@/i18n/server';
 
-export default function PrivacyPolicyPage() {
-  const locale = getLocale();
+export default async function PrivacyPolicyRedirectPage() {
+  const locale = await getLocale();
   redirect(`/${locale}/privacy-policy`);
 } 
