@@ -21,7 +21,7 @@ interface ProgressDashboardProps {
   initialReviewedToday: number;
 }
 
-export function ProgressDashboard({
+export default function ProgressDashboard({
   initialStats,
   initialReviewedToday,
 }: ProgressDashboardProps) {
