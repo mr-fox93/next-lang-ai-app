@@ -1,16 +1,5 @@
 import { Flashcard } from "@/core/entities/Flashcard";
-
-// Definiuję interfejs dla ImportableFlashcard, aby uniknąć zależności od pliku actions.ts
-interface ImportableFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-}
+import { ImportableFlashcard } from "@/types/flashcard";
 
 const GUEST_FLASHCARDS_KEY = "guest_flashcards";
 

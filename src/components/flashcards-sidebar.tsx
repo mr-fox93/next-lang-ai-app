@@ -50,8 +50,7 @@ import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
-
-export type SidebarVariant = "authenticated" | "demo" | "guest";
+import { SidebarVariant } from "@/types/component-props";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;

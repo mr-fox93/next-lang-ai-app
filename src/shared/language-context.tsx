@@ -1,142 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  Language, 
+  Translations, 
+  LanguageContextType 
+} from '@/types/locale';
 
-type Language = "pl" | "en";
-
-// Typy dla tłumaczeń
-interface CookieTranslations {
-  title: string;
-  description: string;
-  necessary: string;
-  necessaryDesc: string;
-  showDetails: string;
-  hideDetails: string;
-  acceptAll: string;
-  onlyNecessary: string;
-}
-
-interface FooterTranslations {
-  allRightsReserved: string;
-  contact: string;
-  privacyPolicy: string;
-  termsOfUse: string;
-  cookieSettings: string;
-}
-
-interface PrivacyPolicyTranslations {
-  title: string;
-  backHome: string;
-  intro: {
-    title: string;
-    content: string;
-  };
-  dataCollection: {
-    title: string;
-    content: string;
-    accountData: string;
-    accountDataDesc: string;
-    userContent: string;
-    userContentDesc: string;
-    tempData: string;
-    tempDataDesc: string;
-  };
-  cookies: {
-    title: string;
-    content: string;
-    necessaryCookies: string;
-    necessaryCookiesDesc: string;
-    localStorageTitle: string;
-    localStorageDesc: string;
-    noCookies: string;
-  };
-  externalServices: {
-    title: string;
-    content: string;
-    clerk: string;
-    clerkDesc: string;
-    openai: string;
-    openaiDesc: string;
-    vercel: string;
-    vercelDesc: string;
-    policy: string;
-  };
-  dataStorage: {
-    title: string;
-    accountData: string;
-    guestData: string;
-  };
-  changes: {
-    title: string;
-    content: string;
-  };
-  contact: {
-    title: string;
-    content: string;
-    email: string;
-  };
-  lastUpdate: string;
-}
-
-interface TermsTranslations {
-  title: string;
-  backHome: string;
-  intro: {
-    title: string;
-    content: string;
-  };
-  accounts: {
-    title: string;
-    content: string;
-  };
-  allowedUse: {
-    title: string;
-    content: string;
-    item1: string;
-    item2: string;
-    item3: string;
-  };
-  userContent: {
-    title: string;
-    content: string;
-  };
-  changes: {
-    title: string;
-    content: string;
-  };
-  contact: {
-    title: string;
-    content: string;
-    email: string;
-  };
-  lastUpdate: string;
-}
-
-interface Translations {
-  cookie: {
-    en: CookieTranslations;
-    pl: CookieTranslations;
-  };
-  footer: {
-    en: FooterTranslations;
-    pl: FooterTranslations;
-  };
-  privacyPolicy: {
-    en: PrivacyPolicyTranslations;
-    pl: PrivacyPolicyTranslations;
-  };
-  terms: {
-    en: TermsTranslations;
-    pl: TermsTranslations;
-  };
-}
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  translations: Translations;
-}
-
+// Translation data would be imported or defined here
 const defaultTranslations: Translations = {
   cookie: {
     en: {
@@ -362,7 +233,7 @@ const LanguageContext = createContext<LanguageContextType>({
 
 export const useLanguage = () => useContext(LanguageContext);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
 
   useEffect(() => {

@@ -6,8 +6,7 @@ import { Globe, ChevronDown } from "lucide-react";
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
-
-type Locale = 'en' | 'pl' | 'es' | 'it';
+import { Locale } from '@/types/locale';
 
 const localeNames = {
   en: 'English',

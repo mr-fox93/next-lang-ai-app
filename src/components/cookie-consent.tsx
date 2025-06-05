@@ -5,25 +5,20 @@ import { X, Shield, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from 'next-intl';
+import type { 
+  CookieConsent, 
+  CookieConsentContextType 
+} from "@/types/component-props";
 
-type CookieConsent = {
-  necessary: boolean;
-  accepted: boolean;
+const CookieConsentContext = createContext<CookieConsentContextType | undefined>(undefined);
+
+export const useCookieConsent = (): CookieConsentContextType => {
+  const context = useContext(CookieConsentContext);
+  if (context === undefined) {
+    throw new Error('useCookieConsent must be used within a CookieConsentProvider');
+  }
+  return context;
 };
-
-// Tworzymy kontekst dla banera cookie
-interface CookieConsentContextType {
-  openBanner: () => void;
-  consent: CookieConsent | null;
-}
-
-const CookieConsentContext = createContext<CookieConsentContextType>({
-  openBanner: () => {},
-  consent: null,
-});
-
-// Hook do używania kontekstu
-export const useCookieConsent = () => useContext(CookieConsentContext);
 
 // Komponent Provider, który będzie opakowywał aplikację
 export function CookieConsentProvider({ children }: { children: React.ReactNode }) {

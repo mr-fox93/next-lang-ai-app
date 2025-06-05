@@ -11,8 +11,7 @@ import { createPortal } from 'react-dom';
 import { DemoModeLoader } from "@/components/ui/demo-mode-loader";
 import type React from "react";
 import { useDemoMode } from '@/hooks';
-
-type Locale = 'en' | 'pl' | 'es' | 'it';
+import { Locale } from '@/types/locale';
 
 const localeNames = {
   en: 'English',

@@ -11,41 +11,17 @@ import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlash
 import { getFlashcardsPrompt } from "@/lib/prompts";
 import { PrismaClient } from "@prisma/client";
 import { cookies } from "next/headers";
+import { 
+  ImportableFlashcard, 
+  FlashcardGenerationResponse, 
+  GenerateFlashcardsActionParams,
+  AIFlashcardGenerator 
+} from "@/types/flashcard";
 
 // Helper function to check if in demo mode
 async function isDemoMode(): Promise<boolean> {
   const cookieStore = await cookies();
   return cookieStore.get('demo_mode')?.value === 'true';
-}
-
-interface ImportableFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-}
-
-interface GenerateFlashcardsActionParams {
-  count: number;
-  message: string;
-  level: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-}
-
-interface FlashcardGenerationResponse {
-  success: boolean;
-  flashcards?: ImportableFlashcard[];
-  error?: string;
-  redirect?: string;
-}
-
-interface AIFlashcardGenerator {
-  generateFlashcardsWithAI(prompt: string): Promise<Record<string, string>[]>;
 }
 
 export async function generateFlashcardsAction(

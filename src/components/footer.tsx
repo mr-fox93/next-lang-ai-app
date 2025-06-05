@@ -8,8 +8,7 @@ import { useContactModal } from "@/shared/contact-modal-context";
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
-
-type Locale = 'en' | 'pl' | 'es' | 'it';
+import { Locale } from '@/types/locale';
 
 const localeNames = {
   en: 'English',

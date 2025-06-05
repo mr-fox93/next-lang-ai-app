@@ -10,6 +10,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { ErrorMessage } from "@/shared/ui/error-message";
+import type { LanguageSettings } from '@/types/component-props';
 
 const LANGUAGES = [
   { code: "pl", name: "Polish" },
@@ -23,12 +24,6 @@ const DIFFICULTY_LEVELS = [
   { value: "advanced", label: "Advanced" },
   { value: "pro", label: "Expert" },
 ] as const;
-
-export type LanguageSettings = {
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-};
 
 type LanguageSettingsProps = {
   onChange?: (settings: LanguageSettings) => void;
