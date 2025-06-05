@@ -10,6 +10,6 @@ export async function getLocale(): Promise<string> {
   } catch (error) {
     // Fallback to default locale if getting current locale fails
     console.warn('Failed to get current locale, falling back to default:', error);
-    return defaultLocale;
+  return defaultLocale;
   }
 } 

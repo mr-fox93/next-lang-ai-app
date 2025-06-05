@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
 import { useState, useEffect } from "react";
-import { ContactFormModal } from "@/components/contact-form-modal";
+import { useContactModal } from "@/shared/contact-modal-context";
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
 export default function PrivacyPolicyClient() {
   const router = useRouter();
   const t = useTranslations('PrivacyPolicy');
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const { openContactModal } = useContactModal();
   const [formattedDate, setFormattedDate] = useState("");
 
   // Ustawiamy datę tylko po stronie klienta, aby uniknąć błędu hydratacji
@@ -116,7 +116,7 @@ export default function PrivacyPolicyClient() {
                 <p>{t('contact.content')}</p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
                   <Button 
-                    onClick={() => setIsContactModalOpen(true)}
+                    onClick={openContactModal}
                     className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white shadow-md transition duration-300 ease-in-out transform hover:scale-105"
                   >
                     {t('contact.contactUs')}
@@ -133,11 +133,6 @@ export default function PrivacyPolicyClient() {
           </motion.div>
         </div>
       </main>
-      
-      <ContactFormModal 
-        isOpen={isContactModalOpen} 
-        onOpenChange={setIsContactModalOpen} 
-      />
     </div>
   );
 } 

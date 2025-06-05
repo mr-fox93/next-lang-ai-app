@@ -227,5 +227,27 @@
     "unlimitedFlashcards": "Generate unlimited flashcards in any language",
     "trackProgress": "Track your progress and mastery levels",
     "syncDevices": "Sync across all your devices automatically"
+  },
+  "ContactForm": {
+    "title": "Contact Us",
+    "description": "Have a question or feedback? We'd love to hear from you!",
+    "nameLabel": "Your Name",
+    "emailLabel": "Your Email",
+    "messageLabel": "Your Message",
+    "messagePlaceholder": "What would you like to let us know?",
+    "cancel": "Cancel",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "aiChecking": "AI is checking your message...",
+    "successTitle": "Success!",
+    "thankYou": "Thank you!",
+    "messageSent": "Your message has been sent successfully. We'll get back to you as soon as possible.",
+    "backButton": "Back to site",
+    "error": "Error",
+    "errorGeneric": "There was a problem sending your message. Please try again later.",
+    "errorNoApiKey": "Email service is not configured properly. Please contact the administrator.",
+    "errorInvalidEmail": "There was a problem with the email address. Please check and try again.",
+    "emailValidationError": "Please enter a valid email address.",
+    "offensiveContentError": "Your message contains content that may violate our community guidelines. Please revise and focus on technical issues or feedback about the application."
   }
 } 

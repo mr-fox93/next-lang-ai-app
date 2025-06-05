@@ -14,7 +14,7 @@ export default async function GuestFlashcardPage({ params }: { params: Promise<{
   
   // Enable static rendering
   setRequestLocale(locale);
-
+  
   return (
     <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader /></div>}>
       <GuestFlashcardView />
