@@ -495,7 +495,7 @@ export function FlashcardsSidebar({
           // On mobile: completely hide when collapsed, on desktop: show narrow version
           isCollapsed 
             ? "w-0 md:w-[60px]" 
-            : "w-[280px]"
+            : "w-[350px]"
         )}
       >
         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
@@ -704,23 +704,29 @@ export function FlashcardsSidebar({
           <div className="p-2 space-y-1">
             {displayedCategories.length > 0 ? (
               displayedCategories.map((category) => (
-                <div key={category} className="flex items-center space-x-2">
+                <div key={category} className="flex items-center gap-2 w-full">
                   <Button
                     variant="ghost"
                     className={cn(
-                      "flex-1 justify-start mb-1 relative group overflow-hidden transition-all duration-300",
+                      "flex-1 min-w-0 justify-start mb-1 relative group overflow-hidden transition-all duration-300 pr-2",
                       selectedCategory === category
                         ? "bg-purple-500/20 text-white hover:bg-purple-500/30"
                         : "text-gray-400 hover:text-white hover:bg-white/5"
                     )}
                     onClick={() => onSelectCategory(category)}
+                    title={!isCollapsed ? category : undefined}
                   >
-                    {!isCollapsed && masteredCategories.includes(category) && (
-                      <CheckCircle className="h-4 w-4 mr-2 text-green-400" />
-                    )}
-                    <span className="relative z-10 truncate">
-                      {isCollapsed ? category.charAt(0) : category}
-                    </span>
+                    <div className="flex items-center min-w-0 w-full">
+                      {!isCollapsed && masteredCategories.includes(category) && (
+                        <CheckCircle className="h-4 w-4 mr-2 text-green-400 flex-shrink-0" />
+                      )}
+                      <span className={cn(
+                        "relative z-10 block text-sm",
+                        isCollapsed ? "text-center w-full" : "truncate min-w-0"
+                      )}>
+                        {isCollapsed ? category.charAt(0) : category}
+                      </span>
+                    </div>
                     {selectedCategory === category && (
                       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
                     )}
@@ -731,11 +737,11 @@ export function FlashcardsSidebar({
                   </Button>
 
                   {!isCollapsed && (
-                    <>
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-green-400 hover:bg-green-500/10"
+                        className="h-8 w-8 min-w-[32px] p-0 text-gray-400 hover:text-green-400 hover:bg-green-500/10 flex-shrink-0"
                         onClick={(e) => handleGenerateClick(category, e)}
                         title={t('addMoreFlashcards')}
                         disabled={
@@ -750,13 +756,13 @@ export function FlashcardsSidebar({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 min-w-8 p-0 shrink-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                        className="h-8 w-8 min-w-[32px] p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10 flex-shrink-0"
                         onClick={(e) => handleDeleteCategory(category, e)}
                         title={t('deleteCategory')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               ))
