@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { checkSessionState } from "../../import-guest-flashcards/actions";
-import ImportGuestFlashcardsView from "../../import-guest-flashcards/view";
+import ImportGuestFlashcardsView from "./view";
 import { Loader } from "@/components/ui/loader";
 import { setRequestLocale } from 'next-intl/server';
 import { locales } from '@/i18n/routing';
@@ -15,8 +14,6 @@ export default async function ImportGuestFlashcardsPage({ params }: { params: Pr
   
   // Enable static rendering
   setRequestLocale(locale);
-  
-  await checkSessionState();
 
   return (
     <Suspense

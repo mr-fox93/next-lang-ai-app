@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
 import { TopBar } from "@/components/ui/top-bar";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
@@ -18,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { generateMoreGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface GuestFlashcardsViewProps {
-  initialFlashcards: Flashcard[];
+  initialFlashcards?: Flashcard[];
   serverError?: string;
   initialCategory?: string | null;
   progressStats?: {
@@ -29,7 +30,7 @@ interface GuestFlashcardsViewProps {
 }
 
 export default function GuestFlashcardsView({
-  initialFlashcards,
+  initialFlashcards = [],
   serverError,
   initialCategory,
   progressStats,

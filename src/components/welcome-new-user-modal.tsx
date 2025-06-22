@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -9,9 +12,6 @@ import {
   Target,
   Zap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 interface WelcomeNewUserModalProps {
   isOpen: boolean;

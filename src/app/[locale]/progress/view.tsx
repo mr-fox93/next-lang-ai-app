@@ -7,8 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Award, BookOpen, ChevronRight, Star, Clock, ArrowUpRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Link } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import { UserProgressStats } from "@/types/progress";
 import { updateDailyGoalAction } from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,7 +21,7 @@ interface ProgressDashboardProps {
   initialReviewedToday: number;
 }
 
-export function ProgressDashboard({
+export default function ProgressDashboard({
   initialStats,
   initialReviewedToday,
 }: ProgressDashboardProps) {

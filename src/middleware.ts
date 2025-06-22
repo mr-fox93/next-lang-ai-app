@@ -6,9 +6,6 @@ import { demoModeService } from './core/useCases/session';
 // Create the next-intl middleware
 const handleI18nRouting = createMiddleware(routing);
 
-// Optional: Create a route matcher for protected routes
-// const isProtectedRoute = createRouteMatcher(['/(.*)dashboard(.*)']);
-
 export default clerkMiddleware((auth, req) => {
   // Handle demo mode auto-logout logic
   const cookies = req.headers.get('cookie') || '';
@@ -24,11 +21,6 @@ export default clerkMiddleware((auth, req) => {
     
     return response;
   }
-
-  // Optional: Protect specific routes
-  // if (isProtectedRoute(req)) {
-  //   return auth.protect();
-  // }
 
   return handleI18nRouting(req);
 });

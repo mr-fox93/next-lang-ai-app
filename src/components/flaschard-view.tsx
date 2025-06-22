@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { speak, SupportedTTSLanguage } from "@/utils/speak";
+import { speak } from "@/utils/speak";
+import { SupportedTTSLanguage } from "@/types/locale";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
 

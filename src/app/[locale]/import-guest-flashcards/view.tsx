@@ -15,17 +15,7 @@ import { AlertCircle, Loader } from "lucide-react";
 import { FlashcardImportAnimation } from "@/components/flashcard-import-animation";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { importGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
-
-interface ImportableFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-}
+import { ImportableFlashcard } from "@/types/flashcard";
 
 export default function ImportGuestFlashcardsView() {
   const [isImporting, setIsImporting] = useState(false);

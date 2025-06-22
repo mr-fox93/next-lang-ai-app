@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Layers, Cpu, Sparkles } from "lucide-react";
+import { Layers, Cpu, Sparkles, Zap } from "lucide-react";
 
 const demoSteps = [
   "Initializing demo environment...",
@@ -17,7 +17,7 @@ export function DemoModeLoader() {
   useEffect(() => {
     const stepInterval = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % demoSteps.length);
-    }, 1200);
+    }, 1500);
 
     return () => {
       clearInterval(stepInterval);
@@ -25,33 +25,78 @@ export function DemoModeLoader() {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center">
+      {/* Animated Background Particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [-20, -40, -20],
+              opacity: [0.3, 0.8, 0.3],
+              scale: [0.5, 1.2, 0.5],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+
       {/* Modal Container */}
       <motion.div
-        className="bg-black/90 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="relative bg-black/95 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-10 max-w-lg w-full mx-4 shadow-2xl shadow-purple-500/10"
+        initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
+        {/* Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 rounded-3xl blur-xl"></div>
+        
         {/* Header with Logo */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="relative flex items-center justify-center mb-10">
           <motion.div
-            className="flex items-center space-x-3"
-            initial={{ opacity: 0, y: -10 }}
+            className="flex items-center space-x-4"
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
             <div className="relative">
-              <Layers className="w-8 h-8 text-purple-500" />
-              <Cpu className="w-4 h-4 text-pink-500 absolute -bottom-1 -right-1" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                <Layers className="w-10 h-10 text-purple-400" />
+              </motion.div>
+              <motion.div
+                className="absolute -bottom-1 -right-1"
+                animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Cpu className="w-5 h-5 text-pink-400" />
+              </motion.div>
             </div>
             <div className="flex flex-col">
-              <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400">
                 Languito
               </h3>
               <motion.span 
-                className="text-xs font-medium text-purple-400 bg-purple-500/20 px-2 py-0.5 rounded-full text-center"
-                animate={{ opacity: [0.7, 1, 0.7] }}
+                className="text-sm font-semibold text-purple-300 bg-gradient-to-r from-purple-500/30 to-pink-500/30 px-3 py-1 rounded-full text-center border border-purple-400/30"
+                animate={{ 
+                  boxShadow: [
+                    "0 0 0 0 rgba(168, 85, 247, 0.4)",
+                    "0 0 20px 0 rgba(168, 85, 247, 0.4)",
+                    "0 0 0 0 rgba(168, 85, 247, 0.4)"
+                  ]
+                }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 DEMO MODE
@@ -60,46 +105,34 @@ export function DemoModeLoader() {
           </motion.div>
         </div>
 
-        {/* Main Visual Animation - Morphing Geometric Loader */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative w-24 h-24 mb-6">
-            {/* Morphing geometric shapes */}
+        {/* Main Loading Animation */}
+        <div className="relative flex flex-col items-center mb-10">
+          {/* Central Rotating Ring */}
+          <div className="relative w-32 h-32 mb-8">
+            {/* Outer Ring */}
             <motion.div
-              className="absolute inset-0 border-2 border-purple-500/60"
-              animate={{
-                borderRadius: ["0%", "50%", "25%", "0%"],
-                rotate: [0, 90, 180, 270, 360],
-                scale: [1, 1.1, 0.9, 1.1, 1],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              className="absolute inset-0 border-2 border-purple-400/40 rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             />
             
-            {/* Inner morphing shape */}
+            {/* Middle Ring */}
             <motion.div
-              className="absolute inset-3 bg-gradient-to-r from-purple-500/40 to-pink-500/40"
-              animate={{
-                borderRadius: ["50%", "0%", "50%", "25%", "50%"],
-                rotate: [360, 270, 180, 90, 0],
-                scale: [0.8, 1.2, 0.6, 1.1, 0.8],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              }}
+              className="absolute inset-2 border-2 border-pink-400/60 rounded-full"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             />
-
-            {/* Central pulsing core */}
+            
+            {/* Inner Core */}
             <motion.div
-              className="absolute inset-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center"
+              className="absolute inset-6 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 rounded-full flex items-center justify-center"
               animate={{
-                scale: [1, 1.3, 0.7, 1.2, 1],
-                opacity: [0.8, 1, 0.6, 1, 0.8],
+                scale: [1, 1.1, 1],
+                boxShadow: [
+                  "0 0 20px rgba(168, 85, 247, 0.5)",
+                  "0 0 40px rgba(236, 72, 153, 0.7)",
+                  "0 0 20px rgba(168, 85, 247, 0.5)"
+                ]
               }}
               transition={{
                 duration: 2,
@@ -107,101 +140,49 @@ export function DemoModeLoader() {
                 ease: "easeInOut"
               }}
             >
-              <Sparkles className="w-4 h-4 text-white" />
+              <motion.div
+                animate={{ rotate: [0, 180, 360] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-6 h-6 text-white" />
+              </motion.div>
             </motion.div>
 
-            {/* Orbiting particles */}
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 bg-purple-400 rounded-full"
-                style={{
-                  top: "50%",
-                  left: "50%",
-                  transform: `translate(-50%, -50%) translateX(${30 + i * 5}px)`,
-                }}
-                animate={{
-                  rotate: [0, 360],
-                  scale: [0.5, 1.5, 0.5],
-                  opacity: [0.3, 1, 0.3],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.5,
-                  ease: "linear"
-                }}
-              />
-            ))}
-          </div>
 
-          {/* DNA Helix-like animation */}
-          <div className="relative w-full h-12 mb-4">
-            {[...Array(8)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-3 h-3 rounded-full"
-                style={{
-                  left: `${10 + i * 10}%`,
-                  background: `linear-gradient(45deg, ${i % 2 === 0 ? '#a855f7' : '#ec4899'}, ${i % 2 === 0 ? '#ec4899' : '#a855f7'})`,
-                }}
-                animate={{
-                  y: [0, -20, 0, 20, 0],
-                  scale: [0.8, 1.2, 0.8],
-                  opacity: [0.4, 1, 0.4],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
           </div>
         </div>
 
         {/* Status Text */}
-        <div className="text-center mb-6">
+        <div className="relative text-center mb-6">
           <AnimatePresence mode="wait">
-            <motion.p
+            <motion.div
               key={currentStep}
-              className="text-white/80 text-sm"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
             >
-              {demoSteps[currentStep]}
-            </motion.p>
+              <p className="text-white text-lg font-medium">
+                {demoSteps[currentStep]}
+              </p>
+            </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Floating particles effect */}
-        <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -40, 0],
-                x: [0, Math.random() * 30 - 15, 0],
-                opacity: [0, 1, 0],
-                scale: [0, 2, 0],
-              }}
-              transition={{
-                duration: Math.random() * 5 + 4,
-                repeat: Infinity,
-                delay: Math.random() * 3,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
+        {/* Bottom Enhancement */}
+        <div className="relative flex justify-center">
+          <motion.div
+            className="flex items-center space-x-2 text-purple-300 text-sm"
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Zap className="w-4 h-4" />
+            <span>Powered by AI</span>
+          </motion.div>
         </div>
+
+        {/* Subtle Border Glow */}
+        <div className="absolute inset-0 rounded-3xl border border-purple-400/20 pointer-events-none"></div>
       </motion.div>
     </div>
   );

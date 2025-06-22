@@ -5,10 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import { LayoutTemplate } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
-import {
-  LanguageSettings,
-  type LanguageSettings as LanguageSettingsType,
-} from "@/components/language-settings";
+import { LanguageSettings as LanguageSettingsComponent } from "@/components/language-settings";
+import type { LanguageSettings } from "@/types/component-props";
 import { useState, useEffect } from "react";
 import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { useRouter } from '@/i18n/navigation';
@@ -28,7 +26,7 @@ export default function Hero() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [languageSettings, setLanguageSettings] =
-    useState<LanguageSettingsType>({
+    useState<LanguageSettings>({
       sourceLanguage: "pl",
       targetLanguage: "en",
       difficultyLevel: "easy",
@@ -137,7 +135,7 @@ export default function Hero() {
             {t('subtitle')}
           </motion.p>
 
-          <LanguageSettings onChange={setLanguageSettings} />
+          <LanguageSettingsComponent onChange={setLanguageSettings} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
