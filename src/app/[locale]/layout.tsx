@@ -44,7 +44,12 @@ export default async function LocaleLayout({
   }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+      afterSignInUrl="/"
+      afterSignUpUrl="/"
+    >
       <html lang={locale}>
         <body className="relative isolate overflow-x-hidden">
           <ErrorBoundary>
