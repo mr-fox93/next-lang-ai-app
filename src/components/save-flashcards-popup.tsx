@@ -44,8 +44,7 @@ export function SaveFlashcardsPopup({
   };
 
   const handleSignUp = () => {
-    window.location.href =
-      "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
+    router.push("/sign-up?redirect=/import-guest-flashcards");
     onClose();
   };
 

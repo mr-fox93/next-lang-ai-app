@@ -66,13 +66,12 @@ export function LoginPromptPopup({
 
   const handleSignUp = () => {
     if (isDemoMode) {
-      // Demo mode flow - exit demo and redirect to sign-up
       exitDemoMode();
-      window.location.href = "https://nearby-mackerel-82.accounts.dev/sign-up";
+      router.push("/sign-up");
     } else {
-      // Guest mode flow - import flashcards
-      window.location.href =
-        "https://nearby-mackerel-82.accounts.dev/sign-up?redirect=%2Fimport-guest-flashcards";
+      sessionStorage.setItem("flashcardsToImport", "true");
+      sessionStorage.setItem("directRedirectAfterImport", "true");
+      router.push("/sign-up?redirect=/import-guest-flashcards");
     }
     onClose();
   };

@@ -225,7 +225,7 @@ export default function Navbar() {
                   <span className="relative">{t('signIn')}</span>
                 </Button>
               </Link>
-              <Link href="https://nearby-mackerel-82.accounts.dev/sign-up">
+              <Link href="sign-up">
                 <Button className="relative overflow-hidden group bg-purple-700 hover:bg-purple-600 transition-colors">
                   <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-100 group-hover:opacity-0 transition-opacity" />
                   <span className="relative">{t('createAccount')}</span>
@@ -342,7 +342,7 @@ export default function Navbar() {
                       </Button>
                     </Link>
                     <Link
-                      href="https://nearby-mackerel-82.accounts.dev/sign-up"
+                      href="sign-up"
                       className="w-full"
                     >
                       <Button className="w-full h-12 relative overflow-hidden group bg-purple-700 hover:bg-purple-600 transition-colors">
