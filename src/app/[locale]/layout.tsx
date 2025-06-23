@@ -9,7 +9,6 @@ import { LoadingErrorProvider } from "@/shared/ui/loading-error-provider";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
 import Footer from "@/components/footer";
 import { CookieConsentProvider } from "@/components/cookie-consent";
-import { LanguageProvider } from "@/shared/language-context";
 import { ContactModalProvider } from "@/shared/contact-modal-context";
 import ClientI18nProvider from '@/components/client-i18n-provider';
 
@@ -45,20 +44,23 @@ export default async function LocaleLayout({
   }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+      afterSignInUrl="/"
+      afterSignUpUrl="/"
+    >
       <html lang={locale}>
         <body className="relative isolate overflow-x-hidden">
           <ErrorBoundary>
             <LoadingErrorProvider>
               <ClientI18nProvider messages={messages}>
-                <LanguageProvider>
-                  <CookieConsentProvider>
-                    <ContactModalProvider>
-                      {children}
-                      <Footer />
-                    </ContactModalProvider>
-                  </CookieConsentProvider>
-                </LanguageProvider>
+                <CookieConsentProvider>
+                  <ContactModalProvider>
+                    {children}
+                    <Footer />
+                  </ContactModalProvider>
+                </CookieConsentProvider>
               </ClientI18nProvider>
             </LoadingErrorProvider>
           </ErrorBoundary>

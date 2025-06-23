@@ -215,5 +215,39 @@
       "email": "Email"
     },
     "lastUpdate": "Ostatnia aktualizacja"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "Brak fiszek. Stwórz nowe fiszki, aby rozpocząć naukę.",
+    "startLearningButton": "Zacznij naukę teraz, generując to, czego chcesz",
+    "welcomeTitle": "Witamy w Languito!",
+    "welcomeSubtitle": "Twoje konto zostało pomyślnie utworzone! 🎉",
+    "welcomeDescription": "Jesteś teraz gotowy, aby rozpocząć swoją podróż w nauce języków. Stwórzmy Twój pierwszy zestaw interaktywnych fiszek!",
+    "generateFirstFlashcards": "Wygeneruj Swoje Pierwsze Fiszki",
+    "accessLater": "Zawsze możesz wrócić do tego ze strony głównej",
+    "unlimitedFlashcards": "Generuj nieograniczoną liczbę fiszek w dowolnym języku",
+    "trackProgress": "Śledź swoje postępy i poziom opanowania",
+    "syncDevices": "Synchronizuj automatycznie na wszystkich urządzeniach"
+  },
+  "ContactForm": {
+    "title": "Skontaktuj się z nami",
+    "description": "Masz pytanie lub opinię? Chętnie Cię wysłuchamy!",
+    "nameLabel": "Twoje Imię",
+    "emailLabel": "Twój Email",
+    "messageLabel": "Twoja Wiadomość",
+    "messagePlaceholder": "Co chciałbyś/chciałabyś nam przekazać?",
+    "cancel": "Anuluj",
+    "send": "Wyślij Wiadomość",
+    "sending": "Wysyłanie...",
+    "aiChecking": "AI sprawdza Twoją wiadomość...",
+    "successTitle": "Sukces!",
+    "thankYou": "Dziękujemy!",
+    "messageSent": "Twoja wiadomość została wysłana pomyślnie. Odpowiemy najszybciej jak to możliwe.",
+    "backButton": "Powrót do strony",
+    "error": "Błąd",
+    "errorGeneric": "Wystąpił problem podczas wysyłania wiadomości. Spróbuj ponownie później.",
+    "errorNoApiKey": "Usługa email nie jest poprawnie skonfigurowana. Skontaktuj się z administratorem.",
+    "errorInvalidEmail": "Wystąpił problem z adresem email. Sprawdź go i spróbuj ponownie.",
+    "emailValidationError": "Proszę wprowadzić poprawny adres email.",
+    "offensiveContentError": "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
   }
 } 

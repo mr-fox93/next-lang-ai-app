@@ -215,5 +215,39 @@
       "email": "Email"
     },
     "lastUpdate": "Última actualización"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "No hay tarjetas disponibles. Crea nuevas tarjetas para comenzar a aprender.",
+    "startLearningButton": "Comienza a aprender ahora generando lo que quieres",
+    "welcomeTitle": "¡Bienvenido a Languito!",
+    "welcomeSubtitle": "¡Tu cuenta ha sido creada exitosamente! 🎉",
+    "welcomeDescription": "¡Ahora estás listo para comenzar tu viaje de aprendizaje de idiomas! ¡Creemos tu primer conjunto de tarjetas interactivas!",
+    "generateFirstFlashcards": "Genera Tus Primeras Tarjetas",
+    "accessLater": "Siempre puedes acceder a esto desde la página principal más tarde",
+    "unlimitedFlashcards": "Genera tarjetas ilimitadas en cualquier idioma",
+    "trackProgress": "Rastrea tu progreso y niveles de dominio",
+    "syncDevices": "Sincroniza automáticamente en todos tus dispositivos"
+  },
+  "ContactForm": {
+    "title": "Contáctanos",
+    "description": "¿Tienes una pregunta o comentario? ¡Nos encantaría escucharte!",
+    "nameLabel": "Tu Nombre",
+    "emailLabel": "Tu Email",
+    "messageLabel": "Tu Mensaje",
+    "messagePlaceholder": "¿Qué te gustaría decirnos?",
+    "cancel": "Cancelar",
+    "send": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "aiChecking": "La IA está revisando tu mensaje...",
+    "successTitle": "¡Éxito!",
+    "thankYou": "¡Gracias!",
+    "messageSent": "Tu mensaje ha sido enviado exitosamente. Te responderemos lo antes posible.",
+    "backButton": "Volver al sitio",
+    "error": "Error",
+    "errorGeneric": "Hubo un problema enviando tu mensaje. Por favor intenta de nuevo más tarde.",
+    "errorNoApiKey": "El servicio de email no está configurado correctamente. Por favor contacta al administrador.",
+    "errorInvalidEmail": "Hubo un problema con la dirección de email. Por favor verifica e intenta de nuevo.",
+    "emailValidationError": "Por favor ingresa una dirección de email válida.",
+    "offensiveContentError": "Tu mensaje contiene contenido que puede violar nuestras pautas comunitarias. Por favor revisa y enfócate en problemas técnicos o comentarios sobre la aplicación."
   }
 } 

@@ -3,8 +3,8 @@ import {
   getFlashcardsForUser,
   getProgressStatsForUser,
   getMasteredCategoriesForUser,
-} from "../../flashcards/actions";
-import FlashcardsView from "../../flashcards/view";
+} from "./actions";
+import FlashcardsView from "./view";
 import { Loader } from "@/components/ui/loader";
 import { setRequestLocale } from 'next-intl/server';
 import { locales } from '@/i18n/routing';

@@ -215,5 +215,39 @@
       "email": "Email"
     },
     "lastUpdate": "Ultimo aggiornamento"
+  },
+  "Flashcards": {
+    "noFlashcardsTitle": "Nessuna scheda disponibile. Crea nuove schede per iniziare ad apprendere.",
+    "startLearningButton": "Inizia ad apprendere ora generando quello che vuoi",
+    "welcomeTitle": "Benvenuto in Languito!",
+    "welcomeSubtitle": "Il tuo account è stato creato con successo! 🎉",
+    "welcomeDescription": "Ora sei pronto per iniziare il tuo viaggio nell'apprendimento delle lingue. Creiamo il tuo primo set di schede interattive!",
+    "generateFirstFlashcards": "Genera Le Tue Prime Schede",
+    "accessLater": "Puoi sempre accedere a questo dalla pagina principale più tardi",
+    "unlimitedFlashcards": "Genera schede illimitate in qualsiasi lingua",
+    "trackProgress": "Traccia i tuoi progressi e livelli di padronanza",
+    "syncDevices": "Sincronizza automaticamente su tutti i tuoi dispositivi"
+  },
+  "ContactForm": {
+    "title": "Contattaci",
+    "description": "Hai una domanda o feedback? Ci piacerebbe sentirti!",
+    "nameLabel": "Il Tuo Nome",
+    "emailLabel": "La Tua Email",
+    "messageLabel": "Il Tuo Messaggio",
+    "messagePlaceholder": "Cosa vorresti farci sapere?",
+    "cancel": "Annulla",
+    "send": "Invia Messaggio",
+    "sending": "Invio...",
+    "aiChecking": "L'IA sta controllando il tuo messaggio...",
+    "successTitle": "Successo!",
+    "thankYou": "Grazie!",
+    "messageSent": "Il tuo messaggio è stato inviato con successo. Ti risponderemo il prima possibile.",
+    "backButton": "Torna al sito",
+    "error": "Errore",
+    "errorGeneric": "C'è stato un problema nell'invio del tuo messaggio. Riprova più tardi.",
+    "errorNoApiKey": "Il servizio email non è configurato correttamente. Contatta l'amministratore.",
+    "errorInvalidEmail": "C'è stato un problema con l'indirizzo email. Controlla e riprova.",
+    "emailValidationError": "Inserisci un indirizzo email valido.",
+    "offensiveContentError": "Il tuo messaggio contiene contenuti che potrebbero violare le nostre linee guida della comunità. Rivedi e concentrati su problemi tecnici o feedback sull'applicazione."
   }
 } 

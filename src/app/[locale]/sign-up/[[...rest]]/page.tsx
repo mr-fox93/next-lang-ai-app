@@ -1,26 +1,22 @@
 "use client";
 
 import { Suspense } from "react";
-import { SignIn } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation";
-import { useParams } from "next/navigation";
+import { SignUp } from "@clerk/nextjs";
+import { useSearchParams, useParams } from "next/navigation";
 
-function SignInWithRedirect() {
-  const searchParams = useSearchParams();
-  const params = useParams();
-  const currentLocale = params?.locale as string || 'en';
-  const redirect = searchParams.get("redirect");
-
-  const fallbackRedirectUrl = redirect || `/${currentLocale}/flashcards`;
+function SignUpWithRedirect() {
+  const search = useSearchParams();
+  const { locale = "en" } = (useParams() as { locale?: string });
+  const redirect = search.get("redirect") ?? `/${locale}/flashcards`;
 
   return (
-    <SignIn
-      path={`/${currentLocale}/sign-in`}
+    <SignUp
+      path={`/${locale}/sign-up`}
       routing="path"
-      fallbackRedirectUrl={fallbackRedirectUrl}
-      signUpFallbackRedirectUrl={fallbackRedirectUrl}
-      forceRedirectUrl={fallbackRedirectUrl}
-      signUpForceRedirectUrl={fallbackRedirectUrl}
+      fallbackRedirectUrl={redirect}
+      signInFallbackRedirectUrl={redirect}
+      forceRedirectUrl={redirect}
+      signInForceRedirectUrl={redirect}
       appearance={{
         elements: {
           formButtonPrimary:
@@ -35,7 +31,7 @@ function SignInWithRedirect() {
   );
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="min-h-screen w-full bg-black antialiased relative overflow-hidden flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
@@ -45,7 +41,7 @@ export default function SignInPage() {
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
         </div>
       }>
-        <SignInWithRedirect />
+        <SignUpWithRedirect />
       </Suspense>
     </div>
   );

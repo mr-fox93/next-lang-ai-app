@@ -7,22 +7,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Award, BookOpen, ChevronRight, Star, Clock, ArrowUpRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Link } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import { UserProgressStats } from "@/types/progress";
 import { updateDailyGoalAction } from "@/app/actions/progress-actions";
 import { useToast } from "@/components/ui/use-toast";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useTranslations } from 'next-intl';
 import { ProgressTopBar } from "@/components/ui/progress-top-bar";
-import { useDemoMode } from "@/hooks";
+import { useDemoMode, useDemoProgressUpdates, setDemoDailyGoal } from "@/hooks/useDemoMode";
 
 interface ProgressDashboardProps {
   initialStats: UserProgressStats;
   initialReviewedToday: number;
 }
 
-export function ProgressDashboard({
+export default function ProgressDashboard({
   initialStats,
   initialReviewedToday,
 }: ProgressDashboardProps) {
@@ -31,12 +30,15 @@ export function ProgressDashboard({
   const { toast } = useToast();
   const t = useTranslations('Progress');
   const [stats, setStats] = useState<UserProgressStats>(initialStats);
-  const [reviewedToday] = useState(initialReviewedToday);
+  const [reviewedToday, setReviewedToday] = useState(initialReviewedToday);
   const [dailyGoal, setDailyGoal] = useState(initialStats.dailyGoal || 10);
   const [isSavingGoal, setIsSavingGoal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   const { isDemoMode, isLoading } = useDemoMode();
+  
+  // Use the new hook for demo progress updates
+  const demoProgressData = useDemoProgressUpdates(initialStats);
 
   useEffect(() => {
     const originalStyles = {
@@ -60,6 +62,19 @@ export function ProgressDashboard({
     };
   }, []);
 
+  // Update stats based on demo mode
+  useEffect(() => {
+    if (isDemoMode) {
+      setStats(demoProgressData.stats);
+      setDailyGoal(demoProgressData.stats.dailyGoal || 10);
+      setReviewedToday(demoProgressData.reviewedToday);
+    } else {
+      setStats(initialStats);
+      setReviewedToday(initialReviewedToday);
+      setDailyGoal(initialStats.dailyGoal || 10);
+    }
+  }, [isDemoMode, initialStats, initialReviewedToday, demoProgressData]);
+
   const handleDailyGoalChange = async (value: string) => {
     const newGoal = parseInt(value, 10);
     setDailyGoal(newGoal);
@@ -68,22 +83,33 @@ export function ProgressDashboard({
       setIsSavingGoal(true);
       setErrorMessage(null);
       try {
-        const result = await updateDailyGoalAction(newGoal);
-        if (result.success) {
+        if (isDemoMode) {
+          // Save to localStorage for demo mode
+          setDemoDailyGoal(newGoal);
+          setStats({ ...stats, dailyGoal: newGoal });
           toast({
             title: "Saved",
             description: "Your daily goal has been updated",
           });
-          if (stats) {
-            setStats({ ...stats, dailyGoal: newGoal });
-          }
         } else {
-          setErrorMessage(result.error || "Failed to update daily goal");
-          toast({
-            title: "Error",
-            description: result.error || "Failed to update daily goal",
-            variant: "destructive",
-          });
+          // Save to server for normal mode
+          const result = await updateDailyGoalAction(newGoal);
+          if (result.success) {
+            toast({
+              title: "Saved",
+              description: "Your daily goal has been updated",
+            });
+            if (stats) {
+              setStats({ ...stats, dailyGoal: newGoal });
+            }
+          } else {
+            setErrorMessage(result.error || "Failed to update daily goal");
+            toast({
+              title: "Error",
+              description: result.error || "Failed to update daily goal",
+              variant: "destructive",
+            });
+          }
         }
       } catch (error) {
         console.error("Daily goal update error:", error);

@@ -1,6 +1,6 @@
 // src/utils/speak.ts
 
-export type SupportedTTSLanguage = "pl-PL" | "en-US" | "es-ES" | "it-IT";
+import { SupportedTTSLanguage } from '@/types/locale';
 
 let cachedVoices: SpeechSynthesisVoice[] | null = null;
 
@@ -28,7 +28,7 @@ const initVoices = (): Promise<SpeechSynthesisVoice[]> => {
 
 export const speak = async (
   text: string,
-  lang: SupportedTTSLanguage = "en-US"
+  language: SupportedTTSLanguage = "en-US"
 ) => {
   if (!window.speechSynthesis) {
     console.error("Speech synthesis not supported");
@@ -38,17 +38,17 @@ export const speak = async (
   speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
+  utterance.lang = language;
 
   try {
     const voices = await initVoices();
 
     if (voices.length > 0) {
-      const exactVoice = voices.find((voice) => voice.lang === lang);
+      const exactVoice = voices.find((voice) => voice.lang === language);
       if (exactVoice) {
         utterance.voice = exactVoice;
       } else {
-        const langCode = lang.split("-")[0];
+        const langCode = language.split("-")[0];
         const similarVoice = voices.find((voice) =>
           voice.lang.startsWith(langCode)
         );

@@ -12,10 +12,10 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Mail, Send, AlertCircle, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { useLanguage } from "@/shared/language-context";
+import { useTranslations } from 'next-intl';
 import { z } from "zod";
 import { Filter } from "bad-words";
 
@@ -53,7 +53,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     message: string;
     detail?: string;
   } | null>(null);
-  const { language } = useLanguage();
+  const t = useTranslations('ContactForm');
   
   // Create enhanced filter with additional words once
   const filter = useMemo(() => {
@@ -63,53 +63,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     return customFilter;
   }, []);
   
-  const translations = {
-    en: {
-      title: "Contact Us",
-      description: "Have a question or feedback? We'd love to hear from you!",
-      nameLabel: "Your Name",
-      emailLabel: "Your Email",
-      messageLabel: "Your Message",
-      messagePlaceholder: "What would you like to let us know?",
-      cancel: "Cancel",
-      send: "Send Message",
-      sending: "Sending...",
-      aiChecking: "AI is checking your message...",
-      thankYou: "Thank you!",
-      messageSent: "Your message has been sent successfully. We'll get back to you as soon as possible.",
-      backButton: "Back to site",
-      error: "Error",
-      errorGeneric: "There was a problem sending your message. Please try again later.",
-      errorNoApiKey: "Email service is not configured properly. Please contact the administrator.",
-      errorInvalidEmail: "There was a problem with the email address. Please check and try again.",
-      emailValidationError: "Please enter a valid email address.",
-      offensiveContentError: "Your message contains content that may violate our community guidelines. Please revise and focus on technical issues or feedback about the application."
-    },
-    pl: {
-      title: "Skontaktuj się z nami",
-      description: "Masz pytanie lub opinię? Chętnie Cię wysłuchamy!",
-      nameLabel: "Twoje Imię",
-      emailLabel: "Twój Email",
-      messageLabel: "Twoja Wiadomość",
-      messagePlaceholder: "Co chciałbyś/chciałabyś nam przekazać?",
-      cancel: "Anuluj",
-      send: "Wyślij Wiadomość",
-      sending: "Wysyłanie...",
-      aiChecking: "AI sprawdza Twoją wiadomość...",
-      thankYou: "Dziękujemy!",
-      messageSent: "Twoja wiadomość została wysłana pomyślnie. Odpowiemy najszybciej jak to możliwe.",
-      backButton: "Powrót do strony",
-      error: "Błąd",
-      errorGeneric: "Wystąpił problem podczas wysyłania wiadomości. Spróbuj ponownie później.",
-      errorNoApiKey: "Usługa email nie jest poprawnie skonfigurowana. Skontaktuj się z administratorem.",
-      errorInvalidEmail: "Wystąpił problem z adresem email. Sprawdź go i spróbuj ponownie.",
-      emailValidationError: "Proszę wprowadzić poprawny adres email.",
-      offensiveContentError: "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
-    }
-  };
-  
-  const t = translations[language];
-  
   // Validate email as user types
   useEffect(() => {
     if (email) {
@@ -117,7 +70,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         emailSchema.parse(email);
         setEmailError(null);
       } catch {
-        setEmailError(t.emailValidationError);
+        setEmailError(t('emailValidationError'));
       }
     } else {
       setEmailError(null);
@@ -125,11 +78,11 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
   }, [email, t]);
   
   // More sophisticated content check
-  const validateMessage = (text: string): boolean => {
+  const validateMessage = useCallback((text: string): boolean => {
     try {
       // Check using bad-words filter
       if (filter.isProfane(text)) {
-        setMessageError(t.offensiveContentError);
+        setMessageError(t('offensiveContentError'));
         return false;
       }
       
@@ -144,7 +97,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       
       for (const pattern of l33tPatterns) {
         if (pattern.test(text)) {
-          setMessageError(t.offensiveContentError);
+          setMessageError(t('offensiveContentError'));
           return false;
         }
       }
@@ -156,7 +109,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       
       for (const pattern of threateningPatterns) {
         if (pattern.test(text)) {
-          setMessageError(t.offensiveContentError);
+          setMessageError(t('offensiveContentError'));
           return false;
         }
       }
@@ -167,7 +120,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       console.error("Error checking content:", err);
       return true; // Allow the message if the filter fails
     }
-  };
+  }, [filter, t]);
   
   // Check message as user types
   useEffect(() => {
@@ -176,7 +129,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     } else {
       setMessageError(null);
     }
-  }, [message]);
+  }, [message, validateMessage, t]);
   
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault(); // Zapobiegaj domyślnemu zamknięciu modalu
@@ -185,7 +138,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     try {
       emailSchema.parse(email);
     } catch {
-      setEmailError(t.emailValidationError);
+      setEmailError(t('emailValidationError'));
       return;
     }
     
@@ -224,18 +177,18 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         setIsSent(true);
         setResponseStatus({
           success: true,
-          message: t.messageSent
+          message: t('messageSent')
         });
       } else {
         console.log("Setting error state");
         // Handle specific error codes
-        let errorMessage = t.errorGeneric;
+        let errorMessage = t('errorGeneric');
         
         if (data.error) {
           if (data.error.statusCode === 403) {
-            errorMessage = t.errorNoApiKey;
+            errorMessage = t('errorNoApiKey');
           } else if (data.error.statusCode === 400 && data.error.message?.includes("email")) {
-            errorMessage = t.errorInvalidEmail;
+            errorMessage = t('errorInvalidEmail');
           }
           
           // Display detailed reason from AI moderation if available
@@ -260,7 +213,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       setIsCheckingAI(false);
       setResponseStatus({
         success: false,
-        message: t.errorGeneric
+        message: t('errorGeneric')
       });
       setIsSent(true); // Pokaż komunikat również przy wyjątku
     } finally {
@@ -327,13 +280,13 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
             </motion.div>
             <AlertDialogTitle className="text-fuchsia-100">
               {isSent ? 
-                (responseStatus?.success ? t.thankYou : t.error) : 
-                t.title
+                (responseStatus?.success ? t('thankYou') : t('error')) : 
+                t('title')
               }
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-purple-200/80">
-            {isSent ? "" : t.description}
+            {isSent ? "" : t('description')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -342,7 +295,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
             <div className="grid gap-4 mt-2 relative z-10">
               <div className="grid gap-2">
                 <label htmlFor="name" className="text-sm text-purple-200">
-                  {t.nameLabel}
+                  {t('nameLabel')}
                 </label>
                 <Input
                   id="name"
@@ -353,7 +306,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
               </div>
               <div className="grid gap-2">
                 <label htmlFor="email" className="text-sm text-purple-200">
-                  {t.emailLabel}
+                  {t('emailLabel')}
                 </label>
                 <Input
                   id="email"
@@ -370,13 +323,13 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
               </div>
               <div className="grid gap-2">
                 <label htmlFor="message" className="text-sm text-purple-200">
-                  {t.messageLabel}
+                  {t('messageLabel')}
                 </label>
                 <Textarea
                   id="message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder={t.messagePlaceholder}
+                  placeholder={t('messagePlaceholder')}
                   className={`border-purple-700/30 bg-purple-950/50 focus-visible:ring-purple-500 min-h-[120px] text-white placeholder:text-purple-400/50 ${
                     messageError ? "border-red-500 focus-visible:ring-red-500" : ""
                   }`}
@@ -392,7 +345,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                 onClick={handleClose}
                 className="bg-purple-950 hover:bg-purple-900 text-purple-200 border-purple-700/30 hover:border-purple-600/50"
               >
-                {t.cancel}
+                {t('cancel')}
               </AlertDialogCancel>
               <button
                 onClick={handleSubmit}
@@ -403,14 +356,14 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                   <>
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 animate-pulse" />
-                      {t.aiChecking}
+                      {t('aiChecking')}
                     </div>
                   </>
                 ) : isSending ? (
-                  t.sending
+                  t('sending')
                 ) : (
                   <>
-                    {t.send} <Send className="h-4 w-4" />
+                    {t('send')} <Send className="h-4 w-4" />
                   </>
                 )}
               </button>
@@ -465,7 +418,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                         className="text-center mb-4"
                       >
                         <h2 className="text-3xl font-bold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-200 to-teal-300">
-                          {language === 'pl' ? 'Sukces!' : 'Success!'}
+                          {t('successTitle')}
                         </h2>
                       </motion.div>
 
@@ -669,7 +622,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                       
                       <div className="flex-1 text-left">
                         <h3 className="font-medium mb-1 text-lg text-rose-300">
-                          {t.error}
+                          {t('error')}
                         </h3>
                         <p className="text-sm text-rose-200/90">
                           {responseStatus.message}
@@ -736,10 +689,10 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                     
                     <div className="flex-1 text-left">
                       <h3 className="font-medium mb-1 text-lg text-green-300">
-                        {t.thankYou}
+                        {t('thankYou')}
                       </h3>
                       <p className="text-sm text-green-200/90">
-                        {t.messageSent}
+                        {t('messageSent')}
                       </p>
                     </div>
                   </div>
@@ -783,7 +736,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
                 whileTap={{ scale: 0.98 }}
                 className="w-full bg-gradient-to-r from-fuchsia-600/90 to-purple-600/90 hover:from-fuchsia-500 hover:to-purple-500 text-white rounded-md py-2 px-4 border-0 shadow-md shadow-purple-900/50 flex items-center justify-center gap-2 group"
               >
-                <span>{t.backButton}</span>
+                <span>{t('backButton')}</span>
                 <motion.div
                   initial={{ x: 0, opacity: 0.5 }}
                   animate={{ x: [0, 3, 0], opacity: [0.5, 1, 0.5] }}

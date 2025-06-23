@@ -1,4 +1,4 @@
-import { ProgressDashboard } from "@/components/progress-dashboard";
+import ProgressDashboard from "./view";
 import {
   getUserProgressStatsAction,
   getReviewedTodayCountAction,

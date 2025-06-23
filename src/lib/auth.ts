@@ -1,19 +1,15 @@
 import { auth as clerkAuth } from "@clerk/nextjs/server";
-import { cookies } from "next/headers";
+import { isDemoMode, getDemoUserId } from "./demo-helpers";
 
 export async function auth() {
-  // Sprawdź czy to tryb demo
-  const cookieStore = await cookies();
-  const isDemoMode = cookieStore.get('demo_mode')?.value === 'true';
-  
-  if (isDemoMode) {
-    // Tryb demo - zwróć demo userId w formacie Clerk
+  // Check if in demo mode
+  if (await isDemoMode()) {
+    // Demo mode - return demo userId in Clerk format
     return { 
-      userId: process.env.DEMO_USER_ID || null,
-      // Dodaj inne pola jeśli potrzeba w przyszłości
+      userId: getDemoUserId(),
     };
   } else {
-    // Normalny tryb - użyj oryginalnego Clerk auth
+    // Normal mode - use original Clerk auth
     return await clerkAuth();
   }
 } 

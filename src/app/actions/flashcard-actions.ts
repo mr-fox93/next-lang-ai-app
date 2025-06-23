@@ -10,41 +10,26 @@ import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFla
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { getFlashcardsPrompt } from "@/lib/prompts";
 import { PrismaClient } from "@prisma/client";
-
-interface ImportableFlashcard {
-  origin_text: string;
-  translate_text: string;
-  example_using: string;
-  translate_example: string;
-  category: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  difficultyLevel: string;
-}
-
-interface GenerateFlashcardsActionParams {
-  count: number;
-  message: string;
-  level: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-}
-
-interface FlashcardGenerationResponse {
-  success: boolean;
-  flashcards?: ImportableFlashcard[];
-  error?: string;
-  redirect?: string;
-}
-
-interface AIFlashcardGenerator {
-  generateFlashcardsWithAI(prompt: string): Promise<Record<string, string>[]>;
-}
+import { isDemoMode } from "@/lib/demo-helpers";
+import { 
+  ImportableFlashcard, 
+  FlashcardGenerationResponse, 
+  GenerateFlashcardsActionParams,
+  AIFlashcardGenerator 
+} from "@/types/flashcard";
 
 export async function generateFlashcardsAction(
   params: GenerateFlashcardsActionParams
 ) {
   try {
+    // Check if in demo mode - if so, don't save to database
+    if (await isDemoMode()) {
+      return {
+        success: false,
+        error: "Demo mode: Please sign in to generate and save flashcards",
+      };
+    }
+
     const { count, message, level, sourceLanguage, targetLanguage } = params;
     const { userId } = await auth();
     const user = await currentUser();
@@ -105,6 +90,14 @@ export async function generateFlashcardsAction(
 
 export async function deleteCategoryAction(category: string) {
   try {
+    // Check if in demo mode - if so, don't delete from database
+    if (await isDemoMode()) {
+      return {
+        success: false,
+        error: "Demo mode: Please sign in to delete categories",
+      };
+    }
+
     const { userId } = await auth();
 
     if (!userId) {
@@ -137,6 +130,14 @@ export async function deleteCategoryAction(category: string) {
 
 export async function getUserLanguagesAction() {
   try {
+    // Check if in demo mode - if so, return mock data
+    if (await isDemoMode()) {
+      return {
+        success: true,
+        languages: ["en", "es", "de"], // Mock languages for demo
+      };
+    }
+
     const { userId } = await auth();
 
     if (!userId) {
@@ -298,6 +299,14 @@ export async function generateMoreFlashcardsAction(params: {
   difficultyLevel: string;
 }) {
   try {
+    // Check if in demo mode - if so, don't save to database
+    if (await isDemoMode()) {
+      return {
+        success: false,
+        error: "Demo mode: Please sign in to generate more flashcards",
+      };
+    }
+
     const { userId } = await auth();
     const user = await currentUser();
 
