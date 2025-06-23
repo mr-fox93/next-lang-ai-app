@@ -186,9 +186,11 @@ export const getFlashcardsPrompt = (
 ### **Category Guidelines:**
   - The category should be **concise and descriptive**, summarizing the primary theme of the flashcards.
   - **All generated flashcards must belong to the same category** (no mixing within one response).
+  - **If the user specifies an EXACT category name in their request, use that EXACT name without any modifications.**
   - Choose a category that accurately reflects the user's input. 
   - If the user's input is broad (e.g., "travel"), use a meaningful subcategory such as "Airport", "Hotel Booking", or "Local Transport".
   - If uncertain, choose the most general but meaningful category.
+  - **CRITICAL: When generating additional flashcards for an existing category, preserve the category name exactly as specified.**
 
   ### **Reference Previous Examples:**
   The user has previously requested flashcards for similar topics. Here are some examples:

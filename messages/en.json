@@ -249,5 +249,8 @@
     "errorInvalidEmail": "There was a problem with the email address. Please check and try again.",
     "emailValidationError": "Please enter a valid email address.",
     "offensiveContentError": "Your message contains content that may violate our community guidelines. Please revise and focus on technical issues or feedback about the application."
-  }
+  },
+  "backToLearning": "Back to Learning",
+  "home": "Home",
+  "categories": "Categories"
 } 

@@ -249,5 +249,6 @@
     "errorInvalidEmail": "C'è stato un problema con l'indirizzo email. Controlla e riprova.",
     "emailValidationError": "Inserisci un indirizzo email valido.",
     "offensiveContentError": "Il tuo messaggio contiene contenuti che potrebbero violare le nostre linee guida della comunità. Rivedi e concentrati su problemi tecnici o feedback sull'applicazione."
-  }
+  },
+  "home": "Home"
 } 

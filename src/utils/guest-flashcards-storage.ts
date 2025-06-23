@@ -4,7 +4,6 @@ import { ImportableFlashcard } from "@/types/flashcard";
 const GUEST_FLASHCARDS_KEY = "guest_flashcards";
 
 export const guestFlashcardsStorage = {
-  // Pobieranie fiszek z localStorage
   getFlashcards: (): Flashcard[] => {
     if (typeof window === "undefined") return [];
 
@@ -19,7 +18,6 @@ export const guestFlashcardsStorage = {
     }
   },
 
-  // Zapisywanie fiszek do localStorage
   saveFlashcards: (flashcards: Flashcard[]): void => {
     if (typeof window === "undefined") return;
 
@@ -30,11 +28,26 @@ export const guestFlashcardsStorage = {
     }
   },
 
-  // Dodawanie nowych fiszek do istniejących
   addFlashcards: (newFlashcards: ImportableFlashcard[]): Flashcard[] => {
-    const existingFlashcards = guestFlashcardsStorage.getFlashcards();
+    const flashcardsWithIds = newFlashcards.map((card, index) => ({
+      ...card,
+      id: index + 1,
+      userId: "guest",
+    })) as Flashcard[];
 
-    // Dodajemy nowe fiszki i upewniamy się, że ID są unikalne
+    guestFlashcardsStorage.saveFlashcards(flashcardsWithIds);
+
+    return flashcardsWithIds;
+  },
+
+  addMoreFlashcardsToCategory: (newFlashcards: ImportableFlashcard[], category: string): Flashcard[] => {
+    const existingFlashcards = guestFlashcardsStorage.getFlashcards();
+    
+    const existingCategory = existingFlashcards.length > 0 ? existingFlashcards[0].category : null;
+    
+    if (existingCategory && existingCategory !== category) {
+      return guestFlashcardsStorage.addFlashcards(newFlashcards);
+    }
     const highestId = existingFlashcards.reduce(
       (max, card) =>
         typeof card.id === "number" && card.id > max ? card.id : max,
@@ -53,25 +66,20 @@ export const guestFlashcardsStorage = {
     return updatedFlashcards;
   },
 
-  // Usuwanie fiszek z określonej kategorii
   deleteFlashcardsByCategory: (category: string): number => {
     const allFlashcards = guestFlashcardsStorage.getFlashcards();
 
-    // Filtrujemy, aby zachować tylko fiszki z innych kategorii
     const remainingFlashcards = allFlashcards.filter(
       (card) => card.category !== category
     );
 
-    // Obliczamy liczbę usuniętych fiszek
     const deletedCount = allFlashcards.length - remainingFlashcards.length;
 
-    // Zapisujemy zaktualizowaną listę
     guestFlashcardsStorage.saveFlashcards(remainingFlashcards);
 
     return deletedCount;
   },
 
-  // Czyszczenie fiszek
   clearFlashcards: (): void => {
     if (typeof window === "undefined") return;
 
@@ -80,5 +88,14 @@ export const guestFlashcardsStorage = {
     } catch (error) {
       console.error("Błąd usuwania fiszek gościa:", error);
     }
+  },
+
+  hasFlashcards: (): boolean => {
+    return guestFlashcardsStorage.getFlashcards().length > 0;
+  },
+
+  getCurrentCategory: (): string | null => {
+    const flashcards = guestFlashcardsStorage.getFlashcards();
+    return flashcards.length > 0 ? flashcards[0].category : null;
   },
 };

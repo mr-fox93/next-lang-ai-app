@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { Button } from "@/components/ui/button";
-import { Grid, Maximize2, PlusCircle } from "lucide-react";
+import { Grid, Maximize2, PlusCircle, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlashcardView } from "@/components/flaschard-view";
 import { FlashcardGrid } from "@/components/flashcard-grid";
@@ -17,6 +17,7 @@ import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreGuestFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { useTranslations } from "next-intl";
 
 interface GuestFlashcardsViewProps {
   initialFlashcards?: Flashcard[];
@@ -35,6 +36,7 @@ export default function GuestFlashcardsView({
   initialCategory,
   progressStats,
 }: GuestFlashcardsViewProps) {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
 
@@ -140,12 +142,15 @@ export default function GuestFlashcardsView({
     setShowLoginPrompt(true);
   };
 
+  const handleBackToHome = () => {
+    router.push("/");
+  };
+
   const handleGenerateFlashcards = async (category: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Zbieramy istniejące fiszki dla tej kategorii
       const existingFlashcards = flashcards.filter(
         (card) => card.category === category
       );
@@ -154,7 +159,6 @@ export default function GuestFlashcardsView({
       const sourceLanguage = existingFlashcards[0]?.sourceLanguage || "pl";
       const difficultyLevel = existingFlashcards[0]?.difficultyLevel || "easy";
 
-      // Zbieramy istniejące terminy, aby uniknąć duplikatów
       const existingTerms = Array.from(
         new Set(
           existingFlashcards.map((card) => card.origin_text.toLowerCase())
@@ -171,8 +175,9 @@ export default function GuestFlashcardsView({
       });
 
       if (result.success && result.flashcards) {
-        const updatedFlashcards = guestFlashcardsStorage.addFlashcards(
-          result.flashcards
+        const updatedFlashcards = guestFlashcardsStorage.addMoreFlashcardsToCategory(
+          result.flashcards,
+          category
         );
         setFlashcards(updatedFlashcards);
 
@@ -221,11 +226,9 @@ export default function GuestFlashcardsView({
   if (flashcards.length === 0) {
     return (
       <div className="min-h-screen h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Background accents */}
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
         <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
 
-        {/* Background pattern */}
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
           style={{
@@ -326,7 +329,6 @@ export default function GuestFlashcardsView({
             selectedCategory={selectedCategory}
             onSelectCategory={(category) => {
               setSelectedCategory(category);
-              // On mobile, collapse sidebar after selecting category
               if (window.innerWidth < 768) {
                 setIsSidebarCollapsed(true);
               }
@@ -361,7 +363,6 @@ export default function GuestFlashcardsView({
           />
         </div>
         
-        {/* Mobile overlay - only show when sidebar is not collapsed on mobile */}
         {!isSidebarCollapsed && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
@@ -380,7 +381,17 @@ export default function GuestFlashcardsView({
 
           {selectedCategory || flashcards.length > 0 ? (
             <>
-              <div className="flex justify-center mt-2 mb-1 flex-shrink-0">
+              <div className="flex justify-between items-center mt-2 mb-1 flex-shrink-0 px-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToHome}
+                  className="text-white hover:text-white bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300 flex items-center gap-2 rounded-lg"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="text-sm">{t('PrivacyPolicy.backHome')}</span>
+                </Button>
+
                 <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg p-1">
                   <Button
                     variant="ghost"
@@ -403,6 +414,8 @@ export default function GuestFlashcardsView({
                     <Grid className="h-5 w-5" />
                   </Button>
                 </div>
+
+                <div className="w-20"></div>
               </div>
 
               <div className="flex-1 overflow-hidden">
