@@ -123,7 +123,7 @@
     "title": "Polityka prywatności i pliki cookie",
     "description": "Ta strona wykorzystuje wyłącznie niezbędne pliki cookie do prawidłowego funkcjonowania. Przechowujemy tymczasowo dane fiszek dla niezalogowanych użytkowników oraz zapamiętujemy Twoje preferencje dotyczące plików cookie.",
     "necessary": "Niezbędne",
-    "necessaryDesc": "Wymagane do działania podstawowych funkcji serwisu: uwierzytelnianie przez Clerk, przechowywanie fiszek w trybie gościa oraz zapamiętanie decyzji dotyczących plików cookie.",
+    "necessaryDesc": "Wymagane do działania podstawowych funkcji serwisu: uwierzytelnianie przez Supabase, przechowywanie fiszek w trybie gościa oraz zapamiętanie decyzji dotyczących plików cookie.",
     "showDetails": "Pokaż szczegóły",
     "hideDetails": "Ukryj szczegóły",
     "acceptAll": "Akceptuję wszystkie",
@@ -140,7 +140,7 @@
       "title": "2. Jakie dane zbieramy",
       "content": "Zbieramy tylko niezbędne dane potrzebne do funkcjonowania aplikacji:",
       "accountData": "Dane konta",
-      "accountDataDesc": "Dane uwierzytelniające za pośrednictwem usługi Clerk (adres e-mail). Dane te są przechowywane przez Clerk zgodnie z ich polityką prywatności.",
+      "accountDataDesc": "Dane uwierzytelniające za pośrednictwem usługi Supabase (adres e-mail). Dane te są przechowywane przez Supabase zgodnie z ich polityką prywatności.",
       "userContent": "Treści użytkownika",
       "userContentDesc": "Fiszki, które tworzysz (tekst oryginalny, tłumaczenie, przykłady użycia, kategorie) oraz statystyki nauki (postępy w opanowaniu materiału).",
       "tempData": "Dane tymczasowe",
@@ -150,7 +150,7 @@
       "title": "3. Jak wykorzystujemy pliki cookie",
       "content": "Nasza strona wykorzystuje tylko niezbędne pliki cookie i podobne technologie:",
       "necessaryCookies": "Niezbędne pliki cookie",
-      "necessaryCookiesDesc": "Umożliwiają podstawowe funkcje, takie jak bezpieczne logowanie i nawigację po stronie. Usługa Clerk używa własnych plików cookie do uwierzytelniania i zarządzania sesją.",
+      "necessaryCookiesDesc": "Umożliwiają podstawowe funkcje, takie jak bezpieczne logowanie i nawigację po stronie. Usługa Supabase używa własnych plików cookie do uwierzytelniania i zarządzania sesją.",
       "localStorageTitle": "Lokalne przechowywanie danych",
       "localStorageDesc": "Używamy pamięci Twojej przeglądarki do przechowywania fiszek w trybie gościa oraz zapamiętania Twoich preferencji dotyczących plików cookie.",
       "noCookies": "Nie używamy żadnych plików cookie do celów marketingowych, śledzenia czy analityki."
@@ -158,13 +158,13 @@
     "externalServices": {
       "title": "4. Usługi zewnętrzne",
       "content": "Korzystamy z następujących usług zewnętrznych:",
-      "clerk": "Clerk",
-      "clerkDesc": "Do uwierzytelniania i zarządzania kontami użytkowników. Clerk może zbierać dane takie jak adres e-mail, IP czy informacje o przeglądarce zgodnie z ich własną polityką prywatności.",
       "openai": "OpenAI",
-      "openaiDesc": "Do generowania treści fiszek za pomocą API. Przesyłane są tylko dane potrzebne do generowania treści, nie przekazujemy danych osobowych użytkowników.",
+      "openaiDesc": "Do generowania treści fiszek za pomocą ich API. Przekazywane są tylko dane niezbędne do generowania treści, nie udostępniamy danych osobowych użytkowników.",
       "vercel": "Vercel",
-      "vercelDesc": "Do hostingu naszej aplikacji.",
-      "policy": "Każda z tych usług ma własną politykę prywatności, z którą można zapoznać się na ich stronach internetowych."
+      "vercelDesc": "Do hostowania naszej aplikacji.",
+      "policy": "Każda z tych usług ma swoją własną politykę prywatności, którą można znaleźć na ich stronach internetowych.",
+      "supabase": "Supabase",
+      "supabaseDesc": "Do uwierzytelniania i zarządzania kontami użytkowników. Supabase może zbierać dane takie jak adres e-mail, IP czy informacje o przeglądarce zgodnie z ich własną polityką prywatności."
     },
     "dataStorage": {
       "title": "5. Przechowywanie danych",

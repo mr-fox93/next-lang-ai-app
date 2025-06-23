@@ -123,7 +123,7 @@
     "title": "Privacy Policy & Cookies",
     "description": "This site only uses necessary cookies for proper functioning. We temporarily store flashcard data for non-logged in users and remember your cookie preferences.",
     "necessary": "Necessary",
-    "necessaryDesc": "Required for basic site functions: authentication via Clerk, storing flashcards in guest mode, and remembering cookie consent preferences.",
+    "necessaryDesc": "Required for basic site functions: authentication via Supabase, storing flashcards in guest mode, and remembering cookie consent preferences.",
     "showDetails": "Show details",
     "hideDetails": "Hide details",
     "acceptAll": "Accept all",
@@ -140,7 +140,7 @@
       "title": "2. What data we collect",
       "content": "We only collect essential data needed for the application to function:",
       "accountData": "Account data",
-      "accountDataDesc": "Authentication data via Clerk service (email address). This data is stored by Clerk in accordance with their privacy policy.",
+      "accountDataDesc": "Authentication data via Supabase service (email address). This data is stored by Supabase in accordance with their privacy policy.",
       "userContent": "User content",
       "userContentDesc": "Flashcards you create (original text, translation, usage examples, categories) and learning statistics (progress in mastering the material).",
       "tempData": "Temporary data",
@@ -150,7 +150,7 @@
       "title": "3. How we use cookies",
       "content": "Our site only uses essential cookies and similar technologies:",
       "necessaryCookies": "Essential cookies",
-      "necessaryCookiesDesc": "Enable basic functions such as secure login and site navigation. The Clerk service uses its own cookies for authentication and session management.",
+      "necessaryCookiesDesc": "Enable basic functions such as secure login and site navigation. The Supabase service uses its own cookies for authentication and session management.",
       "localStorageTitle": "Local data storage",
       "localStorageDesc": "We use your browser's memory to store flashcards in guest mode and remember your cookie preferences.",
       "noCookies": "We do not use any cookies for marketing, tracking, or analytics purposes."
@@ -158,13 +158,13 @@
     "externalServices": {
       "title": "4. External services",
       "content": "We use the following external services:",
-      "clerk": "Clerk",
-      "clerkDesc": "For authentication and user account management. Clerk may collect data such as email address, IP, or browser information in accordance with their own privacy policy.",
       "openai": "OpenAI",
       "openaiDesc": "For generating flashcard content using their API. Only data necessary for content generation is transmitted; we do not share users' personal data.",
       "vercel": "Vercel",
       "vercelDesc": "For hosting our application.",
-      "policy": "Each of these services has its own privacy policy, which can be found on their websites."
+      "policy": "Each of these services has its own privacy policy, which can be found on their websites.",
+      "supabase": "Supabase",
+      "supabaseDesc": "For authentication and user account management. Supabase may collect data such as email address, IP, or browser information in accordance with their own privacy policy."
     },
     "dataStorage": {
       "title": "5. Data storage",

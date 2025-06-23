@@ -123,7 +123,7 @@
     "title": "Política de privacidad y cookies",
     "description": "Este sitio solo utiliza cookies necesarias para su correcto funcionamiento. Almacenamos temporalmente datos de tarjetas para usuarios no conectados y recordamos tus preferencias de cookies.",
     "necessary": "Necesarias",
-    "necessaryDesc": "Requeridas para funciones básicas del sitio: autenticación a través de Clerk, almacenamiento de tarjetas en modo invitado y recordar preferencias de cookies.",
+    "necessaryDesc": "Requeridas para funciones básicas del sitio: autenticación a través de Supabase, almacenamiento de tarjetas en modo invitado y recordar preferencias de cookies.",
     "showDetails": "Mostrar detalles",
     "hideDetails": "Ocultar detalles",
     "acceptAll": "Aceptar todas",
@@ -140,7 +140,7 @@
       "title": "2. Qué datos recopilamos",
       "content": "Solo recopilamos datos esenciales necesarios para el funcionamiento de la aplicación:",
       "accountData": "Datos de cuenta",
-      "accountDataDesc": "Datos de autenticación a través del servicio Clerk (dirección de correo electrónico). Estos datos son almacenados por Clerk de acuerdo con su política de privacidad.",
+      "accountDataDesc": "Datos de autenticación a través del servicio Supabase (dirección de correo electrónico). Estos datos son almacenados por Supabase de acuerdo con su política de privacidad.",
       "userContent": "Contenido del usuario",
       "userContentDesc": "Tarjetas que creas (texto original, traducción, ejemplos de uso, categorías) y estadísticas de aprendizaje (progreso en el dominio del material).",
       "tempData": "Datos temporales",
@@ -150,7 +150,7 @@
       "title": "3. Cómo usamos las cookies",
       "content": "Nuestro sitio solo usa cookies esenciales y tecnologías similares:",
       "necessaryCookies": "Cookies esenciales",
-      "necessaryCookiesDesc": "Permiten funciones básicas como inicio de sesión seguro y navegación por el sitio. El servicio Clerk usa sus propias cookies para autenticación y gestión de sesiones.",
+      "necessaryCookiesDesc": "Permiten funciones básicas como inicio de sesión seguro y navegación por el sitio. El servicio Supabase usa sus propias cookies para autenticación y gestión de sesiones.",
       "localStorageTitle": "Almacenamiento local de datos",
       "localStorageDesc": "Usamos la memoria de tu navegador para almacenar tarjetas en modo invitado y recordar tus preferencias de cookies.",
       "noCookies": "No usamos cookies para fines de marketing, seguimiento o análisis."
@@ -158,13 +158,13 @@
     "externalServices": {
       "title": "4. Servicios externos",
       "content": "Utilizamos los siguientes servicios externos:",
-      "clerk": "Clerk",
-      "clerkDesc": "Para autenticación y gestión de cuentas de usuario. Clerk puede recopilar datos como dirección de correo electrónico, IP o información del navegador de acuerdo con su propia política de privacidad.",
       "openai": "OpenAI",
-      "openaiDesc": "Para generar contenido de tarjetas usando su API. Solo se transmiten datos necesarios para la generación de contenido; no compartimos datos personales de los usuarios.",
+      "openaiDesc": "Para generar contenido de tarjetas usando su API. Solo se transmiten datos necesarios para la generación de contenido; no compartimos datos personales de usuarios.",
       "vercel": "Vercel",
-      "vercelDesc": "Para alojar nuestra aplicación.",
-      "policy": "Cada uno de estos servicios tiene su propia política de privacidad, que puede consultarse en sus sitios web."
+      "vercelDesc": "Para el alojamiento de nuestra aplicación.",
+      "policy": "Cada uno de estos servicios tiene su propia política de privacidad, que se puede encontrar en sus sitios web.",
+      "supabase": "Supabase",
+      "supabaseDesc": "Para autenticación y gestión de cuentas de usuario. Supabase puede recopilar datos como dirección de correo electrónico, IP o información del navegador de acuerdo con su propia política de privacidad."
     },
     "dataStorage": {
       "title": "5. Almacenamiento de datos",

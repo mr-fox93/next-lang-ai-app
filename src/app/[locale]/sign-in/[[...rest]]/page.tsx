@@ -1,32 +1,18 @@
 "use client";
 
 import { Suspense } from "react";
-import { SignIn } from "@clerk/nextjs";
+import { SignInForm } from "@/components/auth/SignInForm";
 import { useSearchParams } from "next/navigation";
-import { useParams } from "next/navigation";
 
 function SignInWithRedirect() {
   const searchParams = useSearchParams();
-  const params = useParams();
-  const currentLocale = params?.locale as string || 'en';
   const redirect = searchParams.get("redirect");
 
-  const fallbackRedirectUrl = redirect || `/${currentLocale}/flashcards`;
+  const redirectUrl = redirect || `/flashcards`;
 
   return (
-    <SignIn
-      path={`/${currentLocale}/sign-in`}
-      routing="path"
-      fallbackRedirectUrl={fallbackRedirectUrl}
-      signUpFallbackRedirectUrl={fallbackRedirectUrl}
-      appearance={{
-        elements: {
-          formButtonPrimary:
-            "w-full h-12 text-lg relative overflow-hidden group bg-gradient-to-r from-purple-600 to-pink-600 border-2 border-white/20 text-white hover:opacity-80 transition-opacity",
-          formFieldInput: "border-gray-300 focus:border-blue-500",
-          card: "shadow-lg rounded-lg p-6 bg-white",
-        },
-      }}
+    <SignInForm 
+      redirectUrl={redirectUrl}
     />
   );
 }

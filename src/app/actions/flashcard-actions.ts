@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { currentUser } from "@clerk/nextjs/server";
 import {
   getGenerateFlashcardsUseCase,
   getFlashcardRepository,
@@ -31,8 +30,7 @@ export async function generateFlashcardsAction(
     }
 
     const { count, message, level, sourceLanguage, targetLanguage } = params;
-    const { userId } = await auth();
-    const user = await currentUser();
+    const { userId, user } = await auth();
 
     if (!userId) {
       return {
@@ -55,8 +53,8 @@ export async function generateFlashcardsAction(
         await prisma.user.create({
           data: {
             id: userId,
-            email: user?.primaryEmailAddress?.emailAddress || "",
-            username: user?.username || user?.firstName || "User",
+            email: user?.email || "",
+            username: user?.user_metadata?.username || user?.email?.split('@')[0] || "User",
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -71,12 +69,14 @@ export async function generateFlashcardsAction(
       message,
       level,
       userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      userEmail: user?.email || "",
       sourceLanguage,
       targetLanguage,
     };
 
-    return await getGenerateFlashcardsUseCase().execute(generateParams);
+    const result = await getGenerateFlashcardsUseCase().execute(generateParams);
+
+    return result;
   } catch (error) {
     console.error("Flashcard generation error:", error);
     return {
@@ -170,8 +170,7 @@ export async function getUserLanguagesAction() {
 export async function importGuestFlashcardsAction(
   flashcards: ImportableFlashcard[]
 ) {
-  const { userId } = await auth();
-  const user = await currentUser();
+  const { userId, user } = await auth();
 
   if (!userId || !user) {
     return {
@@ -191,8 +190,8 @@ export async function importGuestFlashcardsAction(
         dbUser = await prisma.user.create({
           data: {
             id: userId,
-            email: user.primaryEmailAddress?.emailAddress || "",
-            username: user.username || user.firstName || "User",
+            email: user.email || "",
+            username: user.user_metadata?.username || user.email?.split('@')[0] || "User",
           },
         });
         console.log("Created new user in database:", dbUser.id);
@@ -307,8 +306,7 @@ export async function generateMoreFlashcardsAction(params: {
       };
     }
 
-    const { userId } = await auth();
-    const user = await currentUser();
+    const { userId, user } = await auth();
 
     if (!userId) {
       return {
@@ -335,18 +333,12 @@ export async function generateMoreFlashcardsAction(params: {
       message,
       level: difficultyLevel,
       userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      userEmail: user?.email || "",
       sourceLanguage,
       targetLanguage,
     };
 
     const result = await getGenerateFlashcardsUseCase().execute(generateParams);
-
-    if (result.success && result.flashcards) {
-      // Currently the API doesn't allow direct category modification when using GenerateFlashcardsUseCase
-      // In practice, the AI model should return flashcards in the requested category, but we may add additional
-      // checks/modifications here in the future if needed
-    }
 
     return result;
   } catch (error) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/hooks/useAuth";
 import { generateFlashcardsAction } from "@/app/actions/flashcard-actions";
 
 interface UseFlashcardsOptions {

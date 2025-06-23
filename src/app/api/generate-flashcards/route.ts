@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { currentUser } from "@clerk/nextjs/server";
 import { getGenerateFlashcardsUseCase } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 
@@ -8,8 +7,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth();
-    const user = await currentUser();
+    const { userId, user } = await auth();
 
     if (!userId) {
       return NextResponse.json(
@@ -31,7 +29,7 @@ export async function POST(req: Request) {
       message,
       level,
       userId,
-      userEmail: user?.primaryEmailAddress?.emailAddress || "",
+      userEmail: user?.email || "",
       sourceLanguage,
       targetLanguage,
     };

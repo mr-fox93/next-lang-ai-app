@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useUser, UserButton, useClerk } from "@clerk/nextjs";
+import { useUser, useSupabase } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { PanelLeftOpen, LogOut, Save } from "lucide-react";
 import { motion } from "framer-motion";
@@ -21,9 +21,19 @@ export function TopBar({
   onProgressClick,
 }: TopBarProps) {
   const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
+  const { signOut } = useSupabase();
   const router = useRouter();
   const { isDemoMode, exitDemoMode } = useDemoMode();
+
+  // Debug logging for TopBar
+  console.log('TopBar debug:', { 
+    variant,
+    isSignedIn, 
+    isDemoMode,
+    hasUser: !!user,
+    userEmail: user?.primaryEmailAddress?.emailAddress,
+    userFullName: user?.fullName
+  });
 
   // Memoized handlers to prevent unnecessary re-renders
   const handleSignOut = useCallback(async () => {
@@ -70,8 +80,13 @@ export function TopBar({
         if (isSignedIn) {
           return (
             <>
-              <UserButton />
-              <span className="text-white font-medium">{user?.fullName}</span>
+              {/* Simple User Avatar */}
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <span className="text-white font-medium">{user?.fullName}</span>
+              </div>
               <Button
                 variant="ghost"
                 className="text-white"

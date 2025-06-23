@@ -88,13 +88,13 @@ export default function PrivacyPolicyClient() {
                 <p>{t('externalServices.content')}</p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>
-                    <span className="font-medium text-purple-300">{t('externalServices.clerk')}:</span> {t('externalServices.clerkDesc')}
-                  </li>
-                  <li>
                     <span className="font-medium text-purple-300">{t('externalServices.openai')}:</span> {t('externalServices.openaiDesc')}
                   </li>
                   <li>
                     <span className="font-medium text-purple-300">{t('externalServices.vercel')}:</span> {t('externalServices.vercelDesc')}
+                  </li>
+                  <li>
+                    <span className="font-medium text-purple-300">{t('externalServices.supabase')}:</span> {t('externalServices.supabaseDesc')}
                   </li>
                 </ul>
                 <p>{t('externalServices.policy')}</p>
