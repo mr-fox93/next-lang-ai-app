@@ -1,5 +1,5 @@
 "use client";
-import { useUser, UserButton, SignOutButton } from "@clerk/nextjs";
+import { useUser, useSupabase } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Menu, Layers, Cpu, X, Globe, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,6 +22,7 @@ const localeNames = {
 
 export default function Navbar() {
   const { user, isSignedIn } = useUser();
+  const { signOut } = useSupabase();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
@@ -190,17 +191,20 @@ export default function Navbar() {
           {isSignedIn ? (
             <>
               <div className="flex items-center space-x-2">
-                <UserButton />
+                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
                 <span className="text-white font-medium">{user?.fullName}</span>
               </div>
 
-              <SignOutButton>
-                <Button className="relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
-                  <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative">{t('logOut')}</span>
-                </Button>
-              </SignOutButton>
+              <Button 
+                className="relative overflow-hidden group"
+                onClick={signOut}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative">{t('logOut')}</span>
+              </Button>
             </>
           ) : isDemoMode ? (
             <div className="flex items-center space-x-3">
@@ -302,18 +306,21 @@ export default function Navbar() {
                 {isSignedIn ? (
                   <>
                     <div className="flex items-center justify-center space-x-4 mb-6 p-4 rounded-lg bg-white/5">
-                      <UserButton />
+                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
                       <span className="text-white font-medium">
                         {user?.fullName || "User"}
                       </span>
                     </div>
-                    <SignOutButton>
-                      <Button className="w-full h-12 relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
-                        <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <span className="relative">{t('logOut')}</span>
-                      </Button>
-                    </SignOutButton>
+                    <Button 
+                      className="w-full h-12 relative overflow-hidden group"
+                      onClick={signOut}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-100 group-hover:opacity-0 transition-opacity" />
+                      <div className="absolute inset-0 bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative">{t('logOut')}</span>
+                    </Button>
                   </>
                 ) : isDemoMode ? (
                   <div className="flex flex-col space-y-3 w-full">

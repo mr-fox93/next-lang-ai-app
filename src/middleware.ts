@@ -1,4 +1,5 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { createServerClient } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { demoModeService } from './core/useCases/session';
@@ -6,13 +7,52 @@ import { demoModeService } from './core/useCases/session';
 // Create the next-intl middleware
 const handleI18nRouting = createMiddleware(routing);
 
-export default clerkMiddleware((auth, req) => {
+export default async function middleware(req: NextRequest) {
+  console.log('Middleware called for:', req.nextUrl.pathname);
+  
+  const pathname = req.nextUrl.pathname;
+  
+  // Skip i18n routing for auth endpoints
+  if (pathname.startsWith('/auth/')) {
+    console.log('Auth endpoint - skipping i18n routing');
+    
+    // Create simple response for auth endpoints
+    const response = NextResponse.next();
+    
+    // Still handle Supabase session for auth endpoints
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              req.cookies.set(name, value);
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      console.error('Auth endpoint session error:', error);
+    }
+
+    return response;
+  }
+  
   // Handle demo mode auto-logout logic
   const cookies = req.headers.get('cookie') || '';
-  const pathname = req.nextUrl.pathname;
   
   // Check if demo mode should be automatically logged out
   if (demoModeService.shouldAutoLogout(pathname, cookies)) {
+    console.log('Demo mode auto-logout');
     // Get the i18n response first
     const response = handleI18nRouting(req);
     
@@ -22,8 +62,41 @@ export default clerkMiddleware((auth, req) => {
     return response;
   }
 
-  return handleI18nRouting(req);
-});
+  // Create response for i18n first
+  const response = handleI18nRouting(req);
+
+  // Create Supabase client for middleware with proper cookie handling
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            req.cookies.set(name, value);
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
+
+  // Refresh session and update cookies
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('Middleware session check:', { 
+      hasSession: !!session, 
+      userId: session?.user?.id 
+    });
+  } catch (error) {
+    console.error('Middleware session error:', error);
+  }
+
+  return response;
+}
 
 export const config = {
   // Match all pathnames except for

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks";
 import { Grid, Maximize2, Sparkles } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";

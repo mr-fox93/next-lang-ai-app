@@ -123,7 +123,7 @@
     "title": "Politica sulla privacy e cookie",
     "description": "Questo sito utilizza solo i cookie necessari per il corretto funzionamento. Memorizziamo temporaneamente i dati delle flashcard per gli utenti non loggati e ricordiamo le tue preferenze sui cookie.",
     "necessary": "Necessari",
-    "necessaryDesc": "Richiesti per le funzioni di base del sito: autenticazione tramite Clerk, archiviazione delle flashcard in modalità ospite e memorizzazione delle preferenze sui cookie.",
+    "necessaryDesc": "Richiesti per le funzioni di base del sito: autenticazione tramite Supabase, archiviazione delle flashcard in modalità ospite e memorizzazione delle preferenze sui cookie.",
     "showDetails": "Mostra dettagli",
     "hideDetails": "Nascondi dettagli",
     "acceptAll": "Accetta tutti",
@@ -140,7 +140,7 @@
       "title": "2. Quali dati raccogliamo",
       "content": "Raccogliamo solo i dati essenziali necessari per il funzionamento dell'applicazione:",
       "accountData": "Dati dell'account",
-      "accountDataDesc": "Dati di autenticazione tramite il servizio Clerk (indirizzo email). Questi dati sono archiviati da Clerk in conformità con la loro politica sulla privacy.",
+      "accountDataDesc": "Dati di autenticazione tramite il servizio Supabase (indirizzo email). Questi dati sono archiviati da Supabase in conformità con la loro politica sulla privacy.",
       "userContent": "Contenuto utente",
       "userContentDesc": "Le flashcard che crei (testo originale, traduzione, esempi di utilizzo, categorie) e le statistiche di apprendimento (progressi nella padronanza del materiale).",
       "tempData": "Dati temporanei",
@@ -150,7 +150,7 @@
       "title": "3. Come utilizziamo i cookie",
       "content": "Il nostro sito utilizza solo cookie essenziali e tecnologie simili:",
       "necessaryCookies": "Cookie essenziali",
-      "necessaryCookiesDesc": "Abilitano funzioni di base come l'accesso sicuro e la navigazione sul sito. Il servizio Clerk utilizza i propri cookie per l'autenticazione e la gestione delle sessioni.",
+      "necessaryCookiesDesc": "Abilitano funzioni di base come l'accesso sicuro e la navigazione sul sito. Il servizio Supabase utilizza i propri cookie per l'autenticazione e la gestione delle sessioni.",
       "localStorageTitle": "Archiviazione dati locale",
       "localStorageDesc": "Utilizziamo la memoria del tuo browser per archiviare flashcard in modalità ospite e ricordare le tue preferenze sui cookie.",
       "noCookies": "Non utilizziamo alcun cookie per finalità di marketing, tracciamento o analisi."
@@ -158,13 +158,13 @@
     "externalServices": {
       "title": "4. Servizi esterni",
       "content": "Utilizziamo i seguenti servizi esterni:",
-      "clerk": "Clerk",
-      "clerkDesc": "Per l'autenticazione e la gestione degli account utente. Clerk può raccogliere dati come indirizzo email, IP o informazioni sul browser in conformità con la propria politica sulla privacy.",
       "openai": "OpenAI",
-      "openaiDesc": "Per generare contenuti delle flashcard utilizzando la loro API. Vengono trasmessi solo i dati necessari per la generazione di contenuti; non condividiamo i dati personali degli utenti.",
+      "openaiDesc": "Per generare contenuti delle flashcard utilizzando la loro API. Vengono trasmessi solo i dati necessari per la generazione del contenuto; non condividiamo i dati personali degli utenti.",
       "vercel": "Vercel",
       "vercelDesc": "Per l'hosting della nostra applicazione.",
-      "policy": "Ciascuno di questi servizi ha la propria politica sulla privacy, che può essere consultata sui rispettivi siti web."
+      "policy": "Ognuno di questi servizi ha la propria politica sulla privacy, che può essere trovata sui loro siti web.",
+      "supabase": "Supabase",
+      "supabaseDesc": "Per l'autenticazione e la gestione degli account utente. Supabase può raccogliere dati come indirizzo email, IP o informazioni sul browser in conformità con la propria politica sulla privacy."
     },
     "dataStorage": {
       "title": "5. Archiviazione dei dati",

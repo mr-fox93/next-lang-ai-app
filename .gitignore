@@ -38,3 +38,5 @@ prisma/generated/
 
 # clerk configuration (can include secrets)
 /.clerk/
+.env.local.backup
+# Trigger rebuild with Supabase env vars

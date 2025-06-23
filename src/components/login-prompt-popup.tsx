@@ -76,9 +76,9 @@ export function LoginPromptPopup({
     onClose();
   };
 
-  const handleClerkClick = (e: React.MouseEvent) => {
+  const handleSupabaseClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open("https://clerk.com/", "_blank", "noopener,noreferrer");
+    window.open("https://supabase.com/", "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -206,17 +206,17 @@ export function LoginPromptPopup({
                 <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
               </Button>
 
-              {/* Secured by Clerk */}
+              {/* Secured by Supabase */}
               <div className="mt-6 pt-4 border-t border-purple-500/20 flex items-center justify-center">
                 <div className="flex items-center space-x-2 text-xs text-gray-400">
                   <Shield className="h-3.5 w-3.5 text-emerald-500" />
                   <span>
                     Secured by{" "}
                     <button
-                      onClick={handleClerkClick}
+                      onClick={handleSupabaseClick}
                       className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
                     >
-                      Clerk
+                      Supabase
                     </button>
                   </span>
                 </div>

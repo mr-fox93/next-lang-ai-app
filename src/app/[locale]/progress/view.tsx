@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -25,7 +25,7 @@ export default function ProgressDashboard({
   initialStats,
   initialReviewedToday,
 }: ProgressDashboardProps) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations('Progress');
@@ -139,8 +139,8 @@ export default function ProgressDashboard({
 
   const dailyProgress = (reviewedToday / dailyGoal) * 100;
 
-  // Show loading while checking demo mode
-  if (isLoading) {
+  // Show loading while checking demo mode OR while auth is loading
+  if (isLoading || !isLoaded) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>

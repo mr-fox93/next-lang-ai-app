@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { locales } from '@/i18n/routing';
 import '../globals.css';
-import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingErrorProvider } from "@/shared/ui/loading-error-provider";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
@@ -44,29 +43,22 @@ export default async function LocaleLayout({
   }
 
   return (
-    <ClerkProvider
-      signInFallbackRedirectUrl="/"
-      signUpFallbackRedirectUrl="/"
-      afterSignInUrl="/"
-      afterSignUpUrl="/"
-    >
-      <html lang={locale}>
-        <body className="relative isolate overflow-x-hidden">
-          <ErrorBoundary>
-            <LoadingErrorProvider>
-              <ClientI18nProvider messages={messages}>
-                <CookieConsentProvider>
-                  <ContactModalProvider>
-                    {children}
-                    <Footer />
-                  </ContactModalProvider>
-                </CookieConsentProvider>
-              </ClientI18nProvider>
-            </LoadingErrorProvider>
-          </ErrorBoundary>
-          <Toaster />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang={locale}>
+      <body className="relative isolate overflow-x-hidden">
+        <ErrorBoundary>
+          <LoadingErrorProvider>
+            <ClientI18nProvider messages={messages}>
+              <CookieConsentProvider>
+                <ContactModalProvider>
+                  {children}
+                  <Footer />
+                </ContactModalProvider>
+              </CookieConsentProvider>
+            </ClientI18nProvider>
+          </LoadingErrorProvider>
+        </ErrorBoundary>
+        <Toaster />
+      </body>
+    </html>
   );
 } 

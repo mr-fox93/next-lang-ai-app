@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, UserButton } from "@clerk/nextjs";
+import { useUser } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -26,10 +26,12 @@ export function ProgressTopBar() {
           </Link>
         </div>
         <div className="flex items-center space-x-2">
-          {/* Show UserButton only for real users, not for demo */}
+          {/* Show User Avatar only for real users, not for demo */}
           {isSignedIn && (
             <>
-              <UserButton />
+              <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {user?.fullName?.charAt(0)?.toUpperCase() || user?.primaryEmailAddress?.emailAddress?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
               <span className="text-white font-medium hidden sm:inline-block">
                 {user?.fullName}
               </span>

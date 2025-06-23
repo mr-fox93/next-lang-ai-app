@@ -16,7 +16,7 @@ import {
 } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/hooks";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslations } from 'next-intl';
 
