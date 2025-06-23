@@ -324,9 +324,41 @@ export async function generateMoreFlashcardsAction(params: {
       difficultyLevel,
     } = params;
 
-    const message = `Generate ${count} new flashcards for the category "${category}" that DO NOT CONTAIN the following terms: ${existingTerms.join(
-      ", "
-    )}. The flashcards should be related to the same category.`;
+    // Step 1: Verify that the category exists in user's flashcards
+    const flashcardRepository = new PrismaFlashcardRepository();
+    const userFlashcards = await flashcardRepository.getFlashcardsByUserId(userId);
+    const existingCategory = userFlashcards.find(card => card.category === category);
+    
+    if (!existingCategory) {
+      return {
+        success: false,
+        error: `Category "${category}" not found. Please select an existing category.`,
+      };
+    }
+
+    // Step 2: Get all existing terms in this category to prevent duplicates
+    const existingFlashcardsInCategory = userFlashcards.filter(card => card.category === category);
+    const allExistingTerms = Array.from(
+      new Set([
+        ...existingTerms,
+        ...existingFlashcardsInCategory.map(card => card.origin_text.toLowerCase()),
+        ...existingFlashcardsInCategory.map(card => card.translate_text.toLowerCase())
+      ])
+    );
+
+    // Step 3: Create a very explicit message that forces the exact category
+    const excludeTermsText = allExistingTerms.length > 0 
+      ? `- DO NOT include ANY of these existing terms: ${allExistingTerms.join(", ")}`
+      : `- Generate completely new and unique terms`;
+      
+    const message = `Generate ${count} new flashcards SPECIFICALLY for the existing category "${category}". 
+
+CRITICAL REQUIREMENTS:
+- ALL flashcards MUST have category: "${category}" (use this EXACT name)
+- DO NOT create variations of the category name
+${excludeTermsText}
+- All flashcards must be related to the same topic as the existing "${category}" category
+- Generate unique terms that complement the existing flashcards in this category`;
 
     const generateParams: GenerateFlashcardsParams = {
       count,
@@ -339,6 +371,24 @@ export async function generateMoreFlashcardsAction(params: {
     };
 
     const result = await getGenerateFlashcardsUseCase().execute(generateParams);
+
+    // Step 4: Validate that AI returned the correct category and no duplicates
+    if (result.success && result.flashcards) {
+      const invalidFlashcards = result.flashcards.filter(card => 
+        card.category !== category || 
+        allExistingTerms.includes(card.origin_text.toLowerCase()) ||
+        allExistingTerms.includes(card.translate_text.toLowerCase())
+      );
+
+      if (invalidFlashcards.length > 0) {
+        return {
+          success: false,
+          error: `AI generated invalid flashcards: wrong category or duplicates detected. Please try again.`,
+        };
+      }
+
+      // Note: Duplicates already checked in Step 4 with comprehensive allExistingTerms
+    }
 
     return result;
   } catch (error) {
@@ -370,9 +420,22 @@ export async function generateMoreGuestFlashcardsAction(params: {
       difficultyLevel,
     } = params;
 
-    const message = `Generate ${count} new flashcards for the category "${category}" that DO NOT CONTAIN the following terms: ${existingTerms.join(
-      ", "
-    )}. The flashcards should be related to the same category.`;
+    // Step 1: Create comprehensive list of existing terms to prevent duplicates
+    const allExistingTerms = Array.from(new Set(existingTerms.map(term => term.toLowerCase())));
+
+    // Step 2: Create a very explicit message that forces the exact category
+    const excludeTermsText = allExistingTerms.length > 0 
+      ? `- DO NOT include ANY of these existing terms: ${allExistingTerms.join(", ")}`
+      : `- Generate completely new and unique terms`;
+      
+    const message = `Generate ${count} new flashcards SPECIFICALLY for the existing category "${category}". 
+
+CRITICAL REQUIREMENTS:
+- ALL flashcards MUST have category: "${category}" (use this EXACT name)
+- DO NOT create variations of the category name
+${excludeTermsText}
+- All flashcards must be related to the same topic as the existing "${category}" category
+- Generate unique terms that complement the existing flashcards in this category`;
 
     const result = await handleGuestFlashcardGeneration({
       count,
@@ -383,9 +446,24 @@ export async function generateMoreGuestFlashcardsAction(params: {
     });
 
     if (result.success && result.flashcards) {
+      // Step 3: Validate that AI returned the correct category and no duplicates
+      const invalidFlashcards = result.flashcards.filter(card => 
+        card.category !== category || 
+        allExistingTerms.includes(card.origin_text.toLowerCase()) ||
+        allExistingTerms.includes(card.translate_text.toLowerCase())
+      );
+
+      if (invalidFlashcards.length > 0) {
+        return {
+          success: false,
+          error: `AI generated invalid flashcards: wrong category or duplicates detected. Please try again.`,
+        };
+      }
+
+      // Step 4: Ensure all flashcards have the correct category
       const flashcardsWithCategory = result.flashcards.map((card) => ({
         ...card,
-        category: category,
+        category: category, // Force the exact category name
       }));
 
       return {

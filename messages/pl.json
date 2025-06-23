@@ -28,7 +28,8 @@
     "noCategories": "Nie masz jeszcze żadnych kategorii fiszek.",
     "createFlashcards": "Utwórz fiszki",
     "untouched": "Nietknięte",
-    "continueLearning": "Kontynuuj naukę"
+    "continueLearning": "Kontynuuj naukę",
+    "home": "Strona główna"
   },
   "Sidebar": {
     "categories": "Kategorie",
@@ -249,5 +250,6 @@
     "errorInvalidEmail": "Wystąpił problem z adresem email. Sprawdź go i spróbuj ponownie.",
     "emailValidationError": "Proszę wprowadzić poprawny adres email.",
     "offensiveContentError": "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
-  }
+  },
+  "home": "Strona główna"
 } 
