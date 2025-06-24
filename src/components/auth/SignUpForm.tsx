@@ -248,6 +248,16 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
             </Link>
           </p>
         </div>
+
+        {/* Secured by Supabase */}
+        <div className="mt-4 text-center">
+          <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.001 2L22 8v8c0 5.55-3.84 9.74-9 11-5.16-1.26-9-5.45-9-11V8l9.999-6z"/>
+            </svg>
+            <span>Secured by Supabase</span>
+          </div>
+        </div>
       </div>
     </div>
   );

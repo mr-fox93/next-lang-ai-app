@@ -28,7 +28,8 @@
     "noCategories": "Nie masz jeszcze żadnych kategorii fiszek.",
     "createFlashcards": "Utwórz fiszki",
     "untouched": "Nietknięte",
-    "continueLearning": "Kontynuuj naukę"
+    "continueLearning": "Kontynuuj naukę",
+    "home": "Strona główna"
   },
   "Sidebar": {
     "categories": "Kategorie",
@@ -253,4 +254,6 @@
   "AnimatedAssistant": {
     "hintMessage": "Potrzebujesz pomocy? Kliknij mnie! 💬"
   }
+
+  "home": "Strona główna"
 } 

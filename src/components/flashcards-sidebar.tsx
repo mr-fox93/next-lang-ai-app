@@ -390,8 +390,9 @@ export function FlashcardsSidebar({
         });
 
         if (result.success && result.flashcards) {
-          const updatedFlashcards = guestFlashcardsStorage.addFlashcards(
-            result.flashcards
+          const updatedFlashcards = guestFlashcardsStorage.addMoreFlashcardsToCategory(
+            result.flashcards,
+            categoryToGenerate
           );
 
           if (onFlashcardsUpdate) {
