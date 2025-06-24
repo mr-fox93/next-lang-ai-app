@@ -7,6 +7,7 @@ export const ResponsStructure = z.object({
   example_using: z.string(),
   translate_example: z.string(),
   category: z.string(),
+  translate_category: z.string(),
   sourceLanguage: z.string().optional(),
   targetLanguage: z.string().optional(),
   difficultyLevel: z.string().optional(),

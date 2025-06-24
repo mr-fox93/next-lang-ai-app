@@ -232,18 +232,6 @@ export default function HowItWorks() {
                 <span>{t('step2.trackProgress')}</span>
               </li>
             </ul>
-
-            <div className="flex flex-wrap gap-3 mt-8">
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.nativeSpeaker')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.smartLearning')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.contextExamples')}
-              </div>
-            </div>
           </div>
         </motion.div>
 
@@ -286,18 +274,6 @@ export default function HowItWorks() {
                 </span>
               </li>
             </ul>
-
-            <div className="flex flex-wrap gap-3 mt-8">
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.progressAnalytics')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.customStudyPlans')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.crossDeviceSync')}
-              </div>
-            </div>
           </div>
 
           <div className="flex items-center justify-center">

@@ -200,6 +200,8 @@ export function FlashcardsSidebar({
     [filteredFlashcards]
   );
 
+
+
   // Memoized filtered categories by learning status
   const getFilteredCategoriesByLearningStatus = useCallback(() => {
     if (learningFilter === "all") {
@@ -486,6 +488,34 @@ export function FlashcardsSidebar({
     return t('noCategoriesAvailable');
   }, [isLoadingLanguages, learningFilter, selectedLanguage, t, getLanguageName]);
 
+  // Memoized function to get target language for a category
+  const categoryInfoMap = useMemo(() => {
+    const infoMap = new Map<string, { 
+      language: string; 
+      translation: string; 
+    }>();
+    
+    filteredFlashcards.forEach(card => {
+      if (!infoMap.has(card.category)) {
+        infoMap.set(card.category, {
+          language: card.targetLanguage.toUpperCase(),
+          translation: card.translate_category
+        });
+      }
+    });
+    
+    return infoMap;
+  }, [filteredFlashcards]);
+
+  // Optimized functions using the map
+  const getCategoryLanguage = useCallback((category: string): string => {
+    return categoryInfoMap.get(category)?.language || '';
+  }, [categoryInfoMap]);
+
+  const getCategoryTranslation = useCallback((category: string): string => {
+    return categoryInfoMap.get(category)?.translation || category;
+  }, [categoryInfoMap]);
+
   return (
     <div className="relative h-screen overflow-hidden">
       {isGenerating && <AIGenerationLoader />}
@@ -721,12 +751,24 @@ export function FlashcardsSidebar({
                       {!isCollapsed && masteredCategories.includes(category) && (
                         <CheckCircle className="h-4 w-4 mr-2 text-green-400 flex-shrink-0" />
                       )}
-                      <span className={cn(
-                        "relative z-10 block text-sm",
-                        isCollapsed ? "text-center w-full" : "truncate min-w-0"
-                      )}>
-                        {isCollapsed ? category.charAt(0) : category}
-                      </span>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className={cn(
+                          "relative z-10 block text-sm font-medium",
+                          isCollapsed ? "text-center w-full" : "truncate min-w-0"
+                        )}>
+                          {isCollapsed ? category.charAt(0) : category}
+                        </span>
+                        {!isCollapsed && getCategoryTranslation(category) !== category && (
+                          <span className="text-xs text-white/50 truncate">
+                            ({getCategoryTranslation(category)})
+                          </span>
+                        )}
+                      </div>
+                      {!isCollapsed && (
+                        <span className="ml-2 px-1.5 py-0.5 text-xs font-medium bg-white/10 text-white/70 rounded flex-shrink-0">
+                          {getCategoryLanguage(category)}
+                        </span>
+                      )}
                     </div>
                     {selectedCategory === category && (
                       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
