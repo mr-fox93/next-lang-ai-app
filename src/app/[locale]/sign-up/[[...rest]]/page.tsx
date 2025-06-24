@@ -2,18 +2,6 @@
 
 import { Suspense } from "react";
 import { SignUpForm } from "@/components/auth/SignUpForm";
-import { useSearchParams } from "next/navigation";
-
-function SignUpWithRedirect() {
-  const search = useSearchParams();
-  const redirect = search.get("redirect") ?? `/flashcards`;
-
-  return (
-    <SignUpForm 
-      redirectUrl={redirect}
-    />
-  );
-}
 
 export default function SignUpPage() {
   return (
@@ -21,7 +9,7 @@ export default function SignUpPage() {
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
       <Suspense fallback={<div className="text-white">Loading…</div>}>
-        <SignUpWithRedirect />
+        <SignUpForm />
       </Suspense>
     </div>
   );
