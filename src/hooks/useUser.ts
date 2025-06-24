@@ -5,16 +5,6 @@ import { useAuth } from './useAuth';
 export function useUser() {
   const { user, isSignedIn, loading } = useAuth();
 
-  // Debug logging for OAuth
-  console.log('useUser debug:', { 
-    hasUser: !!user, 
-    isSignedIn, 
-    loading,
-    userEmail: user?.email,
-    userMetadata: user?.user_metadata,
-    appMetadata: user?.app_metadata
-  });
-
   return {
     user: user ? {
       id: user.id,

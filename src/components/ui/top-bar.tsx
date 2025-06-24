@@ -25,16 +25,6 @@ export function TopBar({
   const router = useRouter();
   const { isDemoMode, exitDemoMode } = useDemoMode();
 
-  // Debug logging for TopBar
-  console.log('TopBar debug:', { 
-    variant,
-    isSignedIn, 
-    isDemoMode,
-    hasUser: !!user,
-    userEmail: user?.primaryEmailAddress?.emailAddress,
-    userFullName: user?.fullName
-  });
-
   // Memoized handlers to prevent unnecessary re-renders
   const handleSignOut = useCallback(async () => {
     try {
