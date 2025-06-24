@@ -1,9 +1,7 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ImageModal } from "./image-modal";
-import { useState, useEffect } from "react";
-import { ChevronUp } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
@@ -17,33 +15,13 @@ const localeNames = {
 };
 
 export default function HowItWorks() {
-  const [showScrollButton, setShowScrollButton] = useState(false);
   const t = useTranslations('HowItWorks');
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
   const currentLocale = params.locale as Locale || 'en';
 
-  useEffect(() => {
-    // Simple scroll handler that shows button after scrolling down 300px
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
 
   const changeLanguage = (locale: Locale) => {
     router.push(pathname, { locale });
@@ -334,22 +312,7 @@ export default function HowItWorks() {
         </motion.div>
       </div>
 
-      <AnimatePresence>
-        {showScrollButton && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-            onClick={scrollToTop}
-            style={{ bottom: 'calc(15vh)', zIndex: 999 }}
-            className="fixed right-6 p-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-900/30 hover:shadow-purple-700/40 border border-white/10 hover:border-white/20 transition-all duration-300"
-            aria-label="Scroll to top"
-          >
-            <ChevronUp size={24} />
-          </motion.button>
-        )}
-      </AnimatePresence>
+
     </div>
   );
 }

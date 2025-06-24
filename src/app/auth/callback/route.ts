@@ -2,17 +2,55 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  console.log('OAuth callback called');
+  console.log('Auth callback called');
   
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/flashcards'
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
 
-  console.log('OAuth callback params:', { code: !!code, next });
+  console.log('Auth callback params:', { 
+    hasCode: !!code, 
+    hasTokenHash: !!token_hash, 
+    type 
+  });
 
-  if (code) {
+  const supabase = await createClient()
+
+  // Handle magic link verification
+  if (token_hash && type) {
+    console.log('Processing magic link verification');
     try {
-      const supabase = await createClient()
+      const { data: { session }, error } = await supabase.auth.verifyOtp({
+        token_hash,
+        type: type as 'email',
+      })
+
+      console.log('Magic link verification:', { 
+        hasSession: !!session, 
+        hasUser: !!session?.user,
+        error 
+      });
+
+      if (error) {
+        console.error('Magic link verification error:', error);
+        return NextResponse.redirect(new URL('/en/sign-in?error=magic_link_error', request.url))
+      }
+
+      if (session?.user) {
+        console.log('Magic link successful, redirecting to flashcards');
+        return NextResponse.redirect(new URL('/en/flashcards', request.url))
+      }
+    } catch (err) {
+      console.error('Magic link callback exception:', err);
+      return NextResponse.redirect(new URL('/en/sign-in?error=magic_link_exception', request.url))
+    }
+  }
+
+  // Handle OAuth code exchange
+  if (code) {
+    console.log('Processing OAuth code exchange');
+    try {
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
       
       console.log('OAuth session exchange:', { 
@@ -27,10 +65,8 @@ export async function GET(request: NextRequest) {
       }
 
       if (session?.user) {
-        console.log('OAuth successful, redirecting to:', next);
-        const redirectUrl = next.startsWith('/') ? `/en${next}` : `/en/${next}`;
-        console.log('Final redirect URL:', redirectUrl);
-        return NextResponse.redirect(new URL(redirectUrl, request.url))
+        console.log('OAuth successful, redirecting to flashcards');
+        return NextResponse.redirect(new URL('/en/flashcards', request.url))
       }
     } catch (err) {
       console.error('OAuth callback exception:', err);
@@ -38,7 +74,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // If no code or session failed, redirect to sign-in
-  console.log('OAuth callback failed, redirecting to sign-in');
+  // If no code or token_hash, or authentication failed, redirect to sign-in
+  console.log('Auth callback failed, redirecting to sign-in');
   return NextResponse.redirect(new URL('/en/sign-in', request.url))
 } 

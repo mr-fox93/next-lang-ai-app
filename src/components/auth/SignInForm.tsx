@@ -1,46 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Mail, Lock } from 'lucide-react';
+import { Loader2, Mail, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 
-interface SignInFormProps {
-  redirectUrl?: string;
-}
-
-export function SignInForm({ redirectUrl }: SignInFormProps) {
+export function SignInForm() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   
-  const { signInWithEmail, signInWithOAuth } = useSupabase();
-  const router = useRouter();
+  const { signInWithMagicLink, signInWithOAuth } = useSupabase();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const { error } = await signInWithEmail(email, password);
+      const { error } = await signInWithMagicLink(email);
       
       if (error) {
         setError(error.message);
       } else {
-        // Redirect after successful sign in
-        const destination = redirectUrl || '/flashcards';
-        router.push(destination);
+        setSuccess(true);
       }
     } catch (err) {
-      console.error('Sign in error:', err);
+      console.error('Magic link error:', err);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -83,12 +75,46 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
     }
   };
 
+  if (success) {
+    return (
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-8 shadow-2xl">
+          <div className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+              <Mail className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">Check Your Email</h2>
+            <p className="text-gray-300 mb-6">
+              We&apos;ve sent you a magic link at <strong className="text-white">{email}</strong>. 
+              Click the link in the email to sign in instantly - no password needed!
+            </p>
+            <div className="space-y-4">
+              <Button
+                onClick={() => {
+                  setSuccess(false);
+                  setEmail('');
+                }}
+                variant="outline"
+                className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
+              >
+                Send Another Link
+              </Button>
+              <p className="text-sm text-gray-400">
+                Didn&apos;t receive the email? Check your spam folder or try again.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-8 shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-300">Sign in to your account</p>
+          <p className="text-gray-300">Enter your email to receive a magic link</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -109,23 +135,6 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400"
-                disabled={loading}
-                required
-              />
-            </div>
-          </div>
-
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
               <p className="text-red-400 text-sm">{error}</p>
@@ -135,15 +144,18 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
           <Button
             type="submit"
             className="w-full h-12 text-lg relative overflow-hidden group bg-gradient-to-r from-purple-600 to-pink-600 border-2 border-white/20 text-white hover:opacity-80 transition-opacity"
-            disabled={loading || !email || !password}
+            disabled={loading || !email}
           >
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                Signing in...
+                Sending Magic Link...
               </>
             ) : (
-              'Sign In'
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                Send Magic Link
+              </>
             )}
           </Button>
         </form>
@@ -173,11 +185,11 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
         {/* Discord Sign In */}
         <Button
           onClick={handleDiscordSignIn}
-          className="w-full h-12 text-lg bg-[#5865F2] text-white hover:bg-[#4752C4] transition-colors flex items-center justify-center gap-3 mt-3"
+          className="w-full h-12 text-lg mt-3 bg-[#5865F2] text-white hover:bg-[#4752C4] transition-colors flex items-center justify-center gap-3"
           disabled={loading}
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0003 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9554 2.4189-2.1568 2.4189Z"/>
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 2.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-2.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
           </svg>
           {loading ? 'Signing in...' : 'Continue with Discord'}
         </Button>

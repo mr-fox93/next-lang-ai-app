@@ -15,57 +15,26 @@ export function useSupabase() {
     router.push('/');
   };
 
-  const signInWithEmail = async (email: string, password: string) => {
-    console.log('Attempting sign in with email:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({
+  const signInWithMagicLink = async (email: string) => {
+    console.log('Attempting magic link sign in with email:', email);
+    const { data, error } = await supabase.auth.signInWithOtp({
       email,
-      password,
-    });
-    console.log('Sign in result:', { data, error });
-    return { data, error };
-  };
-
-  const signUpWithEmail = async (email: string, password: string, options?: {
-    data?: {
-      full_name?: string;
-      username?: string;
-    };
-  }) => {
-    console.log('Attempting sign up with email:', email);
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
       options: {
-        ...options,
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/flashcards')}`,
+        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    
-    console.log('Sign up result:', { data, error });
-    
-    // If sign up was successful but user needs to confirm email
-    if (data.user && !data.session && !error) {
-      return { 
-        data, 
-        error: { 
-          message: 'Please check your email and click the confirmation link to complete registration.' 
-        } 
-      };
-    }
-    
+    console.log('Magic link result:', { data, error });
     return { data, error };
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github' | 'discord') => {
     console.log('Attempting OAuth sign in with:', provider);
     
-    const nextUrl = `/flashcards`;
-    
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     console.log('OAuth result:', { data, error });
@@ -74,8 +43,7 @@ export function useSupabase() {
 
   return {
     signOut,
-    signInWithEmail,
-    signUpWithEmail,
+    signInWithMagicLink,
     signInWithOAuth,
     supabase,
   };
