@@ -3,15 +3,12 @@
 import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { debugLog, debugError } from '@/utils/debug';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     debugLog('Getting initial session...');
@@ -45,7 +42,7 @@ export function useAuth() {
     );
 
     return () => subscription.unsubscribe();
-  }, [router, searchParams]);
+  }, []);
 
   return {
     user,

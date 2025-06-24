@@ -3,6 +3,7 @@ import Hero from "@/components/hero";
 import HowItWorks from "@/components/how-it-works";
 import Navbar from "@/components/navbar";
 import { SparklesCore } from "@/components/sparkles";
+import { Suspense } from 'react';
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   // Await the params to get the locale
@@ -28,9 +29,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       </div>
 
       <div className="relative z-[5]">
-        <Navbar />
+        <Suspense fallback={<div className="h-20 bg-black" />}>
+          <Navbar />
+        </Suspense>
         <div className="relative z-[1]">
-          <Hero />
+          <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+            <Hero />
+          </Suspense>
           <HowItWorks />
         </div>
       </div>
