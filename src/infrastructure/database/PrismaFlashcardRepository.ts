@@ -1,6 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
+import { prisma } from "@/lib/prisma"; // Use secure configured client
 import { CategoryProgress } from "@/types/progress";
 import { Decimal } from "@prisma/client/runtime/library";
 
@@ -8,7 +9,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prisma; // Use imported secure client instead of new instance
   }
 
   async getFlashcardsByUserId(userId: string): Promise<Flashcard[]> {

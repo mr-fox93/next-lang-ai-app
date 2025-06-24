@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { ProgressRepository, ProgressData, Progress } from "@/core/interfaces/repositories/ProgressRepository";
+import { prisma } from "@/lib/prisma"; // Use secure configured client
 
 export class PrismaProgressRepository implements ProgressRepository {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = prisma; // Use imported secure client instead of new instance
   }
 
   async createProgress(data: ProgressData): Promise<Progress> {

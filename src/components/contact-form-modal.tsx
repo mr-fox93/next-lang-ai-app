@@ -150,8 +150,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     setIsCheckingAI(true);
     
     try {
-      console.log("Sending message...");
-      
       const response = await fetch("/api/send", {
         method: "POST",
         headers: {
@@ -171,7 +169,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       setIsCheckingAI(false);
       
       if (response.ok) {
-        console.log("Contact form submission successful");
         setIsSending(true);
         setIsSent(true);
         setResponseStatus({
@@ -216,7 +213,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       });
       setIsSent(true); // Pokaż komunikat również przy wyjątku
     } finally {
-      console.log("Setting isSending to false");
       setIsSending(false);
     }
   };

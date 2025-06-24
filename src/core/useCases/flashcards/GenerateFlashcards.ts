@@ -7,6 +7,7 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
 import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 export interface GenerateFlashcardsParams {
   count: number;
@@ -34,10 +35,10 @@ export class GenerateFlashcardsUseCase {
     private progressRepository: ProgressRepository,
     private userRepository: UserRepository
   ) {
+    this.prisma = prisma;
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    this.prisma = new PrismaClient();
   }
 
   async execute(
