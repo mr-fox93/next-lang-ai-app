@@ -1,13 +1,12 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ImageModal } from "./image-modal";
-import { useState, useEffect } from "react";
-import { ChevronUp } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { Locale } from '@/types/locale';
+import Image from "next/image";
 
 const localeNames = {
   en: 'English',
@@ -17,33 +16,11 @@ const localeNames = {
 };
 
 export default function HowItWorks() {
-  const [showScrollButton, setShowScrollButton] = useState(false);
   const t = useTranslations('HowItWorks');
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
   const currentLocale = params.locale as Locale || 'en';
-
-  useEffect(() => {
-    // Simple scroll handler that shows button after scrolling down 300px
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
 
   const changeLanguage = (locale: Locale) => {
     router.push(pathname, { locale });
@@ -194,9 +171,11 @@ export default function HowItWorks() {
               <div className="flex gap-4">
                 <div className="group inline-block w-1/2 rounded-xl border border-pink-600/40 shadow-lg shadow-pink-900/20 bg-black/40 p-[3px] group-hover:border-pink-500/70 group-hover:shadow-pink-700/30 transition-all duration-300">
                   <div className="relative rounded-lg overflow-hidden">
-                    <img 
+                    <Image 
                       src="/lang.png" 
                       alt="Language Filter" 
+                      width={200}
+                      height={120}
                       className="w-full rounded-lg"
                     />
                   </div>
@@ -204,9 +183,11 @@ export default function HowItWorks() {
                 
                 <div className="group inline-block w-1/2 rounded-xl border border-pink-600/40 shadow-lg shadow-pink-900/20 bg-black/40 p-[3px] group-hover:border-pink-500/70 group-hover:shadow-pink-700/30 transition-all duration-300">
                   <div className="relative rounded-lg overflow-hidden">
-                    <img 
+                    <Image 
                       src="/learn.png" 
                       alt="Progress Filter" 
+                      width={200}
+                      height={120}
                       className="w-full rounded-lg"
                     />
                   </div>
@@ -254,18 +235,6 @@ export default function HowItWorks() {
                 <span>{t('step2.trackProgress')}</span>
               </li>
             </ul>
-
-            <div className="flex flex-wrap gap-3 mt-8">
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.nativeSpeaker')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.smartLearning')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-pink-600 text-white">
-                {t('step2.contextExamples')}
-              </div>
-            </div>
           </div>
         </motion.div>
 
@@ -308,18 +277,6 @@ export default function HowItWorks() {
                 </span>
               </li>
             </ul>
-
-            <div className="flex flex-wrap gap-3 mt-8">
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.progressAnalytics')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.customStudyPlans')}
-              </div>
-              <div className="inline-flex items-center px-6 py-2.5 rounded-full bg-black border border-purple-600 text-white">
-                {t('step3.crossDeviceSync')}
-              </div>
-            </div>
           </div>
 
           <div className="flex items-center justify-center">
@@ -334,22 +291,7 @@ export default function HowItWorks() {
         </motion.div>
       </div>
 
-      <AnimatePresence>
-        {showScrollButton && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-            onClick={scrollToTop}
-            style={{ bottom: 'calc(15vh)', zIndex: 999 }}
-            className="fixed right-6 p-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-900/30 hover:shadow-purple-700/40 border border-white/10 hover:border-white/20 transition-all duration-300"
-            aria-label="Scroll to top"
-          >
-            <ChevronUp size={24} />
-          </motion.button>
-        )}
-      </AnimatePresence>
+
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from 'next-intl';
 import { z } from "zod";
 import { Filter } from "bad-words";
+import { debugLog, debugError } from '@/utils/debug';
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -38,6 +39,8 @@ const additionalProfanities = [
   // Threatening words
   'zabije', 'zabiję', 'zabić', 'śmierć', 'grożę', 'groźba', 'nienawidzę', 'nienawiść'
 ];
+
+
 
 export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps) {
   const [name, setName] = useState("");
@@ -117,7 +120,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       setMessageError(null);
       return true;
     } catch (err) {
-      console.error("Error checking content:", err);
+      debugError("Error checking content:", err);
       return true; // Allow the message if the filter fails
     }
   }, [filter, t]);
@@ -150,7 +153,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     setIsCheckingAI(true);
     
     try {
-      console.log("Sending message...");
+      debugLog("Sending message...");
       
       const response = await fetch("/api/send", {
         method: "POST",
@@ -164,15 +167,15 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         }),
       });
       
-      console.log("Response status:", response.status);
+      debugLog("Response status:", response.status);
       const data = await response.json();
-      console.log("Response data:", data);
+      debugLog("Response data:", data);
       
       // AI checking is complete
       setIsCheckingAI(false);
       
       if (response.ok) {
-        console.log("Setting success state");
+        debugLog("Setting success state");
         setIsSending(true);
         setIsSent(true);
         setResponseStatus({
@@ -180,7 +183,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
           message: t('messageSent')
         });
       } else {
-        console.log("Setting error state");
+        debugLog("Setting error state");
         // Handle specific error codes
         let errorMessage = t('errorGeneric');
         
@@ -209,7 +212,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         setIsSent(true); // Pokaż komunikat nawet gdy jest błąd
       }
     } catch (err) {
-      console.error("Error sending message:", err);
+      debugError("Error sending message:", err);
       setIsCheckingAI(false);
       setResponseStatus({
         success: false,
@@ -217,7 +220,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       });
       setIsSent(true); // Pokaż komunikat również przy wyjątku
     } finally {
-      console.log("Setting isSending to false");
+      debugLog("Setting isSending to false");
       setIsSending(false);
     }
   };

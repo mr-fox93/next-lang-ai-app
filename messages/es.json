@@ -249,5 +249,8 @@
     "errorInvalidEmail": "Hubo un problema con la dirección de email. Por favor verifica e intenta de nuevo.",
     "emailValidationError": "Por favor ingresa una dirección de email válida.",
     "offensiveContentError": "Tu mensaje contiene contenido que puede violar nuestras pautas comunitarias. Por favor revisa y enfócate en problemas técnicos o comentarios sobre la aplicación."
+  },
+  "AnimatedAssistant": {
+    "hintMessage": "¿Necesitas ayuda? ¡Haz clic! 💬"
   }
 } 

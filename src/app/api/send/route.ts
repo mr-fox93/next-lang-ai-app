@@ -4,9 +4,12 @@ import * as React from 'react';
 import { z } from 'zod';
 import { Filter } from 'bad-words';
 import { moderateContent } from '@/lib/openai-moderation';
+import { debugLog, debugError } from '@/utils/debug';
 
 // Inicjalizacja Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+
 
 // Content validation schema
 const messageSchema = z.object({
@@ -25,11 +28,11 @@ filter.addWords(
 );
 
 export async function POST(request: Request) {
-  console.log("Received contact form submission");
+  debugLog("Received contact form submission");
   try {
     // Pobierz dane z formularza
     const formData = await request.json();
-    console.log("Form data:", { 
+    debugLog("Form data:", { 
       name: formData.name, 
       email: formData.email ? `${formData.email.substring(0, 3)}...` : 'missing', 
       messageLength: formData.message ? formData.message.length : 0 
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
       messageSchema.parse(formData);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.log("Validation failed:", error.errors);
+        debugLog("Validation failed:", error.errors);
         return Response.json({ 
           error: { 
             message: error.errors[0].message, 
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
 
     // Simple initial check with bad-words filter
     if (filter.isProfane(message)) {
-      console.log("Offensive content detected by basic filter");
+      debugLog("Offensive content detected by basic filter");
       return Response.json({ 
         error: { 
           message: "We couldn't send your message",
@@ -66,11 +69,11 @@ export async function POST(request: Request) {
     }
 
     // Advanced AI-powered moderation check
-    console.log("Running AI content moderation...");
+    debugLog("Running AI content moderation...");
     const moderationResult = await moderateContent(message);
     
     if (!moderationResult.isSafe) {
-      console.log("AI moderation flagged content:", moderationResult.reasons);
+      debugLog("AI moderation flagged content:", moderationResult.reasons);
       
       // Tworzenie bardziej pomocnego komunikatu dla użytkownika
       const detailMessage = moderationResult.reasons[0].includes("Content flagged for:") 
@@ -86,7 +89,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
     
-    console.log("Content passed AI moderation check");
+    debugLog("Content passed AI moderation check");
 
     // Sprawdź czy email ma podejrzany format (dodatkowe zabezpieczenie)
     const suspiciousEmailPatterns = [
@@ -99,7 +102,7 @@ export async function POST(request: Request) {
     ];
 
     if (suspiciousEmailPatterns.some(pattern => pattern.test(email))) {
-      console.log("Suspicious email detected:", email.substring(0, 3) + "...");
+      debugLog("Suspicious email detected:", email.substring(0, 3) + "...");
       return Response.json({ 
         error: { 
           message: "Invalid email address", 
@@ -118,7 +121,7 @@ export async function POST(request: Request) {
     ];
 
     if (suspiciousPatterns.some(pattern => pattern.test(message))) {
-      console.log("Suspicious content detected");
+      debugLog("Suspicious content detected");
       return Response.json({ 
         error: { 
           message: "Message contains suspicious content",
@@ -145,7 +148,7 @@ export async function POST(request: Request) {
     emailRequestsMap[userKey] = (emailRequestsMap[userKey] || 0) + 1;
     
     if (emailRequestsMap[userKey] > MAX_REQUESTS) {
-      console.log("Rate limit exceeded for:", email.substring(0, 3) + "...");
+      debugLog("Rate limit exceeded for:", email.substring(0, 3) + "...");
       return Response.json({ 
         error: { 
           message: "Too many messages sent. Please try again later.", 
@@ -155,7 +158,7 @@ export async function POST(request: Request) {
     }
 
     // Główna wiadomość do administratora
-    console.log("Sending email via Resend...");
+    debugLog("Sending email via Resend...");
     const emailResult = await resend.emails.send({
       from: 'Flashcards AI <onboarding@resend.dev>',
       to: ['lisieckikamil93@gmail.com'],
@@ -168,22 +171,22 @@ export async function POST(request: Request) {
       replyTo: email,
     });
 
-    console.log("Email send result:", emailResult);
+    debugLog("Email send result:", emailResult);
 
     // Sprawdź błędy
     if (emailResult.error) {
-      console.error('Error sending email:', emailResult.error);
+      debugError('Error sending email:', emailResult.error);
       return Response.json({ error: emailResult.error }, { status: 500 });
     }
 
     // Zwróć sukces
-    console.log("Email sent successfully");
+    debugLog("Email sent successfully");
     return Response.json({ 
       success: true, 
       data: emailResult.data
     });
   } catch (error) {
-    console.error('Error in contact form handler:', error);
+    debugError('Error in contact form handler:', error);
     return Response.json({ 
       error: { 
         message: "Internal server error", 
