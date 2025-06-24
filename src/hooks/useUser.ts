@@ -1,12 +1,13 @@
 'use client';
 
 import { useAuth } from './useAuth';
+import { debugLog } from '@/utils/debug';
 
 export function useUser() {
   const { user, isSignedIn, loading } = useAuth();
 
   // Debug logging for OAuth
-  console.log('useUser debug:', { 
+  debugLog('useUser debug:', { 
     hasUser: !!user, 
     isSignedIn, 
     loading,

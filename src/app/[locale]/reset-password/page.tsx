@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ResetPasswordForm } from '@/components/auth';
 
 export default function ResetPasswordPage() {
@@ -8,7 +9,18 @@ export default function ResetPasswordPage() {
       
       {/* Modal container */}
       <div className="relative z-10">
-        <ResetPasswordForm />
+        <Suspense fallback={
+          <div className="w-full max-w-md mx-auto">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-8 shadow-2xl">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white mb-4"></div>
+                <p className="text-white">Loading...</p>
+              </div>
+            </div>
+          </div>
+        }>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );

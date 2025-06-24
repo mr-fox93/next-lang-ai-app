@@ -1,25 +1,26 @@
 import { createClient } from "@/lib/supabase/server";
 import { isDemoMode, getDemoUserId } from "./demo-helpers";
+import { debugLog, debugError } from '@/utils/debug';
 
 export async function auth() {
-  console.log('Server-side auth() called');
+  debugLog('Server-side auth() called');
   
   // Check if in demo mode
   if (await isDemoMode()) {
-    console.log('Demo mode detected');
+    debugLog('Demo mode detected');
     // Demo mode - return demo userId in demo format
     return { 
       userId: getDemoUserId(),
       user: null,
     };
   } else {
-    console.log('Normal mode - checking Supabase auth');
+    debugLog('Normal mode - checking Supabase auth');
     try {
       // Normal mode - use Supabase auth
       const supabase = await createClient();
       const { data: { session }, error } = await supabase.auth.getSession();
       
-      console.log('Server auth result:', { 
+      debugLog('Server auth result:', { 
         hasSession: !!session, 
         hasUser: !!session?.user, 
         userId: session?.user?.id,
@@ -27,7 +28,7 @@ export async function auth() {
       });
       
       if (error) {
-        console.error('Server auth error:', error);
+        debugError('Server auth error:', error);
       }
       
       return {
@@ -35,7 +36,7 @@ export async function auth() {
         user: session?.user || null,
       };
     } catch (err) {
-      console.error('Server auth exception:', err);
+      debugError('Server auth exception:', err);
       return {
         userId: null,
         user: null,
