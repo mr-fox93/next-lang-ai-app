@@ -164,15 +164,14 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         }),
       });
       
-      console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Response data:", data);
+      // Remove unsafe response data logging that could expose sensitive info
       
       // AI checking is complete
       setIsCheckingAI(false);
       
       if (response.ok) {
-        console.log("Setting success state");
+        console.log("Contact form submission successful");
         setIsSending(true);
         setIsSent(true);
         setResponseStatus({
@@ -180,7 +179,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
           message: t('messageSent')
         });
       } else {
-        console.log("Setting error state");
+        console.error("Contact form submission failed", { status: response.status });
         // Handle specific error codes
         let errorMessage = t('errorGeneric');
         

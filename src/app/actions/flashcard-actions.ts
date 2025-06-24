@@ -194,7 +194,10 @@ export async function importGuestFlashcardsAction(
             username: user.user_metadata?.username || user.email?.split('@')[0] || "User",
           },
         });
-        console.log("Created new user in database:", dbUser.id);
+        // Secure: don't log user ID or sensitive data
+        if (process.env.NODE_ENV === 'development') {
+          console.log("[FLASHCARDS] New user created in database");
+        }
       } catch (createError) {
         console.error("Failed to create user:", createError);
         return {

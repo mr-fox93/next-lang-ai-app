@@ -8,14 +8,10 @@ import { demoModeService } from './core/useCases/session';
 const handleI18nRouting = createMiddleware(routing);
 
 export default async function middleware(req: NextRequest) {
-  console.log('Middleware called for:', req.nextUrl.pathname);
-  
   const pathname = req.nextUrl.pathname;
   
   // Skip i18n routing for auth endpoints
   if (pathname.startsWith('/auth/')) {
-    console.log('Auth endpoint - skipping i18n routing');
-    
     // Create simple response for auth endpoints
     const response = NextResponse.next();
     
@@ -52,7 +48,6 @@ export default async function middleware(req: NextRequest) {
   
   // Check if demo mode should be automatically logged out
   if (demoModeService.shouldAutoLogout(pathname, cookies)) {
-    console.log('Demo mode auto-logout');
     // Get the i18n response first
     const response = handleI18nRouting(req);
     
@@ -86,11 +81,7 @@ export default async function middleware(req: NextRequest) {
 
   // Refresh session and update cookies
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    console.log('Middleware session check:', { 
-      hasSession: !!session, 
-      userId: session?.user?.id 
-    });
+    await supabase.auth.getSession();
   } catch (error) {
     console.error('Middleware session error:', error);
   }
