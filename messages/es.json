@@ -6,7 +6,10 @@
     "createAccount": "Crear cuenta",
     "logOut": "Cerrar sesión",
     "yourAccount": "Tu cuenta",
-    "manageAccount": "Gestiona tu cuenta o inicia sesión"
+    "manageAccount": "Gestiona tu cuenta o inicia sesión",
+    "backToLearning": "Volver al Aprendizaje",
+    "home": "Inicio",
+    "categories": "Categorías"
   },
   "Progress": {
     "backToLearning": "Volver al aprendizaje",
@@ -253,5 +256,4 @@
   "AnimatedAssistant": {
     "hintMessage": "¿Necesitas ayuda? ¡Haz clic! 💬"
   }
-  "home": "Inicio"
-} 
+}

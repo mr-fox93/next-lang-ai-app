@@ -6,7 +6,10 @@
     "createAccount": "Utwórz konto",
     "logOut": "Wyloguj się",
     "yourAccount": "Twoje konto",
-    "manageAccount": "Zarządzaj kontem lub zaloguj się"
+    "manageAccount": "Zarządzaj kontem lub zaloguj się",
+    "backToLearning": "Powrót do Nauki",
+    "home": "Główna",
+    "categories": "Kategorie"
   },
   "Progress": {
     "backToLearning": "Powrót do nauki",
@@ -28,8 +31,7 @@
     "noCategories": "Nie masz jeszcze żadnych kategorii fiszek.",
     "createFlashcards": "Utwórz fiszki",
     "untouched": "Nietknięte",
-    "continueLearning": "Kontynuuj naukę",
-    "home": "Strona główna"
+    "continueLearning": "Kontynuuj naukę"
   },
   "Sidebar": {
     "categories": "Kategorie",
@@ -254,6 +256,4 @@
   "AnimatedAssistant": {
     "hintMessage": "Potrzebujesz pomocy? Kliknij mnie! 💬"
   }
-
-  "home": "Strona główna"
-} 
+}
