@@ -10,39 +10,36 @@ export function useAuth() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Get initial session
-    const getSession = async () => {
+    // Get initial user - secure way
+    const getUser = async () => {
       try {
-        // First check if this is an OAuth callback
-        const { data: { session: oauthSession }, error: oauthError } = await supabase.auth.getSession();
+        // Use getUser() instead of getSession() for security
+        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
         
-        // Handle OAuth callback from URL hash
-        if (window.location.hash && window.location.hash.includes('access_token')) {
-          const { data: { session: callbackSession } } = await supabase.auth.getSession();
-          
-          if (callbackSession?.user) {
-            setUser(callbackSession.user);
-            setLoading(false);
-            // Clean up the URL hash
-            window.history.replaceState({}, document.title, window.location.pathname);
-            return;
+        // Handle auth-related errors - session missing is normal when logged out
+        if (error) {
+          if (error.message?.includes('session_missing') || error.message?.includes('AuthSessionMissingError')) {
+            // User is not logged in - this is normal, not an error
+            setUser(null);
+          } else {
+            // Real auth error - log it
+            console.error('Auth error:', error);
+            setUser(null);
           }
+        } else {
+          setUser(currentUser);
         }
         
-        if (oauthError) {
-          console.error('Session error:', oauthError);
-        }
-        
-        setUser(oauthSession?.user || null);
         setLoading(false);
       } catch (err) {
-        console.error('Failed to get session:', err);
+        // Handle any other exceptions
+        console.error('Failed to get user:', err);
         setUser(null);
         setLoading(false);
       }
     };
 
-    getSession();
+    getUser();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

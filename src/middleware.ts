@@ -35,9 +35,13 @@ export default async function middleware(req: NextRequest) {
     );
 
     try {
-      await supabase.auth.getSession();
+      await supabase.auth.getUser();
     } catch (error) {
-      console.error('Auth endpoint session error:', error);
+      // Only log real errors, not session missing (normal when logged out)
+      const errorMessage = error instanceof Error ? error.message : '';
+      if (!errorMessage.includes('session_missing') && !errorMessage.includes('AuthSessionMissingError')) {
+        console.error('Auth endpoint session error:', error);
+      }
     }
 
     return response;
@@ -79,11 +83,15 @@ export default async function middleware(req: NextRequest) {
     }
   );
 
-  // Refresh session and update cookies
+  // Refresh user authentication and update cookies
   try {
-    await supabase.auth.getSession();
+    await supabase.auth.getUser();
   } catch (error) {
-    console.error('Middleware session error:', error);
+    // Only log real errors, not session missing (normal when logged out)
+    const errorMessage = error instanceof Error ? error.message : '';
+    if (!errorMessage.includes('session_missing') && !errorMessage.includes('AuthSessionMissingError')) {
+      console.error('Middleware session error:', error);
+    }
   }
 
   return response;
