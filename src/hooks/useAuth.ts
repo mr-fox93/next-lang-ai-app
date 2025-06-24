@@ -10,49 +10,33 @@ export function useAuth() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Get initial session
-    const getSession = async () => {
-      console.log('Getting initial session...');
+    // Get initial user - secure way with full error handling
+    const getUser = async () => {
       try {
-        // First check if this is an OAuth callback
-        const { data: { session: oauthSession }, error: oauthError } = await supabase.auth.getSession();
+        // Use getUser() instead of getSession() for security
+        const { data: { user: currentUser }, error } = await supabase.auth.getUser();
         
-        // Handle OAuth callback from URL hash
-        if (window.location.hash && window.location.hash.includes('access_token')) {
-          console.log('Handling OAuth callback...');
-          const { data: { session: callbackSession }, error: callbackError } = await supabase.auth.getSession();
-          console.log('OAuth callback session:', { session: callbackSession, error: callbackError });
-          
-          if (callbackSession?.user) {
-            setUser(callbackSession.user);
-            setLoading(false);
-            // Clean up the URL hash
-            window.history.replaceState({}, document.title, window.location.pathname);
-            return;
-          }
+        if (error) {
+          // Any auth error when not logged in is normal - don't log it
+          setUser(null);
+        } else {
+          setUser(currentUser);
         }
         
-        console.log('Initial session result:', { session: oauthSession, error: oauthError });
-        
-        if (oauthError) {
-          console.error('Session error:', oauthError);
-        }
-        
-        setUser(oauthSession?.user || null);
         setLoading(false);
-      } catch (err) {
-        console.error('Failed to get session:', err);
+      } catch {
+        // Any exception when checking auth is normal when not logged in
+        // Could be AuthSessionMissingError or any other auth-related error
         setUser(null);
         setLoading(false);
       }
     };
 
-    getSession();
+    getUser();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', { event, session: !!session, user: !!session?.user });
         setUser(session?.user || null);
         setLoading(false);
       }

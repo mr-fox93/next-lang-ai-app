@@ -16,7 +16,6 @@ export function useSupabase() {
   };
 
   const signInWithMagicLink = async (email: string) => {
-    console.log('Attempting magic link sign in with email:', email);
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -24,20 +23,16 @@ export function useSupabase() {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    console.log('Magic link result:', { data, error });
     return { data, error };
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github' | 'discord') => {
-    console.log('Attempting OAuth sign in with:', provider);
-    
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    console.log('OAuth result:', { data, error });
     return { data, error };
   };
 

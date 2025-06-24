@@ -150,8 +150,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
     setIsCheckingAI(true);
     
     try {
-      console.log("Sending message...");
-      
       const response = await fetch("/api/send", {
         method: "POST",
         headers: {
@@ -164,15 +162,13 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
         }),
       });
       
-      console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Response data:", data);
+      // Remove unsafe response data logging that could expose sensitive info
       
       // AI checking is complete
       setIsCheckingAI(false);
       
       if (response.ok) {
-        console.log("Setting success state");
         setIsSending(true);
         setIsSent(true);
         setResponseStatus({
@@ -180,7 +176,7 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
           message: t('messageSent')
         });
       } else {
-        console.log("Setting error state");
+        console.error("Contact form submission failed", { status: response.status });
         // Handle specific error codes
         let errorMessage = t('errorGeneric');
         
@@ -217,7 +213,6 @@ export function ContactFormModal({ isOpen, onOpenChange }: ContactFormModalProps
       });
       setIsSent(true); // Pokaż komunikat również przy wyjątku
     } finally {
-      console.log("Setting isSending to false");
       setIsSending(false);
     }
   };

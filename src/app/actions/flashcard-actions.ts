@@ -8,7 +8,7 @@ import {
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
 import { getFlashcardsPrompt } from "@/lib/prompts";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma"; // Use secure configured client
 import { isDemoMode } from "@/lib/demo-helpers";
 import { 
   ImportableFlashcard, 
@@ -40,16 +40,12 @@ export async function generateFlashcardsAction(
     }
 
     try {
-      const prisma = new PrismaClient();
       const dbUser = await prisma.user.findUnique({
         where: { id: userId },
       });
 
       if (!dbUser) {
-        console.log(
-          "Creating new user in database before generating flashcards:",
-          userId
-        );
+        // Create new user without any logging
         await prisma.user.create({
           data: {
             id: userId,
@@ -180,7 +176,6 @@ export async function importGuestFlashcardsAction(
   }
 
   try {
-    const prisma = new PrismaClient();
     let dbUser = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -194,7 +189,7 @@ export async function importGuestFlashcardsAction(
             username: user.user_metadata?.username || user.email?.split('@')[0] || "User",
           },
         });
-        console.log("Created new user in database:", dbUser.id);
+        // User created successfully - no logging needed
       } catch (createError) {
         console.error("Failed to create user:", createError);
         return {

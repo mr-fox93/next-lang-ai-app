@@ -37,7 +37,7 @@ export default function Hero() {
   const t = useTranslations('Hero');
 
   useEffect(() => {
-    console.log("Auth state changed:", isSignedIn);
+    // Remove unnecessary auth state logging
   }, [isSignedIn]);
 
   const handleGenerateFlashcards = async () => {
@@ -47,11 +47,10 @@ export default function Hero() {
     setErrorMessage(null);
 
     const authState = isSignedIn;
-    console.log("Current auth state before generation:", authState);
 
     try {
       if (authState && user) {
-        console.log("Generating flashcards as authenticated user:", user.id);
+        // Secure: don't log user ID or sensitive data
 
         const result = await generateFlashcardsAction({
           count: 5,
@@ -76,7 +75,7 @@ export default function Hero() {
           setErrorMessage(result.error || "Error generating flashcards");
         }
       } else {
-        console.log("Generating flashcards as guest");
+        // Remove guest mode logging
 
         const result = await handleGuestFlashcardGeneration({
           count: 5,
