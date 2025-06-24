@@ -279,7 +279,7 @@ export async function updateDailyGoalAction(newGoal: number) {
   }
 }
 
-// Funkcja zwracająca kategorie gdzie wszystkie fiszki są już opanowane
+// Function returning categories where all flashcards are already mastered
 export async function getMasteredCategoriesAction() {
   try {
     // Check if in demo mode - if so, calculate from real flashcards + localStorage
@@ -297,7 +297,7 @@ export async function getMasteredCategoriesAction() {
       return { success: false, error: "Użytkownik nie jest zalogowany" };
     }
 
-    // Jedno zapytanie SQL, które znajdzie wszystkie opanowane kategorie
+    // Single SQL query that finds all mastered categories
     type CategoryResult = { category: string; total_count: bigint; mastered_count: bigint }[];
     
     const categoryStats = await prisma.$queryRaw<CategoryResult>`
@@ -319,7 +319,7 @@ export async function getMasteredCategoriesAction() {
       ORDER BY category
     `;
     
-    // Filtruj tylko kategorie, w których wszystkie fiszki są opanowane
+    // Filter only categories where all flashcards are mastered
     const masteredCategories = categoryStats
       .filter(({ total_count, mastered_count }) => 
         Number(total_count) > 0 && Number(total_count) === Number(mastered_count))

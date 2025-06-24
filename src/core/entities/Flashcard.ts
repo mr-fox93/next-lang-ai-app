@@ -5,6 +5,7 @@ export interface Flashcard {
   example_using: string;
   translate_example: string;
   category: string;
+  translate_category: string;
   userId: string;
   sourceLanguage: string;
   targetLanguage: string;

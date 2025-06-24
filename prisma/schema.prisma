@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id                String      @id // ID z Clerk
+  id                String      @id // ID from Clerk
   email             String      @unique
   username          String?
   createdAt         DateTime    @default(now())
@@ -24,7 +24,7 @@ model User {
   learningStreak    Int         @default(0)
   lastActivityDate  DateTime?
   preferredLanguage String      @default("en")
-  dailyGoal         Int         @default(10) // Liczba fiszek do nauki dziennie
+  dailyGoal         Int         @default(10) // Number of flashcards to learn daily
   level             Int         @default(1)
   experiencePoints  Int         @default(0)
 }
@@ -36,9 +36,10 @@ model Flashcard {
   example_using     String
   translate_example String
   category          String
-  sourceLanguage    String   @default("en") // Język źródłowy
-  targetLanguage    String   @default("pl") // Język docelowy
-  difficultyLevel   String   @default("easy") // Poziom trudności: easy, advanced, pro
+  translate_category String? // Category translation for user interface language
+  sourceLanguage    String   @default("en") // Source language
+  targetLanguage    String   @default("pl") // Target language
+  difficultyLevel   String   @default("easy") // Difficulty level: easy, advanced, pro
   createdAt         DateTime @default(now())
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
@@ -55,7 +56,7 @@ model Progress {
   incorrectAnswers  Int       @default(0)
   lastReviewed      DateTime?
   nextReviewDate    DateTime?
-  masteryLevel      Int       @default(0) // 0-5 poziom opanowania
+  masteryLevel      Int       @default(0) // 0-5 mastery level
   
   @@unique([flashcardId, userId])
 }

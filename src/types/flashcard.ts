@@ -4,6 +4,7 @@ export interface ImportableFlashcard {
   example_using: string;
   translate_example: string;
   category: string;
+  translate_category: string;
   sourceLanguage: string;
   targetLanguage: string;
   difficultyLevel: string;

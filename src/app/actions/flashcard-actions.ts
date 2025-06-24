@@ -199,7 +199,7 @@ export async function importGuestFlashcardsAction(
       }
     }
 
-    // Teraz gdy mamy pewność, że użytkownik istnieje, importujemy fiszki
+    // Now that we're sure the user exists, import flashcards
     const flashcardRepository = getFlashcardRepository();
 
     const flashcardPromises = flashcards.map((card) =>
@@ -209,6 +209,7 @@ export async function importGuestFlashcardsAction(
         example_using: card.example_using,
         translate_example: card.translate_example,
         category: card.category,
+        translate_category: card.translate_category,
         sourceLanguage: card.sourceLanguage,
         targetLanguage: card.targetLanguage,
         difficultyLevel: card.difficultyLevel,
@@ -261,6 +262,7 @@ export async function handleGuestFlashcardGeneration(data: {
         example_using: flashcard.example_using || "",
         translate_example: flashcard.translate_example || "",
         category: flashcard.category || "",
+        translate_category: flashcard.translate_category,
         sourceLanguage: data.sourceLanguage,
         targetLanguage: data.targetLanguage,
         difficultyLevel: data.level,

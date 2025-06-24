@@ -87,7 +87,7 @@ export class GenerateFlashcardsUseCase {
         };
       }
 
-      // Przypisz wybrane przez użytkownika ustawienia językowe do wygenerowanych fiszek
+      // Assign user-selected language settings to generated flashcards
       const flashcards = generatedFlashcards.map((flashcard) => ({
         ...flashcard,
         sourceLanguage,
@@ -160,7 +160,7 @@ export class GenerateFlashcardsUseCase {
           "flashcardResponse"
         ),
         temperature: 0.1,
-        max_tokens: 500,
+        max_tokens: 1000,
       });
 
       const parsedData = FlashCardSchema.parse(
@@ -205,6 +205,7 @@ export class GenerateFlashcardsUseCase {
         example_using: flashcard.example_using,
         translate_example: flashcard.translate_example,
         category: flashcard.category,
+        translate_category: flashcard.translate_category,
         sourceLanguage: flashcard.sourceLanguage,
         targetLanguage: flashcard.targetLanguage,
         difficultyLevel: flashcard.difficultyLevel,

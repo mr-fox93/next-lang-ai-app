@@ -19,7 +19,11 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       }
     });
 
-    return flashcards;
+    // Handle legacy records without translate_category
+    return flashcards.map(flashcard => ({
+      ...flashcard,
+      translate_category: flashcard.translate_category || flashcard.category
+    } as Flashcard));
   }
   
   async getUserFlashcards(userId: string): Promise<Flashcard[]> {
@@ -33,6 +37,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       example_using, 
       translate_example, 
       category, 
+      translate_category,
       userId, 
       sourceLanguage, 
       targetLanguage, 
@@ -46,12 +51,13 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
         example_using,
         translate_example,
         category,
+        translate_category,
         userId,
         sourceLanguage,
         targetLanguage,
         difficultyLevel
       }
-    });
+    }) as Flashcard;
   }
   
   async updateFlashcard(id: number, flashcard: Partial<Flashcard>): Promise<Flashcard> {
@@ -62,6 +68,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     if (flashcard.example_using !== undefined) updateData.example_using = flashcard.example_using;
     if (flashcard.translate_example !== undefined) updateData.translate_example = flashcard.translate_example;
     if (flashcard.category !== undefined) updateData.category = flashcard.category;
+    if (flashcard.translate_category !== undefined) updateData.translate_category = flashcard.translate_category;
     if (flashcard.sourceLanguage !== undefined) updateData.sourceLanguage = flashcard.sourceLanguage;
     if (flashcard.targetLanguage !== undefined) updateData.targetLanguage = flashcard.targetLanguage;
     if (flashcard.difficultyLevel !== undefined) updateData.difficultyLevel = flashcard.difficultyLevel;
@@ -69,7 +76,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     return await this.prisma.flashcard.update({
       where: { id },
       data: updateData
-    });
+    }) as Flashcard;
   }
 
   async deleteFlashcard(id: number): Promise<boolean> {
@@ -122,7 +129,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     categories: CategoryProgress[];
   }> {
     try {
-      // 1. Pobierz ogólne liczby fiszek z różnymi poziomami
+      // 1. Get overall flashcard counts with different levels
       type StatsResult = {
         total: bigint;
         mastered: bigint;
@@ -141,14 +148,14 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
         WHERE f."userId" = ${userId}
       `;
 
-      // 2. Pobierz statystyki dla każdej kategorii
+      // 2. Get statistics for each category
       type CategoryStatsResult = {
         category: string;
         total: bigint;
         mastered: bigint;
         in_progress: bigint;
         untouched: bigint;
-        avg_mastery: number | Decimal | null; // Obsługuje różne typy zwracane przez SQL
+        avg_mastery: number | Decimal | null; // Handles different types returned by SQL
       }[];
 
       const categoryStats = await this.prisma.$queryRaw<CategoryStatsResult>`
@@ -166,16 +173,16 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
         ORDER BY f.category
       `;
 
-      // 3. Formatuj dane wyjściowe - konwertuj wszystkie wartości na natywne typy JS
+      // 3. Format output data - convert all values to native JS types
       const categories: CategoryProgress[] = categoryStats.map(cat => {
-        // Zapewniamy, że avg_mastery jest zawsze liczbą
+        // Ensure avg_mastery is always a number
         let avgMastery: number;
         if (typeof cat.avg_mastery === 'number') {
           avgMastery = cat.avg_mastery;
         } else if (cat.avg_mastery === null) {
           avgMastery = 0;
         } else {
-          // Obsługa różnych typów, które mogą się pojawić (np. Decimal)
+          // Handle different types that may appear (e.g., Decimal)
           avgMastery = Number(cat.avg_mastery.toString());
         }
 
@@ -198,7 +205,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
       };
     } catch (error) {
       console.error("Error fetching flashcard stats:", error);
-      // Zwróć dane domyślne w przypadku błędu
+      // Return default data in case of error
       return {
         totalFlashcards: 0,
         masteredFlashcards: 0,
