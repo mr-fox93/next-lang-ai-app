@@ -1,80 +1,79 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Secure logging helper
+const secureLog = (message: string, data?: Record<string, unknown>) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[AUTH] ${message}`, data || '');
+  }
+}
+
 export async function GET(request: NextRequest) {
-  console.log('Auth callback called');
+  secureLog('Auth callback initiated');
   
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
 
-  console.log('Auth callback params:', { 
+  secureLog('Auth callback params received', { 
     hasCode: !!code, 
     hasTokenHash: !!token_hash, 
-    type 
+    type: type || 'none' 
   });
 
   const supabase = await createClient()
 
   // Handle magic link verification
   if (token_hash && type) {
-    console.log('Processing magic link verification');
+    secureLog('Processing magic link verification');
     try {
       const { data: { session }, error } = await supabase.auth.verifyOtp({
         token_hash,
         type: type as 'email',
       })
 
-      console.log('Magic link verification:', { 
-        hasSession: !!session, 
-        hasUser: !!session?.user,
-        error 
-      });
-
       if (error) {
-        console.error('Magic link verification error:', error);
+        secureLog('Magic link verification failed', { 
+          errorCode: error.message?.substring(0, 50) // Only log first 50 chars
+        });
         return NextResponse.redirect(new URL('/en/sign-in?error=magic_link_error', request.url))
       }
 
       if (session?.user) {
-        console.log('Magic link successful, redirecting to flashcards');
+        secureLog('Magic link verification successful');
         return NextResponse.redirect(new URL('/en/flashcards', request.url))
       }
-    } catch (err) {
-      console.error('Magic link callback exception:', err);
+    } catch (_err: unknown) {
+      secureLog('Magic link callback exception');
       return NextResponse.redirect(new URL('/en/sign-in?error=magic_link_exception', request.url))
     }
   }
 
   // Handle OAuth code exchange
   if (code) {
-    console.log('Processing OAuth code exchange');
+    secureLog('Processing OAuth code exchange');
     try {
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
-      
-      console.log('OAuth session exchange:', { 
-        hasSession: !!session, 
-        hasUser: !!session?.user,
-        error 
-      });
 
       if (error) {
-        console.error('OAuth session exchange error:', error);
+        secureLog('OAuth session exchange failed', { 
+          errorCode: error.message?.substring(0, 50) // Only log first 50 chars  
+        });
         return NextResponse.redirect(new URL('/en/sign-in?error=oauth_error', request.url))
       }
 
       if (session?.user) {
-        console.log('OAuth successful, redirecting to flashcards');
+        secureLog('OAuth authentication successful');
         return NextResponse.redirect(new URL('/en/flashcards', request.url))
       }
-    } catch (err) {
-      console.error('OAuth callback exception:', err);
+    } catch (_err: unknown) {
+      secureLog('OAuth callback exception');
       return NextResponse.redirect(new URL('/en/sign-in?error=oauth_exception', request.url))
     }
   }
 
   // If no code or token_hash, or authentication failed, redirect to sign-in
-  console.log('Auth callback failed, redirecting to sign-in');
+  secureLog('Auth callback completed - redirecting to sign-in');
   return NextResponse.redirect(new URL('/en/sign-in', request.url))
 } 
