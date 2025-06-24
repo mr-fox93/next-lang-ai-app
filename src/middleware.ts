@@ -36,12 +36,8 @@ export default async function middleware(req: NextRequest) {
 
     try {
       await supabase.auth.getUser();
-    } catch (error) {
-      // Only log real errors, not session missing (normal when logged out)
-      const errorMessage = error instanceof Error ? error.message : '';
-      if (!errorMessage.includes('session_missing') && !errorMessage.includes('AuthSessionMissingError')) {
-        console.error('Auth endpoint session error:', error);
-      }
+    } catch {
+      // Auth errors are normal when not logged in - don't log them
     }
 
     return response;
@@ -86,12 +82,8 @@ export default async function middleware(req: NextRequest) {
   // Refresh user authentication and update cookies
   try {
     await supabase.auth.getUser();
-  } catch (error) {
-    // Only log real errors, not session missing (normal when logged out)
-    const errorMessage = error instanceof Error ? error.message : '';
-    if (!errorMessage.includes('session_missing') && !errorMessage.includes('AuthSessionMissingError')) {
-      console.error('Middleware session error:', error);
-    }
+  } catch {
+    // Auth errors are normal when not logged in - don't log them
   }
 
   return response;

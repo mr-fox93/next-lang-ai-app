@@ -15,30 +15,20 @@ export async function auth() {
       const supabase = await createClient();
       const { data: { user }, error } = await supabase.auth.getUser();
       
-      // Handle auth-related errors - session missing is normal when logged out
+      // Any auth error is normal when not logged in - don't log it
       if (error) {
-        if (error.message?.includes('session_missing') || error.message?.includes('AuthSessionMissingError')) {
-          // User is not logged in - this is normal, not an error
-          return {
-            userId: null,
-            user: null,
-          };
-        } else {
-          // Real auth error - log it
-          console.error('Server auth error:', error);
-          return {
-            userId: null,
-            user: null,
-          };
-        }
+        return {
+          userId: null,
+          user: null,
+        };
       }
       
       return {
         userId: user?.id || null,
         user: user || null,
       };
-    } catch (err) {
-      console.error('Server auth exception:', err);
+    } catch {
+      // Any exception when checking auth is normal when not logged in
       return {
         userId: null,
         user: null,

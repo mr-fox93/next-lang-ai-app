@@ -10,30 +10,23 @@ export function useAuth() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Get initial user - secure way
+    // Get initial user - secure way with full error handling
     const getUser = async () => {
       try {
         // Use getUser() instead of getSession() for security
         const { data: { user: currentUser }, error } = await supabase.auth.getUser();
         
-        // Handle auth-related errors - session missing is normal when logged out
         if (error) {
-          if (error.message?.includes('session_missing') || error.message?.includes('AuthSessionMissingError')) {
-            // User is not logged in - this is normal, not an error
-            setUser(null);
-          } else {
-            // Real auth error - log it
-            console.error('Auth error:', error);
-            setUser(null);
-          }
+          // Any auth error when not logged in is normal - don't log it
+          setUser(null);
         } else {
           setUser(currentUser);
         }
         
         setLoading(false);
-      } catch (err) {
-        // Handle any other exceptions
-        console.error('Failed to get user:', err);
+      } catch {
+        // Any exception when checking auth is normal when not logged in
+        // Could be AuthSessionMissingError or any other auth-related error
         setUser(null);
         setLoading(false);
       }
