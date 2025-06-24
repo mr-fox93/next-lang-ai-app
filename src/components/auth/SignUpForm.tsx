@@ -8,10 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, Lock, User } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-
-interface SignUpFormProps {
-  redirectUrl?: string;
-}
+import { validatePassword, sanitizeEmail, sanitizePassword } from '@/utils/validation';
+import { debugError } from '@/utils/debug';
+import { SignUpFormProps } from '@/types/auth';
 
 export function SignUpForm({ redirectUrl }: SignUpFormProps) {
   const [email, setEmail] = useState('');
@@ -28,14 +27,23 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
     e.preventDefault();
     if (!email || !password) return;
 
+    // Validate password before submission
+    const sanitizedPassword = sanitizePassword(password);
+    const validation = validatePassword(sanitizedPassword);
+    if (!validation.isValid) {
+      setError(validation.errors[0]);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const { error } = await signUpWithEmail(email, password, {
+      const sanitizedEmail = sanitizeEmail(email);
+      const { error } = await signUpWithEmail(sanitizedEmail, sanitizedPassword, {
         data: {
           full_name: fullName,
-          username: fullName || email.split('@')[0],
+          username: fullName || sanitizedEmail.split('@')[0],
         }
       });
       
@@ -50,7 +58,7 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
         }, 2000);
       }
     } catch (err) {
-      console.error('Sign up error:', err);
+      debugError('Sign up error:', err);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -68,7 +76,7 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
       }
       // OAuth will redirect automatically on success
     } catch (err) {
-      console.error('Google sign up error:', err);
+      debugError('Google sign up error:', err);
       setError('An unexpected error occurred with Google sign up');
     } finally {
       setLoading(false);
@@ -86,7 +94,7 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
       }
       // OAuth will redirect automatically on success
     } catch (err) {
-      console.error('Discord sign up error:', err);
+      debugError('Discord sign up error:', err);
       setError('An unexpected error occurred with Discord sign up');
     } finally {
       setLoading(false);
@@ -163,13 +171,12 @@ export function SignUpForm({ redirectUrl }: SignUpFormProps) {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password (min. 6 characters)"
+                placeholder="Enter your password (min. 8 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400"
                 disabled={loading}
                 required
-                minLength={6}
               />
             </div>
           </div>

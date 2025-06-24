@@ -8,10 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, Lock } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-
-interface SignInFormProps {
-  redirectUrl?: string;
-}
+import { sanitizeEmail } from '@/utils/validation';
+import { debugError } from '@/utils/debug';
+import { SignInFormProps } from '@/types/auth';
 
 export function SignInForm({ redirectUrl }: SignInFormProps) {
   const [email, setEmail] = useState('');
@@ -30,7 +29,8 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
     setError(null);
 
     try {
-      const { error } = await signInWithEmail(email, password);
+      const sanitizedEmail = sanitizeEmail(email);
+      const { error } = await signInWithEmail(sanitizedEmail, password);
       
       if (error) {
         setError(error.message);
@@ -40,7 +40,7 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
         router.push(destination);
       }
     } catch (err) {
-      console.error('Sign in error:', err);
+      debugError('Sign in error:', err);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
       }
       // OAuth will redirect automatically on success
     } catch (err) {
-      console.error('Google sign in error:', err);
+      debugError('Google sign in error:', err);
       setError('An unexpected error occurred with Google sign in');
     } finally {
       setLoading(false);
@@ -76,7 +76,7 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
       }
       // OAuth will redirect automatically on success
     } catch (err) {
-      console.error('Discord sign in error:', err);
+      debugError('Discord sign in error:', err);
       setError('An unexpected error occurred with Discord sign in');
     } finally {
       setLoading(false);
@@ -124,6 +124,15 @@ export function SignInForm({ redirectUrl }: SignInFormProps) {
                 required
               />
             </div>
+          </div>
+
+          <div className="text-center">
+            <Link 
+              href="/forgot-password"
+              className="text-sm text-purple-400 hover:text-purple-300 underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           {error && (

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { debugLog, debugError } from '@/utils/debug';
 
 export function useSupabase() {
   const supabase = createClient();
@@ -10,18 +11,18 @@ export function useSupabase() {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      debugError('Sign out error:', error);
     }
     router.push('/');
   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    console.log('Attempting sign in with email:', email);
+    debugLog('Attempting sign in with email:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    console.log('Sign in result:', { data, error });
+    debugLog('Sign in result:', { data, error });
     return { data, error };
   };
 
@@ -31,7 +32,7 @@ export function useSupabase() {
       username?: string;
     };
   }) => {
-    console.log('Attempting sign up with email:', email);
+    debugLog('Attempting sign up with email:', email);
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -42,7 +43,7 @@ export function useSupabase() {
       },
     });
     
-    console.log('Sign up result:', { data, error });
+    debugLog('Sign up result:', { data, error });
     
     // If sign up was successful but user needs to confirm email
     if (data.user && !data.session && !error) {
@@ -58,7 +59,7 @@ export function useSupabase() {
   };
 
   const signInWithOAuth = async (provider: 'google' | 'github' | 'discord') => {
-    console.log('Attempting OAuth sign in with:', provider);
+    debugLog('Attempting OAuth sign in with:', provider);
     
     const nextUrl = `/flashcards`;
     
@@ -68,7 +69,32 @@ export function useSupabase() {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`,
       },
     });
-    console.log('OAuth result:', { data, error });
+    debugLog('OAuth result:', { data, error });
+    return { data, error };
+  };
+
+  const resetPassword = async (email: string) => {
+    debugLog('Attempting password reset for email:', email);
+    
+    // Build locale-aware redirect: {origin}/{locale?}/reset-password
+    const { origin, pathname } = window.location;
+    const localeSegment = pathname.split('/')[1]; // e.g. "en", "pl"
+    const localePrefix = localeSegment && localeSegment.length <= 5 ? `/${localeSegment}` : '';
+    const redirectUrl = `${origin}${localePrefix}/reset-password`;
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    debugLog('Password reset result:', { error });
+    return { error };
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    debugLog('Attempting password update');
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    debugLog('Password update result:', { data, error });
     return { data, error };
   };
 
@@ -77,6 +103,8 @@ export function useSupabase() {
     signInWithEmail,
     signUpWithEmail,
     signInWithOAuth,
+    resetPassword,
+    updatePassword,
     supabase,
   };
 } 
