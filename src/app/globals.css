@@ -70,3 +70,74 @@
 .bg-gradient-primary {
   @apply bg-gradient-to-r from-purple-600 to-pink-600;
 }
+
+
+
+/* reCAPTCHA styles for modal interaction fix */
+.g-recaptcha,
+.g-recaptcha * {
+  z-index: 10002 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Fix for reCAPTCHA dropdown in modal */
+.rc-anchor-container,
+.rc-anchor-container * {
+  z-index: 10003 !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for reCAPTCHA challenge popup - ALL ELEMENTS */
+.rc-imageselect-challenge,
+.rc-imageselect-challenge *,
+.rc-imageselect-payload,
+.rc-imageselect-payload *,
+.rc-imageselect-table,
+.rc-imageselect-table *,
+.rc-imageselect-tile,
+.rc-imageselect-tile *,
+.rc-button-default,
+.rc-button-default *,
+.rc-imageselect-dynamic-select,
+.rc-imageselect-dynamic-select *,
+.rc-imageselect-instructions,
+.rc-imageselect-instructions *,
+.rc-imageselect-desc,
+.rc-imageselect-desc * {
+  z-index: 10004 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Force all Google reCAPTCHA elements to be interactive */
+[id*="recaptcha"],
+[class*="recaptcha"],
+[id*="recaptcha"] *,
+[class*="recaptcha"] *,
+[class*="rc-"],
+[class*="rc-"] * {
+  z-index: 10005 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Specific fix for challenge iframe */
+iframe[src*="recaptcha"],
+iframe[src*="google.com/recaptcha"] {
+  z-index: 10006 !important;
+  pointer-events: auto !important;
+}
+
+/* Fix AlertDialog overlay to not block reCAPTCHA popup */
+[data-radix-popper-content-wrapper],
+[data-radix-dialog-overlay] {
+  z-index: 9998 !important;
+}
+
+/* Make sure reCAPTCHA challenge popup appears above everything */
+.rc-imageselect-payload-wrapper,
+.rc-imageselect-candidate {
+  z-index: 10007 !important;
+  pointer-events: auto !important;
+}

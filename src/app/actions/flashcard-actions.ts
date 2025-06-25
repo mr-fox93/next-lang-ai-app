@@ -16,6 +16,7 @@ import {
   GenerateFlashcardsActionParams,
   AIFlashcardGenerator 
 } from "@/types/flashcard";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export async function generateFlashcardsAction(
   params: GenerateFlashcardsActionParams
@@ -238,8 +239,26 @@ export async function handleGuestFlashcardGeneration(data: {
   level: string;
   sourceLanguage: string;
   targetLanguage: string;
+  recaptchaToken?: string;
 }): Promise<FlashcardGenerationResponse> {
   try {
+    // Verify reCAPTCHA for guest users
+    if (data.recaptchaToken) {
+      const recaptchaResult = await verifyRecaptcha(data.recaptchaToken);
+      if (!recaptchaResult.success) {
+        return {
+          success: false,
+          error: recaptchaResult.error || "reCAPTCHA verification failed"
+        };
+      }
+    } else {
+      // For guest users, reCAPTCHA is required
+      return {
+        success: false,
+        error: "reCAPTCHA verification required for guest users"
+      };
+    }
+
     const generateUseCase = getGenerateFlashcardsUseCase();
 
     const prompt = getFlashcardsPrompt(
