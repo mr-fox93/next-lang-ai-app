@@ -19,6 +19,7 @@ import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
 import { useAuth, useUser } from "@/hooks";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslations } from 'next-intl';
+import { RecaptchaV3 } from "@/components/recaptcha-v3";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -31,6 +32,8 @@ export default function Hero() {
       targetLanguage: "en",
       difficultyLevel: "easy",
     });
+  const [showRecaptcha, setShowRecaptcha] = useState(false);
+  const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
@@ -43,55 +46,47 @@ export default function Hero() {
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
 
+    const authState = isSignedIn;
+
+    // For guest users, trigger reCAPTCHA v3 verification
+    if (!authState || !user) {
+      // Check if reCAPTCHA is configured
+      if (!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+        setErrorMessage("reCAPTCHA is not configured. Please contact administrator.");
+        return;
+      }
+
+      setShowRecaptcha(true);
+      setRecaptchaError(null);
+      return;
+    }
+
+    // For authenticated users, proceed directly
     setIsLoading(true);
     setErrorMessage(null);
 
-    const authState = isSignedIn;
-
     try {
-      if (authState && user) {
-        // Secure: don't log user ID or sensitive data
+      const result = await generateFlashcardsAction({
+        count: 5,
+        message: userInput,
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage,
+      });
 
-        const result = await generateFlashcardsAction({
-          count: 5,
-          message: userInput,
-          level: languageSettings.difficultyLevel,
-          sourceLanguage: languageSettings.sourceLanguage,
-          targetLanguage: languageSettings.targetLanguage,
+      if (result.success) {
+        setUserInput("");
+        toast({
+          title: t('success'),
+          description: t('successMessage'),
+          variant: "success",
         });
 
-        if (result.success) {
-          setUserInput("");
-          toast({
-            title: t('success'),
-            description: t('successMessage'),
-            variant: "success",
-          });
-
-          setTimeout(() => {
-            router.push("flashcards");
-          }, 100);
-        } else {
-          setErrorMessage(result.error || "Error generating flashcards");
-        }
+        setTimeout(() => {
+          router.push("flashcards");
+        }, 100);
       } else {
-        // Remove guest mode logging
-
-        const result = await handleGuestFlashcardGeneration({
-          count: 5,
-          message: userInput,
-          level: languageSettings.difficultyLevel,
-          sourceLanguage: languageSettings.sourceLanguage,
-          targetLanguage: languageSettings.targetLanguage,
-        });
-
-        if (result.success && result.flashcards) {
-          guestFlashcardsStorage.addFlashcards(result.flashcards);
-          setUserInput("");
-          router.push("guest-flashcard");
-        } else {
-          setErrorMessage(result.error || "Error generating flashcards");
-        }
+        setErrorMessage(result.error || "Error generating flashcards");
       }
     } catch (error) {
       console.error("Flashcard generation client error:", error);
@@ -103,6 +98,47 @@ export default function Hero() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRecaptchaVerified = async (token: string) => {
+    setShowRecaptcha(false);
+    setIsLoading(true);
+    setErrorMessage(null);
+    setRecaptchaError(null);
+
+    try {
+      const result = await handleGuestFlashcardGeneration({
+        count: 5,
+        message: userInput,
+        level: languageSettings.difficultyLevel,
+        sourceLanguage: languageSettings.sourceLanguage,
+        targetLanguage: languageSettings.targetLanguage,
+        recaptchaToken: token,
+      });
+
+      if (result.success && result.flashcards) {
+        guestFlashcardsStorage.addFlashcards(result.flashcards);
+        setUserInput("");
+        router.push("guest-flashcard");
+      } else {
+        setErrorMessage(result.error || "Error generating flashcards");
+      }
+    } catch (error) {
+      console.error("Flashcard generation client error:", error);
+      setErrorMessage(
+        error instanceof Error
+          ? `Flashcard generation failed: ${error.message}`
+          : "An unexpected error occurred during flashcard generation"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRecaptchaError = (error: string) => {
+    setRecaptchaError(error);
+    setShowRecaptcha(false);
+    setErrorMessage(`Security verification failed: ${error}`);
   };
 
   return (
@@ -179,6 +215,25 @@ export default function Hero() {
                 {isLoading ? t('generating') : t('generateButton')}
               </span>
             </Button>
+            
+            {/* reCAPTCHA v3 component for guest users */}
+            {showRecaptcha && (
+              <div className="mt-4">
+                <RecaptchaV3
+                  trigger={showRecaptcha}
+                  onVerified={handleRecaptchaVerified}
+                  onError={handleRecaptchaError}
+                  action="generate_flashcards"
+                />
+              </div>
+            )}
+            
+            {recaptchaError && (
+              <ErrorMessage
+                message={recaptchaError}
+                onClose={() => setRecaptchaError(null)}
+              />
+            )}
           </motion.div>
         </div>
       </div>
