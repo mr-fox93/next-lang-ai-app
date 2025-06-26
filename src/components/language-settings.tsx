@@ -22,7 +22,6 @@ const LANGUAGES = [
 const DIFFICULTY_LEVELS = [
   { value: "easy", label: "Easy" },
   { value: "advanced", label: "Advanced" },
-  { value: "pro", label: "Expert" },
 ] as const;
 
 type LanguageSettingsProps = {

@@ -67,7 +67,7 @@ export default function Hero() {
 
     try {
       const result = await generateFlashcardsAction({
-        count: 5,
+        count: 10,
         message: userInput,
         level: languageSettings.difficultyLevel,
         sourceLanguage: languageSettings.sourceLanguage,
@@ -108,7 +108,7 @@ export default function Hero() {
 
     try {
       const result = await handleGuestFlashcardGeneration({
-        count: 5,
+        count: 10,
         message: userInput,
         level: languageSettings.difficultyLevel,
         sourceLanguage: languageSettings.sourceLanguage,

@@ -10,6 +10,7 @@ import { speak } from "@/utils/speak";
 import { SupportedTTSLanguage } from "@/types/locale";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
+import { useTranslations } from "next-intl";
 
 const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
@@ -27,6 +28,7 @@ interface FlashcardViewProps {
 
 export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false }: FlashcardViewProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const t = useTranslations("Difficulty");
 
   const handleAnswer = (isCorrect: boolean) => {
     setTimeout(() => {
@@ -40,6 +42,18 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
   );
 
   const targetTTS = langToTTSMap[card.targetLanguage] || "en-US";
+
+  // Function to get difficulty level display info
+  const getDifficultyInfo = (level: string) => {
+    switch (level) {
+      case "easy":
+        return { label: t("easy"), className: "bg-green-800/60 text-green-200 border-green-600/50" };
+      case "advanced":
+        return { label: t("advanced"), className: "bg-orange-800/60 text-orange-200 border-orange-600/50" };
+      default:
+        return { label: t("easy"), className: "bg-green-800/60 text-green-200 border-green-600/50" };
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full max-w-3xl mx-auto overflow-hidden pt-10 sm:pt-8">
@@ -104,9 +118,12 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
                 </motion.div>
 
                 <div className="p-1.5 sm:p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
-                  <div>
+                  <div className="flex items-center gap-2">
                     <Badge variant="outline" className="bg-gray-800/60 text-xs">
                       {card.category}
+                    </Badge>
+                    <Badge variant="outline" className={`text-xs ${getDifficultyInfo(card.difficultyLevel).className}`}>
+                      {getDifficultyInfo(card.difficultyLevel).label}
                     </Badge>
                   </div>
                   <div className="text-xs">Click to flip</div>
@@ -136,9 +153,12 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
                 </motion.div>
 
                 <div className="p-1.5 sm:p-2 flex items-center justify-between text-xs text-gray-400 bg-gray-800/30 rounded-b-xl">
-                  <div>
+                  <div className="flex items-center gap-2">
                     <Badge variant="outline" className="bg-gray-800/60 text-xs">
                       {card.category}
+                    </Badge>
+                    <Badge variant="outline" className={`text-xs ${getDifficultyInfo(card.difficultyLevel).className}`}>
+                      {getDifficultyInfo(card.difficultyLevel).label}
                     </Badge>
                   </div>
                   <div className="text-xs">Click to flip</div>

@@ -239,6 +239,7 @@ export async function handleGuestFlashcardGeneration(data: {
   level: string;
   sourceLanguage: string;
   targetLanguage: string;
+  existingFlashcards?: Array<{origin_text: string, translate_text: string}>;
   recaptchaToken?: string;
 }): Promise<FlashcardGenerationResponse> {
   try {
@@ -251,8 +252,8 @@ export async function handleGuestFlashcardGeneration(data: {
           error: recaptchaResult.error || "reCAPTCHA verification failed"
         };
       }
-    } else {
-      // For guest users, reCAPTCHA is required
+    } else if (!data.existingFlashcards || data.existingFlashcards.length === 0) {
+      // For guest users, reCAPTCHA is required only for initial generation (not for generateMore)
       return {
         success: false,
         error: "reCAPTCHA verification required for guest users"
@@ -266,7 +267,8 @@ export async function handleGuestFlashcardGeneration(data: {
       data.message,
       data.level,
       data.sourceLanguage,
-      data.targetLanguage
+      data.targetLanguage,
+      data.existingFlashcards || []
     );
 
     const aiGenerator = generateUseCase as unknown as AIFlashcardGenerator;
@@ -354,57 +356,32 @@ export async function generateMoreFlashcardsAction(params: {
 
     // Step 2: Get all existing terms in this category to prevent duplicates
     const existingFlashcardsInCategory = userFlashcards.filter(card => card.category === category);
-    const allExistingTerms = Array.from(
-      new Set([
-        ...existingTerms,
-        ...existingFlashcardsInCategory.map(card => card.origin_text.toLowerCase()),
-        ...existingFlashcardsInCategory.map(card => card.translate_text.toLowerCase())
-      ])
-    );
+    const existingFlashcards = [
+      ...existingFlashcardsInCategory.map(card => ({
+        origin_text: card.origin_text,
+        translate_text: card.translate_text
+      })),
+      // Add terms from existingTerms parameter (may come from frontend)
+      ...existingTerms.map(term => ({
+        origin_text: term,
+        translate_text: term // Placeholder, will be filtered out by AI
+      }))
+    ];
 
-    // Step 3: Create a very explicit message that forces the exact category
-    const excludeTermsText = allExistingTerms.length > 0 
-      ? `- DO NOT include ANY of these existing terms: ${allExistingTerms.join(", ")}`
-      : `- Generate completely new and unique terms`;
-      
-    const message = `Generate ${count} new flashcards SPECIFICALLY for the existing category "${category}". 
+    // Step 3: Use the enhanced generation with retry mechanism
+    const message = `Generate more flashcards for the existing category "${category}". Focus on expanding vocabulary in this topic area with diverse, unique terms.`;
 
-CRITICAL REQUIREMENTS:
-- ALL flashcards MUST have category: "${category}" (use this EXACT name)
-- DO NOT create variations of the category name
-${excludeTermsText}
-- All flashcards must be related to the same topic as the existing "${category}" category
-- Generate unique terms that complement the existing flashcards in this category`;
-
-    const generateParams: GenerateFlashcardsParams = {
+    const result = await getGenerateFlashcardsUseCase().generateMoreFlashcards({
       count,
       message,
       level: difficultyLevel,
       userId,
       userEmail: user?.email || "",
       sourceLanguage,
-      targetLanguage,
-    };
-
-    const result = await getGenerateFlashcardsUseCase().execute(generateParams);
-
-    // Step 4: Validate that AI returned the correct category and no duplicates
-    if (result.success && result.flashcards) {
-      const invalidFlashcards = result.flashcards.filter(card => 
-        card.category !== category || 
-        allExistingTerms.includes(card.origin_text.toLowerCase()) ||
-        allExistingTerms.includes(card.translate_text.toLowerCase())
-      );
-
-      if (invalidFlashcards.length > 0) {
-        return {
-          success: false,
-          error: `AI generated invalid flashcards: wrong category or duplicates detected. Please try again.`,
-        };
-      }
-
-      // Note: Duplicates already checked in Step 4 with comprehensive allExistingTerms
-    }
+      targetLanguage, 
+      category,
+      existingFlashcards,
+    });
 
     return result;
   } catch (error) {
@@ -437,58 +414,79 @@ export async function generateMoreGuestFlashcardsAction(params: {
     } = params;
 
     // Step 1: Create comprehensive list of existing terms to prevent duplicates
-    const allExistingTerms = Array.from(new Set(existingTerms.map(term => term.toLowerCase())));
+    const existingFlashcards = existingTerms.map(term => ({
+      origin_text: term,
+      translate_text: term // Placeholder, exact matching will be done by AI
+    }));
 
-    // Step 2: Create a very explicit message that forces the exact category
-    const excludeTermsText = allExistingTerms.length > 0 
-      ? `- DO NOT include ANY of these existing terms: ${allExistingTerms.join(", ")}`
-      : `- Generate completely new and unique terms`;
+    // Step 2: Try up to 3 times to generate unique flashcards
+    const maxAttempts = 3;
+    let lastError: string | null = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const message = `Generate more flashcards for the existing category "${category}". Focus on expanding vocabulary in this topic area with diverse, unique terms.`;
       
-    const message = `Generate ${count} new flashcards SPECIFICALLY for the existing category "${category}". 
+      try {
+        const result = await handleGuestFlashcardGeneration({
+          count,
+          message,
+          level: difficultyLevel,
+          sourceLanguage,
+          targetLanguage,
+          existingFlashcards,
+          recaptchaToken: undefined, // No recaptcha needed for generateMore
+        });
 
-CRITICAL REQUIREMENTS:
-- ALL flashcards MUST have category: "${category}" (use this EXACT name)
-- DO NOT create variations of the category name
-${excludeTermsText}
-- All flashcards must be related to the same topic as the existing "${category}" category
-- Generate unique terms that complement the existing flashcards in this category`;
+        if (result.success && result.flashcards) {
+          // Step 3: Validate and filter duplicates
+          const uniqueFlashcards = result.flashcards.filter(card => 
+            !existingTerms.some(term => 
+              term.toLowerCase() === card.origin_text.toLowerCase() ||
+              term.toLowerCase() === card.translate_text.toLowerCase()
+            )
+          );
 
-    const result = await handleGuestFlashcardGeneration({
-      count,
-      message,
-      level: difficultyLevel,
-      sourceLanguage,
-      targetLanguage,
-    });
+          if (uniqueFlashcards.length > 0) {
+            // Step 4: Ensure all flashcards have the correct category
+            const flashcardsWithCategory = uniqueFlashcards.map((card) => ({
+              ...card,
+              category: category, // Force the exact category name
+            }));
 
-    if (result.success && result.flashcards) {
-      // Step 3: Validate that AI returned the correct category and no duplicates
-      const invalidFlashcards = result.flashcards.filter(card => 
-        card.category !== category || 
-        allExistingTerms.includes(card.origin_text.toLowerCase()) ||
-        allExistingTerms.includes(card.translate_text.toLowerCase())
-      );
-
-      if (invalidFlashcards.length > 0) {
-        return {
-          success: false,
-          error: `AI generated invalid flashcards: wrong category or duplicates detected. Please try again.`,
-        };
+            return {
+              success: true,
+              flashcards: flashcardsWithCategory,
+            };
+          } else if (attempt < maxAttempts) {
+            console.log(`Guest attempt ${attempt}: All generated flashcards were duplicates, retrying...`);
+            lastError = `Wszystkie wygenerowane fiszki były duplikatami (próba ${attempt}/${maxAttempts})`;
+            
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+            continue;
+          }
+        } else if (attempt < maxAttempts) {
+          lastError = result.error || "Nieznany błąd podczas generowania";
+          
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+          continue;
+        }
+      } catch (error) {
+        console.error(`Guest generate more flashcards attempt ${attempt} error:`, error);
+        lastError = error instanceof Error ? error.message : "Nieznany błąd";
+        
+        if (attempt < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        }
       }
-
-      // Step 4: Ensure all flashcards have the correct category
-      const flashcardsWithCategory = result.flashcards.map((card) => ({
-        ...card,
-        category: category, // Force the exact category name
-      }));
-
-      return {
-        success: true,
-        flashcards: flashcardsWithCategory,
-      };
     }
 
-    return result;
+    return {
+      success: false,
+      error: `Nie udało się wygenerować unikalnych fiszek po ${maxAttempts} próbach. Ostatni błąd: ${lastError}`,
+    };
+
   } catch (error) {
     console.error("Additional guest flashcards generation error:", error);
     return {

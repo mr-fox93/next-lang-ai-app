@@ -115,9 +115,13 @@
   "Footer": {
     "allRightsReserved": "Todos los derechos reservados",
     "contact": "Contacto",
-    "privacyPolicy": "Política de Privacidad",
-    "termsOfUse": "Términos de Uso",
-    "cookieSettings": "Configuración de Cookies"
+    "privacyPolicy": "Política de privacidad",
+    "termsOfUse": "Términos de uso",
+    "cookieSettings": "Configuración de cookies"
+  },
+  "Difficulty": {
+    "easy": "Fácil",
+    "advanced": "Avanzado"
   },
   "Cookie": {
     "title": "Política de privacidad y cookies",

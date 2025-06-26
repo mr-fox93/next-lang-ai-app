@@ -59,7 +59,7 @@ export function GenerateFlashcardsDialog({
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-purple-200/80">
-            Would you like to generate 5 new flashcards for the{" "}
+            Would you like to generate 10 new flashcards for the{" "}
             <span className="font-medium text-fuchsia-300">
               &quot;{categoryName}&quot;
             </span>{" "}

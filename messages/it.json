@@ -115,9 +115,9 @@
   "Footer": {
     "allRightsReserved": "Tutti i diritti riservati",
     "contact": "Contatto",
-    "privacyPolicy": "Politica sulla Privacy",
-    "termsOfUse": "Termini di Utilizzo",
-    "cookieSettings": "Impostazioni Cookie"
+    "privacyPolicy": "Informativa sulla privacy",
+    "termsOfUse": "Termini di servizio",
+    "cookieSettings": "Impostazioni cookie"
   },
   "Cookie": {
     "title": "Politica sulla privacy e cookie",
@@ -250,5 +250,9 @@
     "emailValidationError": "Inserisci un indirizzo email valido.",
     "offensiveContentError": "Il tuo messaggio contiene contenuti che potrebbero violare le nostre linee guida della comunità. Rivedi e concentrati su problemi tecnici o feedback sull'applicazione."
   },
-  "home": "Home"
+  "home": "Home",
+  "Difficulty": {
+    "easy": "Facile",
+    "advanced": "Avanzato"
+  }
 } 

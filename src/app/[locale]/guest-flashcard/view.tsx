@@ -168,7 +168,7 @@ export default function GuestFlashcardsView({
       const result = await generateMoreGuestFlashcardsAction({
         category,
         existingTerms,
-        count: 5,
+        count: 10,
         sourceLanguage,
         targetLanguage,
         difficultyLevel,
