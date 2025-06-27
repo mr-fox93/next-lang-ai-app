@@ -22,7 +22,7 @@ export function useFlashcards(options: UseFlashcardsOptions = {}) {
   const generateFlashcards = async (params: {
     count: number;
     message: string;
-    level: "beginner" | "intermediate" | "advanced";
+    level: "easy" | "advanced";
     sourceLanguage?: string;
     targetLanguage?: string;
   }) => {

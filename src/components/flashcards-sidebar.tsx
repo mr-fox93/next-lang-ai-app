@@ -385,7 +385,7 @@ export function FlashcardsSidebar({
         const result = await generateMoreGuestFlashcardsAction({
           category: categoryToGenerate,
           existingTerms,
-          count: 5,
+          count: 10,
           sourceLanguage,
           targetLanguage,
           difficultyLevel,
@@ -424,7 +424,7 @@ export function FlashcardsSidebar({
         const result = await generateMoreFlashcardsAction({
           category: categoryToGenerate,
           existingTerms,
-          count: 5,
+          count: 10,
           sourceLanguage,
           targetLanguage,
           difficultyLevel,

@@ -151,7 +151,7 @@ export default function FlashcardsView({
       const result = await generateMoreFlashcardsAction({
         category,
         existingTerms,
-        count: 5,
+        count: 10,
         sourceLanguage,
         targetLanguage,
         difficultyLevel,

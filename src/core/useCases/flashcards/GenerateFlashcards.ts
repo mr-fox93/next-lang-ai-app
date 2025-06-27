@@ -76,7 +76,8 @@ export class GenerateFlashcardsUseCase {
         message,
         level,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
+        [] // Empty array for new flashcards generation
       );
       const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
 
@@ -114,6 +115,144 @@ export class GenerateFlashcardsUseCase {
     }
   }
 
+  async generateMoreFlashcards(params: {
+    count: number;
+    message: string;
+    level: string;
+    userId: string;
+    userEmail: string;
+    sourceLanguage: string;
+    targetLanguage: string;
+    category: string;
+    existingFlashcards: Array<{origin_text: string, translate_text: string}>;
+  }): Promise<GenerateFlashcardsResult> {
+    try {
+      const {
+        count,
+        message,
+        level,
+        userId,
+        userEmail,
+        sourceLanguage,
+        targetLanguage,
+        category,
+        existingFlashcards,
+      } = params;
+
+      if (!userId) {
+        return {
+          success: false,
+          error: "Nie jesteś zalogowany",
+        };
+      }
+
+      if (!count || count <= 0) {
+        return {
+          success: false,
+          error: "Liczba fiszek musi być większa niż 0",
+        };
+      }
+
+      await this.upsertUser(userId, userEmail);
+
+      // Try up to 3 times to generate unique flashcards
+      const maxAttempts = 3;
+      let lastError: string | null = null;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const { getEnhancedFlashcardsPrompt } = await import("@/lib/prompts");
+        
+        const prompt = getEnhancedFlashcardsPrompt(
+          count,
+          message,
+          level,
+          sourceLanguage,
+          targetLanguage,
+          existingFlashcards,
+          category,
+          attempt
+        );
+
+        try {
+          const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
+
+          if (!generatedFlashcards || generatedFlashcards.length === 0) {
+            lastError = "AI nie wygenerował żadnych fiszek";
+            continue;
+          }
+
+          // Check for duplicates
+          const duplicates = generatedFlashcards.filter(card => 
+            existingFlashcards.some(existing => 
+              existing.origin_text.toLowerCase() === card.origin_text.toLowerCase() ||
+              existing.translate_text.toLowerCase() === card.translate_text.toLowerCase()
+            )
+          );
+
+          if (duplicates.length > 0 && attempt < maxAttempts) {
+            console.log(`Attempt ${attempt}: Found ${duplicates.length} duplicates, retrying...`);
+            lastError = `Znaleziono ${duplicates.length} duplikatów, próbując ponownie...`;
+            continue;
+          }
+
+          // Filter out duplicates and keep unique ones
+          const uniqueFlashcards = generatedFlashcards.filter(card => 
+            !existingFlashcards.some(existing => 
+              existing.origin_text.toLowerCase() === card.origin_text.toLowerCase() ||
+              existing.translate_text.toLowerCase() === card.translate_text.toLowerCase()
+            )
+          );
+
+          if (uniqueFlashcards.length === 0) {
+            lastError = "Wszystkie wygenerowane fiszki były duplikatami";
+            continue;
+          }
+
+          // Assign user-selected language settings to generated flashcards
+          const flashcards = uniqueFlashcards.map((flashcard) => ({
+            ...flashcard,
+            sourceLanguage,
+            targetLanguage,
+            difficultyLevel: level,
+            category, // Ensure correct category
+          }));
+
+          const savedFlashcards = await this.saveFlashcards(flashcards, userId);
+          await this.createProgressRecords(savedFlashcards, userId);
+
+          return {
+            success: true,
+            message: `Pomyślnie wygenerowano ${savedFlashcards.length} nowych fiszek${duplicates.length > 0 ? ` (pominięto ${duplicates.length} duplikatów)` : ''}`,
+            flashcards: savedFlashcards,
+          };
+
+        } catch (error) {
+          console.error(`Generate more flashcards attempt ${attempt} error:`, error);
+          lastError = error instanceof Error ? error.message : "Nieznany błąd";
+          
+          if (attempt < maxAttempts) {
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+          }
+        }
+      }
+
+      return {
+        success: false,
+        error: `Nie udało się wygenerować unikalnych fiszek po ${maxAttempts} próbach. Ostatni błąd: ${lastError}`,
+      };
+
+    } catch (error) {
+      console.error("Generate more flashcards error:", error);
+      return {
+        success: false,
+        error: `Generowanie dodatkowych fiszek nie powiodło się: ${
+          error instanceof Error ? error.message : "Nieznany błąd"
+        }`,
+      };
+    }
+  }
+
   private async upsertUser(userId: string, userEmail: string): Promise<void> {
     const existingUser = await this.userRepository.getUserById(userId);
 
@@ -139,59 +278,70 @@ export class GenerateFlashcardsUseCase {
   }
 
   private async generateFlashcardsWithAI(
-    prompt: string
+    prompt: string,
+    maxRetries: number = 3
   ): Promise<Omit<Flashcard, "id" | "userId">[]> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        response_format: zodResponseFormat(
-          FlashCardSchema,
-          "flashcardResponse"
-        ),
-        temperature: 0.1,
-        max_tokens: 1000,
-      });
+    let lastError: Error | null = null;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Focus on creating DIVERSE vocabulary with different starting letters and semantic variety. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          response_format: zodResponseFormat(
+            FlashCardSchema,
+            "flashcardResponse"
+          ),
+          temperature: attempt > 1 ? 0.3 + (attempt - 1) * 0.2 : 0.1, // Increase creativity on retries
+          max_tokens: 1000,
+        });
 
-      const parsedData = FlashCardSchema.parse(
-        JSON.parse(response.choices[0].message.content || "[]")
-      );
-
-      const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(
-        (flashcard) => ({
-          ...flashcard,
-          sourceLanguage: "pl",
-          targetLanguage: "en",
-          difficultyLevel: "easy",
-        })
-      );
-
-      return flashcardsWithDefaultLanguageSettings;
-    } catch (error) {
-      console.error("AI flashcard generation error:", error);
-
-      if (error instanceof Error && error.message.includes("429")) {
-        throw new Error(
-          "Przekroczono limit zapytań do API OpenAI. Spróbuj ponownie później lub skontaktuj się z administratorem w celu aktualizacji planu subskrypcji."
+        const parsedData = FlashCardSchema.parse(
+          JSON.parse(response.choices[0].message.content || "[]")
         );
-      }
 
-      throw new Error(
-        `Failed to generate flashcards with AI: ${
-          error instanceof Error ? error.message : "Unknown error occurred"
-        }`
-      );
+        const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(
+          (flashcard) => ({
+            ...flashcard,
+            sourceLanguage: "pl",
+            targetLanguage: "en",
+            difficultyLevel: "easy",
+          })
+        );
+
+        return flashcardsWithDefaultLanguageSettings;
+      } catch (error) {
+        console.error(`AI flashcard generation error (attempt ${attempt}/${maxRetries}):`, error);
+        lastError = error as Error;
+
+        if (error instanceof Error && error.message.includes("429")) {
+          throw new Error(
+            "Przekroczono limit zapytań do API OpenAI. Spróbuj ponownie później lub skontaktuj się z administratorem w celu aktualizacji planu subskrypcji."
+          );
+        }
+
+        // If this is not the last attempt, wait before retry
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
     }
+
+    throw new Error(
+      `Failed to generate flashcards with AI after ${maxRetries} attempts: ${
+        lastError?.message || "Unknown error occurred"
+      }`
+    );
   }
 
   private async saveFlashcards(

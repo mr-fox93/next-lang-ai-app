@@ -116,9 +116,13 @@
   "Footer": {
     "allRightsReserved": "Wszelkie prawa zastrzeżone",
     "contact": "Kontakt",
-    "privacyPolicy": "Polityka Prywatności",
-    "termsOfUse": "Warunki Użytkowania",
-    "cookieSettings": "Ustawienia Cookies"
+    "privacyPolicy": "Polityka prywatności",
+    "termsOfUse": "Regulamin",
+    "cookieSettings": "Ustawienia plików cookie"
+  },
+  "Difficulty": {
+    "easy": "Łatwy",
+    "advanced": "Zaawansowany"
   },
   "Cookie": {
     "title": "Polityka prywatności i pliki cookie",
@@ -251,5 +255,9 @@
     "emailValidationError": "Proszę wprowadzić poprawny adres email.",
     "offensiveContentError": "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
   },
-  "home": "Strona główna"
+  "home": "Strona główna",
+  "Difficulty": {
+    "easy": "Łatwy",
+    "advanced": "Zaawansowany"
+  }
 } 

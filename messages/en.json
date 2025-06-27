@@ -252,5 +252,9 @@
   },
   "backToLearning": "Back to Learning",
   "home": "Home",
-  "categories": "Categories"
+  "categories": "Categories",
+  "Difficulty": {
+    "easy": "Easy",
+    "advanced": "Advanced"
+  }
 } 

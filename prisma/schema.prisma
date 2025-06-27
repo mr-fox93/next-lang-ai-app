@@ -39,7 +39,7 @@ model Flashcard {
   translate_category String? // Category translation for user interface language
   sourceLanguage    String   @default("en") // Source language
   targetLanguage    String   @default("pl") // Target language
-  difficultyLevel   String   @default("easy") // Difficulty level: easy, advanced, pro
+  difficultyLevel   String   @default("easy") // Difficulty level: easy, advanced
   createdAt         DateTime @default(now())
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
