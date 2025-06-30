@@ -139,7 +139,7 @@ export default function HowItWorks() {
           <div className="flex items-center justify-center">
             <div className="group inline-block rounded-xl border border-purple-600/40 shadow-lg shadow-purple-900/20 bg-black/40 p-[3px] group-hover:border-purple-500/70 group-hover:shadow-purple-700/30 transition-all duration-300">
               <ImageModal
-                src="/step1.png"
+                src="/landing.png"
                 alt="Language Selection"
                 className="rounded-lg"
               />

@@ -44,7 +44,7 @@ export const metadata = {
     },
   },
   verification: {
-    google: 'your-google-verification-code', 
+    google: 'your-google-verification-code', // Można dodać kod weryfikacji Google
   },
 };
 

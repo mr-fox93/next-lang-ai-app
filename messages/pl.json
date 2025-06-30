@@ -60,7 +60,8 @@
     "flashcardsAddedSuccess": "Pomyślnie dodano {count} nowych fiszek do kategorii \"{category}\".",
     "addedNewFlashcards": "Pomyślnie dodano nowe fiszki do kategorii \"{category}\".",
     "failedToGenerateFlashcards": "Nie udało się wygenerować nowych fiszek",
-    "generating": "Generowanie..."
+    "generating": "Generowanie...",
+    "logOut": "Wyloguj się"
   },
   "Hero": {
     "title": "Zmień swój sposób nauki z",

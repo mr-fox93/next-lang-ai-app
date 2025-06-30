@@ -59,7 +59,8 @@
     "flashcardsAddedSuccess": "Se agregaron exitosamente {count} nuevas tarjetas a la categoría \"{category}\".",
     "addedNewFlashcards": "Se agregaron exitosamente nuevas tarjetas a la categoría \"{category}\".",
     "failedToGenerateFlashcards": "No se pudieron generar nuevas tarjetas",
-    "generating": "Generando..."
+    "generating": "Generando...",
+    "logOut": "Cerrar sesión"
   },
   "Hero": {
     "title": "Transforma tu aprendizaje con",

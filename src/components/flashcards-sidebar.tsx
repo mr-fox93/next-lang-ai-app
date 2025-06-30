@@ -13,6 +13,7 @@ import {
   CheckCircle,
   ListFilter,
   Save,
+  LogOut,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,7 @@ import { AIGenerationLoader } from "@/components/ui/ai-generation-loader";
 import { GenerateFlashcardsDialog } from "@/components/generate-flashcards-dialog";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { SidebarVariant } from "@/types/component-props";
+import { useSupabase } from "@/hooks/useSupabase";
 
 interface FlashcardsSidebarProps {
   selectedCategory: string | null;
@@ -111,6 +113,7 @@ export function FlashcardsSidebar({
 
   const router = useRouter();
   const { toast } = useToast();
+  const { signOut } = useSupabase();
 
   // Determine if component is in guest mode
   const isGuestMode = variant === "guest" || variant === "demo";
@@ -567,12 +570,23 @@ export function FlashcardsSidebar({
               {/* Mobile Action Buttons */}
               <div className="flex flex-col space-y-2">
                 {/* Exit Demo Button for Mobile */}
-                {(variant === "demo" || variant === "authenticated") && onExitDemo && (
+                {variant === "demo" && onExitDemo && (
                   <Button
                     onClick={onExitDemo}
                     className="w-full border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors text-sm py-2"
                   >
                     Exit Demo
+                  </Button>
+                )}
+
+                {/* Log Out Button for Authenticated Users on Mobile */}
+                {variant === "authenticated" && (
+                  <Button
+                    onClick={signOut}
+                    className="w-full border border-red-500 text-red-400 hover:text-red-300 hover:border-red-400 bg-transparent transition-colors text-sm py-2"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {t('logOut')}
                   </Button>
                 )}
 
