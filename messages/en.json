@@ -59,7 +59,8 @@
     "flashcardsAddedSuccess": "Successfully added {count} new flashcards to the \"{category}\" category.",
     "addedNewFlashcards": "Successfully added new flashcards to the \"{category}\" category.",
     "failedToGenerateFlashcards": "Failed to generate new flashcards",
-    "generating": "Generating..."
+    "generating": "Generating...",
+    "logOut": "Log Out"
   },
   "Hero": {
     "title": "Transform Your Learning with",

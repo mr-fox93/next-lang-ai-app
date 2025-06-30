@@ -59,7 +59,8 @@
     "flashcardsAddedSuccess": "Aggiunte con successo {count} nuove flashcard alla categoria \"{category}\".",
     "addedNewFlashcards": "Aggiunte con successo nuove flashcard alla categoria \"{category}\".",
     "failedToGenerateFlashcards": "Impossibile generare nuove flashcard",
-    "generating": "Generazione..."
+    "generating": "Generazione...",
+    "logOut": "Disconnetti"
   },
   "Hero": {
     "title": "Trasforma il tuo apprendimento con",
