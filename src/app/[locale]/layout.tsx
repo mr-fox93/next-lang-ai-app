@@ -11,6 +11,7 @@ import { CookieConsentProvider } from "@/components/cookie-consent";
 import { ContactModalProvider } from "@/shared/contact-modal-context";
 import ClientI18nProvider from '@/components/client-i18n-provider';
 import { AnimatedAssistant } from '@/components/animated-assistant';
+import { Analytics } from '@vercel/analytics/next';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -60,6 +61,7 @@ export default async function LocaleLayout({
           </LoadingErrorProvider>
         </ErrorBoundary>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
