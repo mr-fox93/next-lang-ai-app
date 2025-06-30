@@ -157,7 +157,7 @@
       "necessaryCookiesDesc": "Permiten funciones básicas como inicio de sesión seguro y navegación por el sitio. El servicio Supabase usa sus propias cookies para autenticación y gestión de sesiones.",
       "localStorageTitle": "Almacenamiento local de datos",
       "localStorageDesc": "Usamos la memoria de tu navegador para almacenar tarjetas en modo invitado y recordar tus preferencias de cookies.",
-      "noCookies": "No usamos cookies para fines de marketing, seguimiento o análisis."
+      "noCookies": "No usamos cookies para fines de marketing o seguimiento. Vercel Analytics recopila datos de uso anónimos sin usar cookies o almacenar información personal."
     },
     "externalServices": {
       "title": "4. Servicios externos",
@@ -165,7 +165,7 @@
       "openai": "OpenAI",
       "openaiDesc": "Para generar contenido de tarjetas usando su API. Solo se transmiten datos necesarios para la generación de contenido; no compartimos datos personales de usuarios.",
       "vercel": "Vercel",
-      "vercelDesc": "Para el alojamiento de nuestra aplicación.",
+      "vercelDesc": "Para el alojamiento de nuestra aplicación y análisis web. Vercel Analytics puede recopilar datos de uso anónimos como visualizaciones de páginas, interacciones de usuarios y métricas de rendimiento para ayudarnos a mejorar la aplicación. No se recopilan datos personales a través del análisis.",
       "policy": "Cada uno de estos servicios tiene su propia política de privacidad, que se puede encontrar en sus sitios web.",
       "supabase": "Supabase",
       "supabaseDesc": "Para autenticación y gestión de cuentas de usuario. Supabase puede recopilar datos como dirección de correo electrónico, IP o información del navegador de acuerdo con su propia política de privacidad."
