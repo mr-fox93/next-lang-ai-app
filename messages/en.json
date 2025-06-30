@@ -153,7 +153,7 @@
       "necessaryCookiesDesc": "Enable basic functions such as secure login and site navigation. The Supabase service uses its own cookies for authentication and session management.",
       "localStorageTitle": "Local data storage",
       "localStorageDesc": "We use your browser's memory to store flashcards in guest mode and remember your cookie preferences.",
-      "noCookies": "We do not use any cookies for marketing, tracking, or analytics purposes."
+      "noCookies": "We do not use any cookies for marketing or tracking purposes. Vercel Analytics collects anonymous usage data without using cookies or storing personal information."
     },
     "externalServices": {
       "title": "4. External services",
@@ -161,7 +161,7 @@
       "openai": "OpenAI",
       "openaiDesc": "For generating flashcard content using their API. Only data necessary for content generation is transmitted; we do not share users' personal data.",
       "vercel": "Vercel",
-      "vercelDesc": "For hosting our application.",
+      "vercelDesc": "For hosting our application and web analytics. Vercel Analytics may collect anonymous usage data such as page views, user interactions, and performance metrics to help us improve the application. No personal data is collected through analytics.",
       "policy": "Each of these services has its own privacy policy, which can be found on their websites.",
       "supabase": "Supabase",
       "supabaseDesc": "For authentication and user account management. Supabase may collect data such as email address, IP, or browser information in accordance with their own privacy policy."

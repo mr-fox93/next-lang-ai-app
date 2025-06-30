@@ -153,7 +153,7 @@
       "necessaryCookiesDesc": "Abilitano funzioni di base come l'accesso sicuro e la navigazione sul sito. Il servizio Supabase utilizza i propri cookie per l'autenticazione e la gestione delle sessioni.",
       "localStorageTitle": "Archiviazione dati locale",
       "localStorageDesc": "Utilizziamo la memoria del tuo browser per archiviare flashcard in modalità ospite e ricordare le tue preferenze sui cookie.",
-      "noCookies": "Non utilizziamo alcun cookie per finalità di marketing, tracciamento o analisi."
+      "noCookies": "Non utilizziamo alcun cookie per finalità di marketing o tracciamento. Vercel Analytics raccoglie dati di utilizzo anonimi senza utilizzare cookie o memorizzare informazioni personali."
     },
     "externalServices": {
       "title": "4. Servizi esterni",
@@ -161,7 +161,7 @@
       "openai": "OpenAI",
       "openaiDesc": "Per generare contenuti delle flashcard utilizzando la loro API. Vengono trasmessi solo i dati necessari per la generazione del contenuto; non condividiamo i dati personali degli utenti.",
       "vercel": "Vercel",
-      "vercelDesc": "Per l'hosting della nostra applicazione.",
+      "vercelDesc": "Per l'hosting della nostra applicazione e l'analisi web. Vercel Analytics può raccogliere dati di utilizzo anonimi come visualizzazioni di pagine, interazioni degli utenti e metriche delle prestazioni per aiutarci a migliorare l'applicazione. Nessun dato personale viene raccolto tramite l'analisi.",
       "policy": "Ognuno di questi servizi ha la propria politica sulla privacy, che può essere trovata sui loro siti web.",
       "supabase": "Supabase",
       "supabaseDesc": "Per l'autenticazione e la gestione degli account utente. Supabase può raccogliere dati come indirizzo email, IP o informazioni sul browser in conformità con la propria politica sulla privacy."
