@@ -17,6 +17,42 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://languito.eu';
+  
+  return {
+    metadataBase: new URL(siteUrl),
+    openGraph: {
+      title: 'Languito - Language Learning with AI Flashcards',
+      description: 'Transform your language learning with AI-generated flashcards tailored to your specific needs.',
+      url: siteUrl,
+      siteName: 'Languito',
+      images: [
+        {
+          url: '/landing.png', // Relative to metadataBase
+          width: 1200,
+          height: 630,
+          alt: 'Languito - AI-powered language learning platform',
+          type: 'image/png',
+        },
+      ],
+      locale: locale,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Languito - Language Learning with AI Flashcards',
+      description: 'Transform your language learning with AI-generated flashcards tailored to your specific needs.',
+      images: ['/landing.png'], // Relative to metadataBase
+    },
+  };
+}
+
 export default async function LocaleLayout({
   children,
   params
@@ -46,6 +82,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
+
       <body className="relative isolate overflow-x-hidden">
         <ErrorBoundary>
           <LoadingErrorProvider>
