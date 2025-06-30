@@ -40,3 +40,8 @@ prisma/generated/
 /.clerk/
 .env.local.backup
 # Trigger rebuild with Supabase env vars
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
