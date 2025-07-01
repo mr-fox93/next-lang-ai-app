@@ -65,11 +65,16 @@
   "Hero": {
     "title": "Trasforma il tuo apprendimento con",
     "subtitle": "Inserisci qualsiasi testo o scenario e lascia che la nostra IA crei flashcard perfette per il tuo percorso di apprendimento.",
+    "subtitleMobile": "Inserisci qualsiasi testo o scenario.",
     "brandName": "Flashcards AI",
     "generateButton": "Genera flashcard",
     "generating": "Generazione in corso...",
     "success": "Successo!",
-    "successMessage": "Le flashcard sono state generate e salvate sul tuo account."
+    "successMessage": "Le flashcard sono state generate e salvate sul tuo account.",
+    "tryDemo": "✨ Prova Demo",
+    "tryDemoSubtitle": "Testa l'app senza registrazione",
+    "loading": "Caricamento...",
+    "or": "O"
   },
   "HowItWorks": {
     "title": "Come funziona",

@@ -65,11 +65,16 @@
   "Hero": {
     "title": "Transform Your Learning with",
     "subtitle": "Enter any text or scenario and let our AI create perfect flashcards for your learning journey.",
+    "subtitleMobile": "Enter any text or scenario.",
     "brandName": "Flashcards AI",
     "generateButton": "Generate Flashcards",
     "generating": "Generating...",
     "success": "Success!",
-    "successMessage": "Flashcards have been generated and saved to your account."
+    "successMessage": "Flashcards have been generated and saved to your account.",
+    "tryDemo": "✨ Try Demo",
+    "tryDemoSubtitle": "Test the app without registration",
+    "loading": "Loading...",
+    "or": "OR"
   },
   "HowItWorks": {
     "title": "How It Works",

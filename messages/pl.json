@@ -66,11 +66,16 @@
   "Hero": {
     "title": "Zmień swój sposób nauki z",
     "subtitle": "Wprowadź dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy idealne fiszki dla Twojej nauki.",
+    "subtitleMobile": "Wprowadź dowolny tekst lub scenariusz.",
     "brandName": "Flashcards AI",
     "generateButton": "Wygeneruj fiszki",
     "generating": "Generowanie...",
     "success": "Sukces!",
-    "successMessage": "Fiszki zostały wygenerowane i zapisane na Twoim koncie."
+    "successMessage": "Fiszki zostały wygenerowane i zapisane na Twoim koncie.",
+    "tryDemo": "✨ Wypróbuj Demo",
+    "tryDemoSubtitle": "Przetestuj aplikację bez rejestracji",
+    "loading": "Ładowanie...",
+    "or": "LUB"
   },
   "HowItWorks": {
     "title": "Jak to działa",

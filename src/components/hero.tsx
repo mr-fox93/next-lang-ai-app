@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import { LayoutTemplate } from "lucide-react";
+import { LayoutTemplate, Play } from "lucide-react";
 import { AnimatedInput } from "@/components/animated-input";
 import { LanguageSettings as LanguageSettingsComponent } from "@/components/language-settings";
 import type { LanguageSettings } from "@/types/component-props";
@@ -16,10 +16,11 @@ import {
 } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
-import { useAuth, useUser } from "@/hooks";
+import { useAuth, useUser, useDemoMode } from "@/hooks";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslations } from 'next-intl';
 import { RecaptchaV3 } from "@/components/recaptcha-v3";
+import { DemoModeLoader } from "@/components/ui/demo-mode-loader";
 
 export default function Hero() {
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -34,14 +35,25 @@ export default function Hero() {
     });
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
+  const { isDemoMode } = useDemoMode();
   const t = useTranslations('Hero');
 
   useEffect(() => {
-    // Remove unnecessary auth state logging
   }, [isSignedIn]);
+
+  const handleTryDemo = () => {
+    setIsDemoLoading(true);
+    
+    document.cookie = "demo_mode=true; path=/; max-age=86400";
+    
+    setTimeout(() => {
+      router.push("/flashcards");
+    }, 1500);
+  };
 
   const handleGenerateFlashcards = async () => {
     if (!userInput.trim()) return;
@@ -144,6 +156,7 @@ export default function Hero() {
   return (
     <div className="relative min-h-[calc(100vh-76px)] flex items-center">
       {isLoading && <AIGenerationLoader />}
+      {isDemoLoading && <DemoModeLoader />}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -161,14 +174,47 @@ export default function Hero() {
             </h1>
           </motion.div>
 
+          {/* Desktop subtitle - shown only on desktop */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-400 text-lg md:text-xl mb-8 max-w-2xl mx-auto px-4 md:px-0"
+            className="hidden md:block text-gray-400 text-lg md:text-xl mb-8 max-w-2xl mx-auto px-4 md:px-0"
           >
             {t('subtitle')}
           </motion.p>
+
+          {/* Mobile Try Demo Button - Compact version above language settings */}
+          {!isSignedIn && !isDemoMode && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="md:hidden mb-6 px-4"
+            >
+              <div className="text-center">
+                <Button
+                  onClick={handleTryDemo}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+                  disabled={isDemoLoading}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  {isDemoLoading ? t('loading') : t('tryDemo')}
+                </Button>
+                
+                <div className="flex items-center justify-center my-4 px-4">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-white/30"></div>
+                  <span className="px-4 text-sm text-white font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{t('or')}</span>
+                  <div className="flex-1 h-px bg-gradient-to-l from-transparent via-pink-500/50 to-white/30"></div>
+                </div>
+                
+                {/* Mobile subtitle - shown after OR separator */}
+                <p className="text-gray-400 text-lg mb-4 max-w-2xl mx-auto">
+                  {t('subtitleMobile')}
+                </p>
+              </div>
+            </motion.div>
+          )}
 
           <LanguageSettingsComponent onChange={setLanguageSettings} />
 

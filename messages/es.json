@@ -65,11 +65,16 @@
   "Hero": {
     "title": "Transforma tu aprendizaje con",
     "subtitle": "Introduce cualquier texto o escenario y deja que nuestra IA cree tarjetas perfectas para tu proceso de aprendizaje.",
+    "subtitleMobile": "Introduce cualquier texto o escenario.",
     "brandName": "Flashcards AI",
     "generateButton": "Generar tarjetas",
     "generating": "Generando...",
     "success": "¡Éxito!",
-    "successMessage": "Las tarjetas han sido generadas y guardadas en tu cuenta."
+    "successMessage": "Las tarjetas han sido generadas y guardadas en tu cuenta.",
+    "tryDemo": "✨ Probar Demo",
+    "tryDemoSubtitle": "Prueba la app sin registro",
+    "loading": "Cargando...",
+    "or": "O"
   },
   "HowItWorks": {
     "title": "Cómo funciona",
