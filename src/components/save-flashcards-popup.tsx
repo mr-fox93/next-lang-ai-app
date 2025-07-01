@@ -44,7 +44,13 @@ export function SaveFlashcardsPopup({
   };
 
   const handleSignUp = () => {
-    router.push("/sign-up?redirect=/import-guest-flashcards");
+    try {
+      sessionStorage.setItem("flashcardsToImport", "true");
+      sessionStorage.setItem("directRedirectAfterImport", "true");
+      router.push("/sign-up?redirect=/import-guest-flashcards");
+    } catch (error) {
+      console.error("Error preparing for import:", error);
+    }
     onClose();
   };
 

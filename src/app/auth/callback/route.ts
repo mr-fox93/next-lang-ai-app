@@ -6,8 +6,13 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
+  const redirectTo = searchParams.get('redirect')
 
   const supabase = await createClient()
+
+  // Default redirect path
+  const defaultRedirect = '/en/flashcards'
+  const targetRedirect = redirectTo || defaultRedirect
 
   // Handle magic link verification
   if (token_hash && type) {
@@ -22,7 +27,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (session?.user) {
-        return NextResponse.redirect(new URL('/en/flashcards', request.url))
+        return NextResponse.redirect(new URL(targetRedirect, request.url))
       }
           } catch {
         return NextResponse.redirect(new URL('/en/sign-in?error=magic_link_exception', request.url))
@@ -39,7 +44,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (session?.user) {
-        return NextResponse.redirect(new URL('/en/flashcards', request.url))
+        return NextResponse.redirect(new URL(targetRedirect, request.url))
       }
           } catch {
         return NextResponse.redirect(new URL('/en/sign-in?error=oauth_exception', request.url))
