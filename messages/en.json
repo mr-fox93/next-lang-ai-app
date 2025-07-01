@@ -262,5 +262,33 @@
   "Difficulty": {
     "easy": "Easy",
     "advanced": "Advanced"
+  },
+  "Auth": {
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Account", 
+    "email": "Email",
+    "enterEmail": "Enter your email",
+    "sendMagicLink": "Send Magic Link",
+    "sendCode": "Send Code",
+    "sendingCode": "Sending code...",
+    "sendingMagicLink": "Sending Magic Link...",
+    "checkEmail": "Check Your Email",
+    "magicLinkSent": "We've sent you a magic link at {email}. Click the link in the email to sign in!",
+    "codeSent": "We've sent you a 6-digit code at {email}. Enter the code below:",
+    "enterCode": "Enter Code",
+    "codeLabel": "6-digit code",
+    "codePlaceholder": "123456",
+    "verifyCode": "Verify Code",
+    "verifyingCode": "Verifying...",
+    "sendAnotherLink": "Send Another Link", 
+    "sendAnotherCode": "Send Another Code",
+    "didntReceiveEmail": "Didn't receive the email? Check your spam folder or try again.",
+    "didntReceiveCode": "Didn't receive the code? Check your spam folder or try again.",
+    "switchToMagicLink": "Use Magic Link instead of code",
+    "switchToCode": "Use code instead of Magic Link",
+    "invalidCode": "Invalid code. Please try again.",
+    "codeExpired": "Code expired. Send a new code.",
+    "troubleOnMobile": "Having trouble with magic links on mobile?",
+    "tryCodeInstead": "Try using a code instead"
   }
 } 

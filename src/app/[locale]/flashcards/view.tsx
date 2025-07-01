@@ -347,14 +347,14 @@ export default function FlashcardsView({
               </div>
             </>
           ) : (
-            <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
+            <div className="flex items-center justify-center h-[calc(100vh-12rem)] p-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="text-center max-w-lg mx-auto px-4 relative z-10"
+                className="text-center max-w-sm sm:max-w-lg mx-auto px-2 sm:px-4 relative z-10"
               >
-                <h2 className="text-2xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 leading-relaxed">
+                <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 leading-relaxed">
                   {t('noFlashcardsTitle')}
                 </h2>
 
@@ -362,9 +362,9 @@ export default function FlashcardsView({
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       onClick={() => router.push("/")}
-                      className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-lg px-8 py-4 rounded-lg shadow-lg shadow-purple-500/20 font-medium inline-flex items-center justify-center"
+                      className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-sm sm:text-lg px-4 sm:px-8 py-3 sm:py-4 rounded-lg shadow-lg shadow-purple-500/20 font-medium inline-flex items-center justify-center"
                     >
-                      <Sparkles className="h-5 w-5 mr-2" />
+                      <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       {t('startLearningButton')}
                     </Button>
                   </motion.div>
