@@ -108,7 +108,7 @@ export function FlashcardGrid({
                     </motion.div>
                   </div>
 
-                  <h3 className="text-2xl font-bold text-fuchsia-100 group-hover:text-white transition-colors duration-300">
+                  <h3 className="text-lg sm:text-2xl font-bold text-fuchsia-100 group-hover:text-white transition-colors duration-300">
                     Generate New Flashcards
                   </h3>
 
@@ -151,7 +151,7 @@ export function FlashcardGrid({
                   <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                     <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-6 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl overflow-hidden">
                       <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-                        <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80">
+                        <h3 className="text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80">
                           {card.translate_text}
                         </h3>
                         <Button
@@ -192,7 +192,7 @@ export function FlashcardGrid({
                   <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
                     <div className="h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-6 flex flex-col group hover:border-purple-500/50 transition-all duration-300 hover:bg-black/50 hover:shadow-2xl overflow-hidden">
                       <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-                        <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80">
+                        <h3 className="text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/80">
                           {card.origin_text}
                         </h3>
                         <div className="text-gray-300 text-center italic text-sm line-clamp-2">

@@ -29,13 +29,24 @@ export function useSupabase() {
     router.push('/');
   };
 
-  const signInWithMagicLink = async (email: string) => {
+  // OTP Code (for mobile-friendly authentication)
+  const signInWithOtpCode = async (email: string) => {
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: getRedirectUrl(),
+        // NO emailRedirectTo = sends OTP code instead of magic link
       },
+    });
+    return { data, error };
+  };
+
+  // Verify OTP Code
+  const verifyOtpCode = async (email: string, code: string) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email',
     });
     return { data, error };
   };
@@ -52,7 +63,8 @@ export function useSupabase() {
 
   return {
     signOut,
-    signInWithMagicLink,
+    signInWithOtpCode,
+    verifyOtpCode,
     signInWithOAuth,
     supabase,
   };

@@ -260,5 +260,33 @@
     "emailValidationError": "Por favor ingresa una dirección de email válida.",
     "offensiveContentError": "Tu mensaje contiene contenido que puede violar nuestras pautas comunitarias. Por favor revisa y enfócate en problemas técnicos o comentarios sobre la aplicación."
   },
-  "home": "Inicio"
+  "home": "Inicio",
+  "Auth": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "createAccount": "Crear cuenta", 
+    "email": "Email",
+    "enterEmail": "Ingresa tu email",
+    "sendMagicLink": "Enviar enlace mágico",
+    "sendCode": "Enviar código",
+    "sendingCode": "Enviando código...",
+    "sendingMagicLink": "Enviando enlace mágico...",
+    "checkEmail": "Revisa tu email",
+    "magicLinkSent": "Te hemos enviado un enlace mágico a {email}. ¡Haz clic en el enlace del email para iniciar sesión!",
+    "codeSent": "Te hemos enviado un código de 6 dígitos a {email}. Ingresa el código a continuación:",
+    "enterCode": "Ingresar código",
+    "codeLabel": "Código de 6 dígitos",
+    "codePlaceholder": "123456",
+    "verifyCode": "Verificar código",
+    "verifyingCode": "Verificando...",
+    "sendAnotherLink": "Enviar otro enlace", 
+    "sendAnotherCode": "Enviar otro código",
+    "didntReceiveEmail": "¿No recibiste el email? Revisa tu carpeta de spam o intenta de nuevo.",
+    "didntReceiveCode": "¿No recibiste el código? Revisa tu carpeta de spam o intenta de nuevo.",
+    "switchToMagicLink": "Usar enlace mágico en lugar de código",
+    "switchToCode": "Usar código en lugar de enlace mágico",
+    "invalidCode": "Código inválido. Intenta de nuevo.",
+    "codeExpired": "Código expirado. Envía un nuevo código.",
+    "troubleOnMobile": "¿Problemas con enlaces mágicos en móvil?",
+    "tryCodeInstead": "Prueba usar un código en su lugar"
+  }
 } 

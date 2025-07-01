@@ -262,8 +262,32 @@
     "offensiveContentError": "Twoja wiadomość zawiera treści, które mogą naruszać nasze wytyczne. Prosimy o skupienie się na opisie problemów technicznych lub opinii dotyczącej aplikacji."
   },
   "home": "Strona główna",
-  "Difficulty": {
-    "easy": "Łatwy",
-    "advanced": "Zaawansowany"
+  "Auth": {
+    "welcomeBack": "Witamy ponownie",
+    "createAccount": "Utwórz konto", 
+    "email": "Email",
+    "enterEmail": "Wprowadź swój email",
+    "sendMagicLink": "Wyślij Magic Link",
+    "sendCode": "Wyślij kod",
+    "sendingCode": "Wysyłanie kodu...",
+    "sendingMagicLink": "Wysyłanie Magic Link...",
+    "checkEmail": "Sprawdź email",
+    "magicLinkSent": "Wysłaliśmy Ci magic link na adres {email}. Kliknij link w emailu aby się zalogować!",
+    "codeSent": "Wysłaliśmy Ci 6-cyfrowy kod na adres {email}. Wprowadź kod poniżej:",
+    "enterCode": "Wprowadź kod",
+    "codeLabel": "6-cyfrowy kod",
+    "codePlaceholder": "123456",
+    "verifyCode": "Weryfikuj kod",
+    "verifyingCode": "Weryfikacja...",
+    "sendAnotherLink": "Wyślij kolejny link", 
+    "sendAnotherCode": "Wyślij kolejny kod",
+    "didntReceiveEmail": "Nie otrzymałeś emaila? Sprawdź folder spam lub spróbuj ponownie.",
+    "didntReceiveCode": "Nie otrzymałeś kodu? Sprawdź folder spam lub spróbuj ponownie.",
+    "switchToMagicLink": "Użyj Magic Link zamiast kodu",
+    "switchToCode": "Użyj kodu zamiast Magic Link",
+    "invalidCode": "Nieprawidłowy kod. Spróbuj ponownie.",
+    "codeExpired": "Kod wygasł. Wyślij nowy kod.",
+    "troubleOnMobile": "Problemy z magic linkami na telefonie?",
+    "tryCodeInstead": "Spróbuj kodu zamiast tego"
   }
 } 

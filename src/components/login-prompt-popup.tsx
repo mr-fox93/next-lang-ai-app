@@ -137,7 +137,7 @@ export function LoginPromptPopup({
                   <LanguagesIcon className="h-10 w-10 text-purple-400" />
                 </motion.div>
               </div>
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 mb-3">
+                              <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 mb-3">
                 Enhance Your Learning Experience
               </h3>
               <p className="text-gray-300 mb-2">{message}</p>
