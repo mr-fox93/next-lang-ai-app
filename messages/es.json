@@ -260,5 +260,22 @@
     "emailValidationError": "Por favor ingresa una dirección de email válida.",
     "offensiveContentError": "Tu mensaje contiene contenido que puede violar nuestras pautas comunitarias. Por favor revisa y enfócate en problemas técnicos o comentarios sobre la aplicación."
   },
+  "MobileAuth": {
+    "title": "Abrir en navegador principal",
+    "subtitle": "Hiciste clic en el enlace en la app {app}. Para iniciar sesión, abre esta página en {browser}.",
+    "emailApp": "email",
+    "step1Title": "Copia esta dirección",
+    "step1Description": "Usa el botón de abajo para copiar la dirección de esta página.",
+    "step2Title": "Abre {browser}",
+    "step2Description": "Ve a la app {browser} en tu teléfono.",
+    "step3Title": "Pega y ve",
+    "step3Description": "Pega la dirección en la barra de direcciones y presiona Enter.",
+    "copyUrl": "Copiar dirección de página",
+    "urlCopied": "¡Copiado!",
+    "openInBrowser": "Abrir en {browser}",
+    "continueAnyway": "Continuar aquí de todos modos",
+    "helpText": "Los enlaces mágicos funcionan mejor en el navegador principal {browser}, no en apps.",
+    "emailReminder": "El enlace se enviará a:"
+  },
   "home": "Inicio"
 } 

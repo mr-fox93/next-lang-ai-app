@@ -1,6 +1,33 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+function isWebView(userAgent: string): boolean {
+  const ua = userAgent.toLowerCase();
+  
+  // iOS WebViews
+  const isIOSWebView = 
+    /iphone|ipad|ipod/.test(ua) && (
+      /instagram/.test(ua) ||
+      /fbav|fban/.test(ua) ||
+      /twitter/.test(ua) ||
+      /gsa\//.test(ua) ||
+      (!/safari/.test(ua) && /mobile/.test(ua)) ||
+      /wkwebview/.test(ua)
+    );
+  
+  // Android WebViews
+  const isAndroidWebView = 
+    /android/.test(ua) && (
+      /fb_iab|fbav/.test(ua) ||
+      /instagram/.test(ua) ||
+      /twitter/.test(ua) ||
+      /gsa\//.test(ua) ||
+      /wv\)/.test(ua)
+    );
+  
+  return isIOSWebView || isAndroidWebView;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
@@ -8,10 +35,15 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type')
   const redirectTo = searchParams.get('redirect')
 
+  // Detect WebView for mobile instructions
+  const userAgent = request.headers.get('user-agent') || '';
+  const isInWebView = isWebView(userAgent);
+
   const supabase = await createClient()
 
-  // Default redirect path
+  // Default redirect paths
   const defaultRedirect = '/en/flashcards'
+  const mobileHelpRedirect = '/en/mobile-auth-help?from=callback'
   const targetRedirect = redirectTo || defaultRedirect
 
   // Handle magic link verification
@@ -27,6 +59,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (session?.user) {
+        // If user authenticated successfully but is in WebView, show mobile instructions
+        if (isInWebView) {
+          return NextResponse.redirect(new URL(mobileHelpRedirect, request.url))
+        }
         return NextResponse.redirect(new URL(targetRedirect, request.url))
       }
           } catch {
@@ -44,6 +80,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (session?.user) {
+        // If user authenticated successfully but is in WebView, show mobile instructions
+        if (isInWebView) {
+          return NextResponse.redirect(new URL(mobileHelpRedirect, request.url))
+        }
         return NextResponse.redirect(new URL(targetRedirect, request.url))
       }
           } catch {

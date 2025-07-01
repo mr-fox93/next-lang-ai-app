@@ -256,6 +256,23 @@
     "emailValidationError": "Inserisci un indirizzo email valido.",
     "offensiveContentError": "Il tuo messaggio contiene contenuti che potrebbero violare le nostre linee guida della comunità. Rivedi e concentrati su problemi tecnici o feedback sull'applicazione."
   },
+  "MobileAuth": {
+    "title": "Apri nel browser principale",
+    "subtitle": "Hai cliccato il link nell'app {app}. Per accedere, apri questa pagina in {browser}.",
+    "emailApp": "email",
+    "step1Title": "Copia questo indirizzo",
+    "step1Description": "Usa il pulsante qui sotto per copiare l'indirizzo di questa pagina.",
+    "step2Title": "Apri {browser}",
+    "step2Description": "Vai all'app {browser} sul tuo telefono.",
+    "step3Title": "Incolla e vai",
+    "step3Description": "Incolla l'indirizzo nella barra degli indirizzi e premi Invio.",
+    "copyUrl": "Copia indirizzo pagina",
+    "urlCopied": "Copiato!",
+    "openInBrowser": "Apri in {browser}",
+    "continueAnyway": "Continua qui comunque",
+    "helpText": "I link magici funzionano meglio nel browser principale {browser}, non nelle app.",
+    "emailReminder": "Il link verrà inviato a:"
+  },
   "home": "Home",
   "Difficulty": {
     "easy": "Facile",

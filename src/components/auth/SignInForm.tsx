@@ -1,20 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabase } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { MobileAuthInstructions } from '@/components/auth/mobile-auth-instructions';
+import { detectWebView } from '@/utils/webview-detection';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [webViewDetection, setWebViewDetection] = useState<ReturnType<typeof detectWebView> | null>(null);
   
   const { signInWithMagicLink, signInWithOAuth } = useSupabase();
+
+  useEffect(() => {
+    setWebViewDetection(detectWebView());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +83,12 @@ export function SignInForm() {
   };
 
   if (success) {
+    // Show mobile instructions if user is in WebView
+    if (webViewDetection?.shouldShowInstructions) {
+      return <MobileAuthInstructions email={email} showFallback={false} />;
+    }
+
+    // Standard success message for desktop/native browsers
     return (
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-8 shadow-2xl">

@@ -256,6 +256,23 @@
     "emailValidationError": "Please enter a valid email address.",
     "offensiveContentError": "Your message contains content that may violate our community guidelines. Please revise and focus on technical issues or feedback about the application."
   },
+  "MobileAuth": {
+    "title": "Open in Main Browser",
+    "subtitle": "You clicked the link in {app} app. To sign in, open this page in {browser}.",
+    "emailApp": "email",
+    "step1Title": "Copy this address",
+    "step1Description": "Use the button below to copy this page's address.",
+    "step2Title": "Open {browser}",
+    "step2Description": "Go to {browser} app on your phone.",
+    "step3Title": "Paste and go",
+    "step3Description": "Paste the address in the address bar and press Enter.",
+    "copyUrl": "Copy page address",
+    "urlCopied": "Copied!",
+    "openInBrowser": "Open in {browser}",
+    "continueAnyway": "Continue here anyway",
+    "helpText": "Magic links work best in the main {browser} browser, not in apps.",
+    "emailReminder": "Link will be sent to:"
+  },
   "backToLearning": "Back to Learning",
   "home": "Home",
   "categories": "Categories",
