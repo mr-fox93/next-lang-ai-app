@@ -34,8 +34,8 @@ export function SaveFlashcardsPopup({
 
   const handleSignIn = () => {
     try {
-      sessionStorage.setItem("flashcardsToImport", "true");
-      sessionStorage.setItem("directRedirectAfterImport", "true");
+      localStorage.setItem("flashcardsToImport", "true");
+      localStorage.setItem("directRedirectAfterImport", "true");
       router.push("/sign-in?redirect=/import-guest-flashcards");
     } catch (error) {
       console.error("Error preparing for import:", error);
@@ -45,8 +45,8 @@ export function SaveFlashcardsPopup({
 
   const handleSignUp = () => {
     try {
-      sessionStorage.setItem("flashcardsToImport", "true");
-      sessionStorage.setItem("directRedirectAfterImport", "true");
+      localStorage.setItem("flashcardsToImport", "true");
+      localStorage.setItem("directRedirectAfterImport", "true");
       router.push("/sign-up?redirect=/import-guest-flashcards");
     } catch (error) {
       console.error("Error preparing for import:", error);

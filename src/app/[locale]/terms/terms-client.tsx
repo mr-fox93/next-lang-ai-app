@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
-import { useRouter, Link } from '@/i18n/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 
@@ -74,14 +74,6 @@ export default function TermsClient() {
               <section className="space-y-4">
                 <h2 className="text-xl font-semibold text-white">{t('changes.title')}</h2>
                 <p>{t('changes.content')}</p>
-              </section>
-              
-              <section className="space-y-4">
-                <h2 className="text-xl font-semibold text-white">{t('contact.title')}</h2>
-                <p>{t('contact.content')}</p>
-                <p>
-                  {t('contact.email')}: <Link href="mailto:contact@flashcardsai.com" className="text-purple-400 hover:text-purple-300">contact@flashcardsai.com</Link>
-                </p>
               </section>
               
               <section className="pt-4">

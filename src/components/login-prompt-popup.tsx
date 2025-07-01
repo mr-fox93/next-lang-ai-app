@@ -54,8 +54,8 @@ export function LoginPromptPopup({
         router.push("/sign-in");
       } else {
         // Guest mode flow - import flashcards
-        sessionStorage.setItem("flashcardsToImport", "true");
-        sessionStorage.setItem("directRedirectAfterImport", "true");
+        localStorage.setItem("flashcardsToImport", "true");
+        localStorage.setItem("directRedirectAfterImport", "true");
         router.push("/sign-in?redirect=/import-guest-flashcards");
       }
     } catch (error) {
@@ -69,8 +69,8 @@ export function LoginPromptPopup({
       exitDemoMode();
       router.push("/sign-up");
     } else {
-      sessionStorage.setItem("flashcardsToImport", "true");
-      sessionStorage.setItem("directRedirectAfterImport", "true");
+      localStorage.setItem("flashcardsToImport", "true");
+      localStorage.setItem("directRedirectAfterImport", "true");
       router.push("/sign-up?redirect=/import-guest-flashcards");
     }
     onClose();
