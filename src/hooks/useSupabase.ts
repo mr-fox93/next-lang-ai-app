@@ -7,6 +7,20 @@ export function useSupabase() {
   const supabase = createClient();
   const router = useRouter();
 
+  const getRedirectUrl = () => {
+    if (typeof window === 'undefined') return `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectParam = urlParams.get('redirect');
+    
+    let callbackUrl = `${window.location.origin}/auth/callback`;
+    if (redirectParam) {
+      callbackUrl += `?redirect=${encodeURIComponent(redirectParam)}`;
+    }
+    
+    return callbackUrl;
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -20,7 +34,7 @@ export function useSupabase() {
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: getRedirectUrl(),
       },
     });
     return { data, error };
@@ -30,7 +44,7 @@ export function useSupabase() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getRedirectUrl(),
       },
     });
     return { data, error };
