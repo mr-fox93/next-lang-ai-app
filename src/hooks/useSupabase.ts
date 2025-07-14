@@ -66,6 +66,5 @@ export function useSupabase() {
     signInWithOtpCode,
     verifyOtpCode,
     signInWithOAuth,
-    supabase,
   };
 } 

@@ -16,5 +16,5 @@ export interface ProgressRepository {
   createProgress(data: ProgressData): Promise<Progress>;
   getProgressByFlashcardId(flashcardId: number, userId: string): Promise<Progress | null>;
   updateProgress(flashcardId: number, userId: string, data: Partial<ProgressData>): Promise<Progress>;
-  getUserProgress(userId: string): Promise<Progress[]>;
+  getReviewedTodayCount(userId: string): Promise<number>;
 } 

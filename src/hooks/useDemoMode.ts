@@ -47,7 +47,6 @@ export function useDemoMode() {
   return {
     isDemoMode,
     isLoading,
-    checkDemoMode,
     exitDemoMode,
   };
 }
@@ -64,7 +63,7 @@ export function useDemoProgressUpdates(initialStats: UserProgressStats) {
     const enhancedStats = enhanceStatsWithDemoProgress(initialStats);
     setStats(enhancedStats);
     
-    const demoReviewedToday = getReviewedTodayCount();
+    const demoReviewedToday = demoProgressService.getReviewedTodayCount();
     setReviewedToday(demoReviewedToday);
   }, [initialStats]);
 
@@ -92,8 +91,7 @@ export function useDemoProgressUpdates(initialStats: UserProgressStats) {
   return { stats, reviewedToday };
 }
 
-// Re-export demo progress service functions for convenience
-export const getDemoProgress = () => demoProgressService.getProgress();
+// Exported functions that are actually used
 export const updateDemoProgress = (flashcardId: number, category: string, isCorrect: boolean) => {
   demoProgressService.updateProgress(flashcardId, category, isCorrect);
   
@@ -102,8 +100,7 @@ export const updateDemoProgress = (flashcardId: number, category: string, isCorr
     window.dispatchEvent(new CustomEvent('demoProgressUpdate'));
   }
 };
-export const getReviewedTodayCount = () => demoProgressService.getReviewedTodayCount();
-export const getDemoDailyGoal = () => demoProgressService.getDailyGoal();
+
 export const setDemoDailyGoal = (goal: number) => {
   demoProgressService.setDailyGoal(goal);
   
@@ -113,8 +110,26 @@ export const setDemoDailyGoal = (goal: number) => {
   }
 };
 
-// Enhanced stats calculation using the service
-export function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): UserProgressStats {
+// CRITICAL: Used for demo mode mastered categories filtering in FlashcardsSidebar
+export function getMasteredCategoriesFromDemo(serverStats: UserProgressStats): string[] {
+  if (typeof window === 'undefined') return [];
+  
+  const progress = demoProgressService.getProgress();
+  
+  return serverStats.categories
+    .filter(category => {
+      // Find all flashcards in this category and check if all are mastered
+      const categoryFlashcards = Object.values(progress).filter(p => 
+        p.category === category.name && p.masteryLevel >= 5
+      );
+      
+      return category.total > 0 && categoryFlashcards.length >= category.total;
+    })
+    .map(category => category.name);
+}
+
+// Internal helper function used by useDemoProgressUpdates
+function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): UserProgressStats {
   if (typeof window === 'undefined') return serverStats;
   
   const progress = demoProgressService.getProgress();
@@ -174,21 +189,4 @@ export function enhanceStatsWithDemoProgress(serverStats: UserProgressStats): Us
     nextLevelPoints,
     dailyGoal,
   };
-}
-
-export function getMasteredCategoriesFromDemo(serverStats: UserProgressStats): string[] {
-  if (typeof window === 'undefined') return [];
-  
-  const progress = demoProgressService.getProgress();
-  
-  return serverStats.categories
-    .filter(category => {
-      // Find all flashcards in this category and check if all are mastered
-      const categoryFlashcards = Object.values(progress).filter(p => 
-        p.category === category.name && p.masteryLevel >= 5
-      );
-      
-      return category.total > 0 && categoryFlashcards.length >= category.total;
-    })
-    .map(category => category.name);
 } 

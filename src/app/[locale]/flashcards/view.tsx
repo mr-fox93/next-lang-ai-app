@@ -18,7 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { WelcomeNewUserModal } from "@/components/welcome-new-user-modal";
-import { useDemoMode } from "@/hooks";
+import { useDemoMode, getMasteredCategoriesFromDemo } from "@/hooks";
 import { useTranslations } from "next-intl";
 
 interface FlashcardsViewProps {
@@ -63,6 +63,11 @@ export default function FlashcardsView({
   const { isDemoMode, exitDemoMode } = useDemoMode();
   const { isSignedIn } = useUser();
   const t = useTranslations('Flashcards');
+
+  // Calculate masteredCategories for demo mode from localStorage
+  const calculatedMasteredCategories = isDemoMode && progressStats?.data 
+    ? getMasteredCategoriesFromDemo(progressStats.data)
+    : masteredCategories;
 
   // Set initial sidebar state based on screen size
   useEffect(() => {
@@ -257,7 +262,7 @@ export default function FlashcardsView({
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             flashcards={initialFlashcards}
             variant={isDemoMode ? "demo" : "authenticated"}
-            masteredCategories={masteredCategories}
+            masteredCategories={calculatedMasteredCategories}
             onNewFlashcardsClick={isDemoMode ? () => handleDemoModeAction("newFlashcards") : undefined}
             onDemoModeAction={isDemoMode ? handleDemoModeAction : undefined}
             onExitDemo={() => {

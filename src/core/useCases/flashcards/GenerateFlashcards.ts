@@ -1,13 +1,11 @@
 import { Flashcard } from "@/core/entities/Flashcard";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
-import { ProgressRepository } from "@/core/interfaces/repositories/ProgressRepository";
-import { UserRepository } from "@/core/interfaces/repositories/UserRepository";
-import OpenAI from "openai";
-import { zodResponseFormat } from "openai/helpers/zod";
-import { FlashCardSchema } from "@/lib/flashcard.schema";
 import { getFlashcardsPrompt } from "@/lib/prompts";
-import { PrismaClient } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { 
+  AIFlashcardGenerationService,
+  UserManagementService,
+  FlashcardProgressService 
+} from "@/core/services";
 
 export interface GenerateFlashcardsParams {
   count: number;
@@ -27,19 +25,12 @@ export interface GenerateFlashcardsResult {
 }
 
 export class GenerateFlashcardsUseCase {
-  private openai: OpenAI;
-  private prisma: PrismaClient;
-
   constructor(
     private flashcardRepository: FlashcardRepository,
-    private progressRepository: ProgressRepository,
-    private userRepository: UserRepository
-  ) {
-    this.prisma = prisma;
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
+    private aiGenerationService: AIFlashcardGenerationService,
+    private userManagementService: UserManagementService,
+    private progressService: FlashcardProgressService
+  ) {}
 
   async execute(
     params: GenerateFlashcardsParams
@@ -69,7 +60,7 @@ export class GenerateFlashcardsUseCase {
         };
       }
 
-      await this.upsertUser(userId, userEmail);
+      await this.userManagementService.upsertUser(userId, userEmail);
 
       const prompt = getFlashcardsPrompt(
         count,
@@ -79,9 +70,10 @@ export class GenerateFlashcardsUseCase {
         targetLanguage,
         [] // Empty array for new flashcards generation
       );
-      const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
 
-      if (!generatedFlashcards) {
+      const generatedFlashcards = await this.aiGenerationService.generateFlashcardsWithAI(prompt);
+
+      if (!generatedFlashcards || generatedFlashcards.length === 0) {
         return {
           success: false,
           error: "Nie udało się wygenerować fiszek",
@@ -97,7 +89,7 @@ export class GenerateFlashcardsUseCase {
       }));
 
       const savedFlashcards = await this.saveFlashcards(flashcards, userId);
-      await this.createProgressRecords(savedFlashcards, userId);
+      await this.progressService.createInitialProgressRecords(savedFlashcards, userId);
 
       return {
         success: true,
@@ -153,7 +145,7 @@ export class GenerateFlashcardsUseCase {
         };
       }
 
-      await this.upsertUser(userId, userEmail);
+      await this.userManagementService.upsertUser(userId, userEmail);
 
       // Try up to 3 times to generate unique flashcards
       const maxAttempts = 3;
@@ -174,19 +166,17 @@ export class GenerateFlashcardsUseCase {
         );
 
         try {
-          const generatedFlashcards = await this.generateFlashcardsWithAI(prompt);
+          const generatedFlashcards = await this.aiGenerationService.generateFlashcardsWithAI(prompt);
 
           if (!generatedFlashcards || generatedFlashcards.length === 0) {
             lastError = "AI nie wygenerował żadnych fiszek";
             continue;
           }
 
-          // Check for duplicates
-          const duplicates = generatedFlashcards.filter(card => 
-            existingFlashcards.some(existing => 
-              existing.origin_text.toLowerCase() === card.origin_text.toLowerCase() ||
-              existing.translate_text.toLowerCase() === card.translate_text.toLowerCase()
-            )
+          // Check for duplicates using AI service
+          const { unique: uniqueFlashcards, duplicates } = this.aiGenerationService.filterDuplicates(
+            generatedFlashcards,
+            existingFlashcards
           );
 
           if (duplicates.length > 0 && attempt < maxAttempts) {
@@ -194,14 +184,6 @@ export class GenerateFlashcardsUseCase {
             lastError = `Znaleziono ${duplicates.length} duplikatów, próbując ponownie...`;
             continue;
           }
-
-          // Filter out duplicates and keep unique ones
-          const uniqueFlashcards = generatedFlashcards.filter(card => 
-            !existingFlashcards.some(existing => 
-              existing.origin_text.toLowerCase() === card.origin_text.toLowerCase() ||
-              existing.translate_text.toLowerCase() === card.translate_text.toLowerCase()
-            )
-          );
 
           if (uniqueFlashcards.length === 0) {
             lastError = "Wszystkie wygenerowane fiszki były duplikatami";
@@ -218,7 +200,7 @@ export class GenerateFlashcardsUseCase {
           }));
 
           const savedFlashcards = await this.saveFlashcards(flashcards, userId);
-          await this.createProgressRecords(savedFlashcards, userId);
+          await this.progressService.createInitialProgressRecords(savedFlashcards, userId);
 
           return {
             success: true,
@@ -253,97 +235,6 @@ export class GenerateFlashcardsUseCase {
     }
   }
 
-  private async upsertUser(userId: string, userEmail: string): Promise<void> {
-    const existingUser = await this.userRepository.getUserById(userId);
-
-    if (!existingUser) {
-      try {
-        await this.prisma.user.create({
-          data: {
-            id: userId,
-            email: userEmail,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      } catch (error) {
-        console.error("User creation error:", error);
-        throw new Error(
-          `Failed to create user: ${
-            error instanceof Error ? error.message : "Unknown error occurred"
-          }`
-        );
-      }
-    }
-  }
-
-  private async generateFlashcardsWithAI(
-    prompt: string,
-    maxRetries: number = 3
-  ): Promise<Omit<Flashcard, "id" | "userId">[]> {
-    let lastError: Error | null = null;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await this.openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are an expert language teacher who always provides high-quality, diverse, and contextually appropriate flashcards for language learning. Focus on creating DIVERSE vocabulary with different starting letters and semantic variety. Your response must be strictly valid JSON without any additional commentary or markdown formatting.",
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          response_format: zodResponseFormat(
-            FlashCardSchema,
-            "flashcardResponse"
-          ),
-          temperature: attempt > 1 ? 0.3 + (attempt - 1) * 0.2 : 0.1, // Increase creativity on retries
-          max_tokens: 1000,
-        });
-
-        const parsedData = FlashCardSchema.parse(
-          JSON.parse(response.choices[0].message.content || "[]")
-        );
-
-        const flashcardsWithDefaultLanguageSettings = parsedData.flashcards.map(
-          (flashcard) => ({
-            ...flashcard,
-            sourceLanguage: "pl",
-            targetLanguage: "en",
-            difficultyLevel: "easy",
-          })
-        );
-
-        return flashcardsWithDefaultLanguageSettings;
-      } catch (error) {
-        console.error(`AI flashcard generation error (attempt ${attempt}/${maxRetries}):`, error);
-        lastError = error as Error;
-
-        if (error instanceof Error && error.message.includes("429")) {
-          throw new Error(
-            "Przekroczono limit zapytań do API OpenAI. Spróbuj ponownie później lub skontaktuj się z administratorem w celu aktualizacji planu subskrypcji."
-          );
-        }
-
-        // If this is not the last attempt, wait before retry
-        if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-        }
-      }
-    }
-
-    throw new Error(
-      `Failed to generate flashcards with AI after ${maxRetries} attempts: ${
-        lastError?.message || "Unknown error occurred"
-      }`
-    );
-  }
-
   private async saveFlashcards(
     flashcards: Omit<Flashcard, "id" | "userId">[],
     userId: string
@@ -364,23 +255,5 @@ export class GenerateFlashcardsUseCase {
     );
 
     return await Promise.all(flashcardPromises);
-  }
-
-  private async createProgressRecords(
-    flashcards: Flashcard[],
-    userId: string
-  ): Promise<void> {
-    const progressPromises = flashcards.map((flashcard) =>
-      this.progressRepository.createProgress({
-        flashcardId: flashcard.id,
-        userId: userId,
-        masteryLevel: 0,
-        correctAnswers: 0,
-        incorrectAnswers: 0,
-        nextReviewDate: new Date(),
-      })
-    );
-
-    await Promise.all(progressPromises);
   }
 }

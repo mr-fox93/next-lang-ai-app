@@ -1,4 +1,5 @@
 import { ProgressRepository } from "@/core/interfaces/repositories/ProgressRepository";
+import { masteryLevelService } from "@/core/services/MasteryLevelService";
 
 export interface UpdateFlashcardProgressParams {
   flashcardId: number;
@@ -31,28 +32,16 @@ export class UpdateFlashcardProgressUseCase {
         masteryLevel: 0,
         correctAnswers: 0,
         incorrectAnswers: 0,
-        nextReviewDate: this.calculateNextReviewDate(0)
+        nextReviewDate: masteryLevelService.calculateNextReviewDate(0)
       });
     }
     
     const correctAnswers = isCorrect ? progress.correctAnswers + 1 : progress.correctAnswers;
     const incorrectAnswers = isCorrect ? progress.incorrectAnswers : progress.incorrectAnswers + 1;
     
-    let newMasteryLevel = progress.masteryLevel;
-    
-    if (isCorrect) {
-      if (progress.masteryLevel === 0) {
-        newMasteryLevel = 2;
-      } else if (progress.masteryLevel === 1) {
-        newMasteryLevel = 3;
-      } else {
-        newMasteryLevel = Math.min(5, progress.masteryLevel + 1);
-      }
-    } else {
-      newMasteryLevel = progress.masteryLevel;
-    }
-    
-    const nextReviewDate = this.calculateNextReviewDate(newMasteryLevel);
+    // Use MasteryLevelService for consistent calculation
+    const newMasteryLevel = masteryLevelService.calculateNewMasteryLevel(progress.masteryLevel, isCorrect);
+    const nextReviewDate = masteryLevelService.calculateNextReviewDate(newMasteryLevel);
     
     const updatedProgress = await this.progressRepository.updateProgress(flashcardId, userId, {
       correctAnswers,
@@ -63,35 +52,5 @@ export class UpdateFlashcardProgressUseCase {
     });
     
     return updatedProgress;
-  }
-  
-  private calculateNextReviewDate(masteryLevel: number): Date {
-    const now = new Date();
-    const nextDate = new Date(now);
-    
-    switch (masteryLevel) {
-      case 0:
-        nextDate.setHours(nextDate.getHours() + 1);
-        break;
-      case 1:
-        nextDate.setHours(nextDate.getHours() + 6);
-        break;
-      case 2:
-        nextDate.setHours(nextDate.getHours() + 24);
-        break;
-      case 3:
-        nextDate.setDate(nextDate.getDate() + 3);
-        break;
-      case 4:
-        nextDate.setDate(nextDate.getDate() + 7);
-        break;
-      case 5:
-        nextDate.setDate(nextDate.getDate() + 30);
-        break;
-      default:
-        nextDate.setDate(nextDate.getDate() + 1);
-    }
-    
-    return nextDate;
   }
 } 

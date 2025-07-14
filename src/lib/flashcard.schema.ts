@@ -18,4 +18,3 @@ export const FlashCardSchema = z.object({
 });
 
 export type FlashCard = z.infer<typeof ResponsStructure>;
-export type FlashCardResponse = z.infer<typeof FlashCardSchema>;
