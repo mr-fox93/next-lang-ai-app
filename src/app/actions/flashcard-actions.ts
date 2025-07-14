@@ -3,20 +3,18 @@
 import { auth } from "@/lib/auth";
 import {
   getGenerateFlashcardsUseCase,
-  getFlashcardRepository,
+  getDeleteCategoryUseCase,
+  getUserLanguagesUseCase,
+  getImportGuestFlashcardsUseCase,
+  getHandleGuestFlashcardGenerationUseCase,
 } from "@/lib/container";
 import { GenerateFlashcardsParams } from "@/core/useCases/flashcards/GenerateFlashcards";
-import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
-import { getFlashcardsPrompt } from "@/lib/prompts";
-import { prisma } from "@/lib/prisma"; // Use secure configured client
 import { isDemoMode } from "@/lib/demo-helpers";
 import { 
   ImportableFlashcard, 
   FlashcardGenerationResponse, 
-  GenerateFlashcardsActionParams,
-  AIFlashcardGenerator 
+  GenerateFlashcardsActionParams
 } from "@/types/flashcard";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export async function generateFlashcardsAction(
   params: GenerateFlashcardsActionParams
@@ -38,27 +36,6 @@ export async function generateFlashcardsAction(
         success: false,
         error: "Authentication required: User is not signed in",
       };
-    }
-
-    try {
-      const dbUser = await prisma.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!dbUser) {
-        // Create new user without any logging
-        await prisma.user.create({
-          data: {
-            id: userId,
-            email: user?.email || "",
-            username: user?.user_metadata?.username || user?.email?.split('@')[0] || "User",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      }
-    } catch (userError) {
-      console.error("Error checking/creating user:", userError);
     }
 
     const generateParams: GenerateFlashcardsParams = {
@@ -104,16 +81,9 @@ export async function deleteCategoryAction(category: string) {
       };
     }
 
-    const flashcardRepository = new PrismaFlashcardRepository();
-    const deletedCount = await flashcardRepository.deleteFlashcardsByCategory(
-      userId,
-      category
-    );
+    const result = await getDeleteCategoryUseCase().execute({ userId, category });
 
-    return {
-      success: true,
-      deletedCount,
-    };
+    return result;
   } catch (error) {
     console.error("Category deletion error:", error);
     return {
@@ -145,13 +115,9 @@ export async function getUserLanguagesAction() {
       };
     }
 
-    const flashcardRepository = new PrismaFlashcardRepository();
-    const languages = await flashcardRepository.getUserTargetLanguages(userId);
+    const result = await getUserLanguagesUseCase().execute({ userId });
 
-    return {
-      success: true,
-      languages,
-    };
+    return result;
   } catch (error) {
     console.error("Get user languages error:", error);
     return {
@@ -177,52 +143,13 @@ export async function importGuestFlashcardsAction(
   }
 
   try {
-    let dbUser = await prisma.user.findUnique({
-      where: { id: userId },
+    const result = await getImportGuestFlashcardsUseCase().execute({
+      userId,
+      userEmail: user.email || "",
+      flashcards,
     });
 
-    if (!dbUser) {
-      try {
-        dbUser = await prisma.user.create({
-          data: {
-            id: userId,
-            email: user.email || "",
-            username: user.user_metadata?.username || user.email?.split('@')[0] || "User",
-          },
-        });
-        // User created successfully - no logging needed
-      } catch (createError) {
-        console.error("Failed to create user:", createError);
-        return {
-          success: false,
-          error: "Failed to create user record in database",
-        };
-      }
-    }
-
-    // Now that we're sure the user exists, import flashcards
-    const flashcardRepository = getFlashcardRepository();
-
-    const flashcardPromises = flashcards.map((card) =>
-      flashcardRepository.createFlashcard({
-        origin_text: card.origin_text,
-        translate_text: card.translate_text,
-        example_using: card.example_using,
-        translate_example: card.translate_example,
-        category: card.category,
-        translate_category: card.translate_category,
-        sourceLanguage: card.sourceLanguage,
-        targetLanguage: card.targetLanguage,
-        difficultyLevel: card.difficultyLevel,
-        userId: userId,
-      })
-    );
-
-    await Promise.all(flashcardPromises);
-
-    return {
-      success: true,
-    };
+    return result;
   } catch (error) {
     console.error("Error importing guest flashcards:", error);
     return {
@@ -243,58 +170,17 @@ export async function handleGuestFlashcardGeneration(data: {
   recaptchaToken?: string;
 }): Promise<FlashcardGenerationResponse> {
   try {
-    // Verify reCAPTCHA for guest users
-    if (data.recaptchaToken) {
-      const recaptchaResult = await verifyRecaptcha(data.recaptchaToken);
-      if (!recaptchaResult.success) {
-        return {
-          success: false,
-          error: recaptchaResult.error || "reCAPTCHA verification failed"
-        };
-      }
-    } else if (!data.existingFlashcards || data.existingFlashcards.length === 0) {
-      // For guest users, reCAPTCHA is required only for initial generation (not for generateMore)
+    const result = await getHandleGuestFlashcardGenerationUseCase().execute(data);
+    
+    // Add redirect for successful generation
+    if (result.success) {
       return {
-        success: false,
-        error: "reCAPTCHA verification required for guest users"
+        ...result,
+        redirect: "/guest-flashcard",
       };
     }
-
-    const generateUseCase = getGenerateFlashcardsUseCase();
-
-    const prompt = getFlashcardsPrompt(
-      data.count,
-      data.message,
-      data.level,
-      data.sourceLanguage,
-      data.targetLanguage,
-      data.existingFlashcards || []
-    );
-
-    const aiGenerator = generateUseCase as unknown as AIFlashcardGenerator;
-    const generatedFlashcards = await aiGenerator.generateFlashcardsWithAI(
-      prompt
-    );
-
-    const flashcards: ImportableFlashcard[] = generatedFlashcards.map(
-      (flashcard: Record<string, string>) => ({
-        origin_text: flashcard.origin_text || "",
-        translate_text: flashcard.translate_text || "",
-        example_using: flashcard.example_using || "",
-        translate_example: flashcard.translate_example || "",
-        category: flashcard.category || "",
-        translate_category: flashcard.translate_category,
-        sourceLanguage: data.sourceLanguage,
-        targetLanguage: data.targetLanguage,
-        difficultyLevel: data.level,
-      })
-    );
-
-    return {
-      success: true,
-      flashcards: flashcards,
-      redirect: "/guest-flashcard",
-    };
+    
+    return result;
   } catch (error) {
     console.error("Guest flashcard generation error:", error);
     return {
@@ -342,25 +228,8 @@ export async function generateMoreFlashcardsAction(params: {
       difficultyLevel,
     } = params;
 
-    // Step 1: Verify that the category exists in user's flashcards
-    const flashcardRepository = new PrismaFlashcardRepository();
-    const userFlashcards = await flashcardRepository.getFlashcardsByUserId(userId);
-    const existingCategory = userFlashcards.find(card => card.category === category);
-    
-    if (!existingCategory) {
-      return {
-        success: false,
-        error: `Category "${category}" not found. Please select an existing category.`,
-      };
-    }
-
-    // Step 2: Get all existing terms in this category to prevent duplicates
-    const existingFlashcardsInCategory = userFlashcards.filter(card => card.category === category);
+    // Prepare existing flashcards data for duplicate prevention
     const existingFlashcards = [
-      ...existingFlashcardsInCategory.map(card => ({
-        origin_text: card.origin_text,
-        translate_text: card.translate_text
-      })),
       // Add terms from existingTerms parameter (may come from frontend)
       ...existingTerms.map(term => ({
         origin_text: term,

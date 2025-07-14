@@ -16,7 +16,7 @@ import {
 } from "@/app/actions/flashcard-actions";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { guestFlashcardsStorage } from "@/utils/guest-flashcards-storage";
-import { useAuth, useUser, useDemoMode } from "@/hooks";
+import { useUser, useDemoMode } from "@/hooks";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslations } from 'next-intl';
 import { RecaptchaV3 } from "@/components/recaptcha-v3";
@@ -37,8 +37,7 @@ export default function Hero() {
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isSignedIn, user } = useUser();
   const { isDemoMode } = useDemoMode();
   const t = useTranslations('Hero');
 

@@ -89,13 +89,4 @@ export const guestFlashcardsStorage = {
       console.error("Błąd usuwania fiszek gościa:", error);
     }
   },
-
-  hasFlashcards: (): boolean => {
-    return guestFlashcardsStorage.getFlashcards().length > 0;
-  },
-
-  getCurrentCategory: (): string | null => {
-    const flashcards = guestFlashcardsStorage.getFlashcards();
-    return flashcards.length > 0 ? flashcards[0].category : null;
-  },
 };

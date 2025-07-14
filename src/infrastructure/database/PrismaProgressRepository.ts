@@ -36,21 +36,19 @@ export class PrismaProgressRepository implements ProgressRepository {
     });
   }
 
-  async getUserProgress(userId: string): Promise<Progress[]> {
-    return await this.prisma.progress.findMany({
+  async getReviewedTodayCount(userId: string): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const count = await this.prisma.progress.count({
       where: {
-        userId
+        userId: userId,
+        lastReviewed: {
+          gte: today,
+        },
       },
-      select: {
-        id: true,
-        flashcardId: true,
-        userId: true,
-        correctAnswers: true,
-        incorrectAnswers: true,
-        lastReviewed: true,
-        nextReviewDate: true,
-        masteryLevel: true
-      }
     });
+
+    return count;
   }
 } 

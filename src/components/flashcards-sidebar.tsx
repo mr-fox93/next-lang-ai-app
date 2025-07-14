@@ -139,7 +139,7 @@ export function FlashcardsSidebar({
     try {
       const result = await getUserLanguagesAction();
       if (result.success) {
-        setLanguages(result.languages);
+        setLanguages(result.languages || []);
         if (!selectedLanguage) {
           setSelectedLanguage("all");
         }

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { UserRepository, User, UserPreferences } from "@/core/interfaces/repositories/UserRepository";
+import { UserRepository, User } from "@/core/interfaces/repositories/UserRepository";
 import { prisma } from "@/lib/prisma"; // Use secure configured client
 
 export class PrismaUserRepository implements UserRepository {
@@ -20,6 +20,7 @@ export class PrismaUserRepository implements UserRepository {
       id: user.id,
       username: user.username || undefined,
       email: user.email || undefined,
+      dailyGoal: user.dailyGoal || 10,
       preferences: {
         theme: user.preferredLanguage || undefined,
         notifications: true
@@ -27,16 +28,10 @@ export class PrismaUserRepository implements UserRepository {
     };
   }
 
-  async getUserPreferences(userId: string): Promise<UserPreferences | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId }
+  async updateDailyGoal(userId: string, dailyGoal: number): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { dailyGoal },
     });
-
-    if (!user) return null;
-
-    return {
-      theme: user.preferredLanguage || undefined,
-      notifications: true
-    };
   }
 } 

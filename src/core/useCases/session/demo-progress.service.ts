@@ -4,6 +4,8 @@
  * Part of clean architecture - handles demo mode data persistence
  */
 
+import { masteryLevelService } from "@/core/services/MasteryLevelService";
+
 export interface DemoProgress {
   flashcardId: number;
   category: string;
@@ -54,21 +56,15 @@ class LocalStorageDemoProgressService implements DemoProgressService {
       lastReviewed: new Date().toISOString(),
     };
 
-    // Update counters
+    // Update counters and mastery level using centralized service
     if (isCorrect) {
       current.correctAnswers += 1;
-      // Update mastery level logic (same as server-side)
-      if (current.masteryLevel === 0) {
-        current.masteryLevel = 2;
-      } else if (current.masteryLevel === 1) {
-        current.masteryLevel = 3;
-      } else {
-        current.masteryLevel = Math.min(5, current.masteryLevel + 1);
-      }
     } else {
       current.incorrectAnswers += 1;
-      // Mastery level stays the same for incorrect answers
     }
+    
+    // Use MasteryLevelService for consistent calculation
+    current.masteryLevel = masteryLevelService.calculateNewMasteryLevel(current.masteryLevel, isCorrect);
 
     current.lastReviewed = new Date().toISOString();
     allProgress[flashcardId] = current;
