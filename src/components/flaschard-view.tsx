@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import type { MouseEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Volume2 } from "lucide-react";
+import { Heart, Volume2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { speak } from "@/utils/speak";
 import { SupportedTTSLanguage } from "@/types/locale";
 import { Flashcard } from "@/core/entities/Flashcard";
 import { MultipleChoiceAnswers } from "@/components/multiple-choice-answers";
 import { useTranslations } from "next-intl";
+import { addFavoriteAction } from "@/app/actions/favorite-actions";
 
 const langToTTSMap: Record<string, SupportedTTSLanguage> = {
   en: "en-US",
@@ -24,10 +26,22 @@ interface FlashcardViewProps {
   onNext: (known: boolean) => void;
   allFlashcards: Flashcard[];
   isGuestMode?: boolean;
+  isFavorited?: boolean;
+  onToggleFavorite?: (flashcardId: number) => void;
+  answerCycle?: number;
 }
 
-export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false }: FlashcardViewProps) {
+export function FlashcardView({
+  card,
+  onNext,
+  allFlashcards,
+  isGuestMode = false,
+  isFavorited = false,
+  onToggleFavorite,
+  answerCycle = 0,
+}: FlashcardViewProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isSavingFavorite, setIsSavingFavorite] = useState(false);
   const t = useTranslations("Difficulty");
 
   const handleAnswer = (isCorrect: boolean) => {
@@ -55,6 +69,22 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
     }
   };
 
+  const handleFavoriteClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    if (isGuestMode || isSavingFavorite) {
+      return;
+    }
+
+    setIsSavingFavorite(true);
+    if (onToggleFavorite) {
+      await onToggleFavorite(card.id);
+    } else {
+      await addFavoriteAction(card.id);
+    }
+    setIsSavingFavorite(false);
+  };
+
   return (
     <div className="flex flex-col items-center justify-start w-full h-full max-w-3xl mx-auto overflow-hidden pt-10 sm:pt-8">
       <div className="w-full flex flex-col items-center justify-start gap-3 flex-1 overflow-hidden">
@@ -77,11 +107,27 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
             <div className="absolute w-full h-full [backface-visibility:hidden]">
               <Card className="w-full h-full flex flex-col justify-between border-0 shadow-xl bg-black/20 backdrop-blur-sm overflow-hidden rounded-xl">
                 <motion.div
-                  className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 text-center"
+                  className="relative flex-1 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 text-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={`absolute right-2 top-2 transition-colors h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-black/50 border border-white/10 shadow-md ${
+                      isFavorited
+                        ? "text-red-400 hover:text-red-300"
+                        : "text-gray-300 hover:text-red-400"
+                    }`}
+                    onClick={handleFavoriteClick}
+                    disabled={isGuestMode || isSavingFavorite}
+                    aria-pressed={isFavorited}
+                    aria-label="Add to favorites"
+                  >
+                    <Heart className="h-5 w-5" fill={isFavorited ? "currentColor" : "none"} />
+                  </Button>
                   <div className="mb-1 md:mb-2 flex flex-col items-center">
                     <span className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
                       {card.translate_text}
@@ -170,6 +216,7 @@ export function FlashcardView({ card, onNext, allFlashcards, isGuestMode = false
         
         <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[80%]">
           <MultipleChoiceAnswers
+            key={`${card.id}-${answerCycle}`}
             card={card}
             isFlipped={isFlipped}
             onAnswer={handleAnswer}

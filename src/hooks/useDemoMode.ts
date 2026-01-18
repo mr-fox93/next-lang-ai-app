@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { demoModeService } from '@/core/useCases/session';
 import { demoProgressService } from '@/core/useCases/session/demo-progress.service';
+import { demoFavoritesService } from '@/core/useCases/session/demo-favorites.service';
 import { UserProgressStats, CategoryProgress } from '@/types/progress';
 
 /**
@@ -107,6 +108,24 @@ export const setDemoDailyGoal = (goal: number) => {
   // Dispatch custom event to notify components
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('demoProgressUpdate'));
+  }
+};
+
+export const getDemoFavoriteIds = (): number[] => {
+  return demoFavoritesService.getFavorites();
+};
+
+export const addDemoFavorite = (flashcardId: number) => {
+  demoFavoritesService.addFavorite(flashcardId);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('demoFavoritesUpdate'));
+  }
+};
+
+export const removeDemoFavorite = (flashcardId: number) => {
+  demoFavoritesService.removeFavorite(flashcardId);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('demoFavoritesUpdate'));
   }
 };
 

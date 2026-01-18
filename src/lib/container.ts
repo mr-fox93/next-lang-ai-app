@@ -1,4 +1,5 @@
 import { PrismaFlashcardRepository } from "@/infrastructure/database/PrismaFlashcardRepository";
+import { PrismaFavoriteRepository } from "@/infrastructure/database/PrismaFavoriteRepository";
 import { PrismaProgressRepository } from "@/infrastructure/database/PrismaProgressRepository";
 import { PrismaUserRepository } from "@/infrastructure/database/PrismaUserRepository";
 import { GetUserFlashcardsUseCase } from "@/core/useCases/flashcards/GetUserFlashcards";
@@ -11,7 +12,11 @@ import { HandleGuestFlashcardGenerationUseCase } from "@/core/useCases/flashcard
 import { GetUserProgressStatsUseCase } from "@/core/useCases/progress/GetUserProgressStats";
 import { UpdateDailyGoalUseCase } from "@/core/useCases/progress/UpdateDailyGoalUseCase";
 import { GetReviewedTodayCountUseCase } from "@/core/useCases/progress/GetReviewedTodayCountUseCase";
+import { AddFavoriteUseCase } from "@/core/useCases/favorites/AddFavoriteUseCase";
+import { GetUserFavoritesUseCase } from "@/core/useCases/favorites/GetUserFavoritesUseCase";
+import { RemoveFavoriteUseCase } from "@/core/useCases/favorites/RemoveFavoriteUseCase";
 import { FlashcardRepository } from "@/core/interfaces/repositories/FlashcardRepository";
+import { FavoriteRepository } from "@/core/interfaces/repositories/FavoriteRepository";
 import { 
   aiFlashcardGenerationService,
   createUserManagementService,
@@ -44,6 +49,7 @@ class Container {
   private constructor() {
     // Inicjalizacja repozytoriów
     this.services.set('FlashcardRepository', new PrismaFlashcardRepository());
+    this.services.set('FavoriteRepository', new PrismaFavoriteRepository());
     this.services.set('ProgressRepository', new PrismaProgressRepository());
     this.services.set('UserRepository', new PrismaUserRepository());
     
@@ -131,6 +137,27 @@ class Container {
         this.get('ProgressRepository')
       )
     );
+
+    this.services.set(
+      'AddFavoriteUseCase',
+      new AddFavoriteUseCase(
+        this.get('FavoriteRepository')
+      )
+    );
+
+    this.services.set(
+      'GetUserFavoritesUseCase',
+      new GetUserFavoritesUseCase(
+        this.get('FavoriteRepository')
+      )
+    );
+
+    this.services.set(
+      'RemoveFavoriteUseCase',
+      new RemoveFavoriteUseCase(
+        this.get('FavoriteRepository')
+      )
+    );
     
     // Auth use cases
     this.services.set(
@@ -198,6 +225,9 @@ export const container = Container.getInstance();
 export const getFlashcardRepository = (): FlashcardRepository => 
   container.get('FlashcardRepository');
 
+export const getFavoriteRepository = (): FavoriteRepository =>
+  container.get('FavoriteRepository');
+
 export const getUserFlashcardsUseCase = (): GetUserFlashcardsUseCase => 
   container.get('GetUserFlashcardsUseCase');
   
@@ -227,6 +257,15 @@ export const getUpdateDailyGoalUseCase = (): UpdateDailyGoalUseCase =>
   
 export const getReviewedTodayCountUseCase = (): GetReviewedTodayCountUseCase =>
   container.get('GetReviewedTodayCountUseCase');
+
+export const getAddFavoriteUseCase = (): AddFavoriteUseCase =>
+  container.get('AddFavoriteUseCase');
+
+export const getUserFavoritesUseCase = (): GetUserFavoritesUseCase =>
+  container.get('GetUserFavoritesUseCase');
+
+export const getRemoveFavoriteUseCase = (): RemoveFavoriteUseCase =>
+  container.get('RemoveFavoriteUseCase');
 
 // Auth exports
 export const getSignInWithOtpUseCase = (): SignInWithOtpUseCase =>

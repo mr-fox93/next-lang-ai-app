@@ -4,3 +4,4 @@
  */
 
 export * from './demo-mode.service'; 
+export * from './demo-favorites.service';

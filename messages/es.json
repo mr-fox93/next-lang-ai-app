@@ -62,6 +62,10 @@
     "generating": "Generando...",
     "logOut": "Cerrar sesión"
   },
+  "TopBar": {
+    "favorites": "Favoritos",
+    "flashcards": "Fichas"
+  },
   "Hero": {
     "title": "Transforma tu aprendizaje con",
     "subtitle": "Introduce cualquier texto o escenario y deja que nuestra IA cree tarjetas perfectas para tu proceso de aprendizaje.",

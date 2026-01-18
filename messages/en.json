@@ -62,6 +62,10 @@
     "generating": "Generating...",
     "logOut": "Log Out"
   },
+  "TopBar": {
+    "favorites": "Favorites",
+    "flashcards": "Flashcards"
+  },
   "Hero": {
     "title": "Transform Your Learning with",
     "subtitle": "Enter any text or scenario and let our AI create perfect flashcards for your learning journey.",

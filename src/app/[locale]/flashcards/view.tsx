@@ -16,13 +16,17 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { UserProgressStats } from "@/types/progress";
 import { toast } from "@/components/ui/use-toast";
 import { generateMoreFlashcardsAction } from "@/app/actions/flashcard-actions";
+import { addFavoriteAction, removeFavoriteAction } from "@/app/actions/favorite-actions";
 import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { WelcomeNewUserModal } from "@/components/welcome-new-user-modal";
-import { useDemoMode, getMasteredCategoriesFromDemo } from "@/hooks";
+import { useDemoMode, getMasteredCategoriesFromDemo, getDemoFavoriteIds, addDemoFavorite, removeDemoFavorite } from "@/hooks";
 import { useTranslations } from "next-intl";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
+  answerFlashcards?: Flashcard[];
+  initialFavoriteIds?: number[];
+  isFavoritesView?: boolean;
   serverError?: string | null;
   initialCategory?: string | null;
   progressStats?: {
@@ -35,6 +39,9 @@ interface FlashcardsViewProps {
 
 export default function FlashcardsView({
   initialFlashcards,
+  answerFlashcards,
+  initialFavoriteIds = [],
+  isFavoritesView = false,
   serverError,
   initialCategory,
   progressStats,
@@ -50,6 +57,13 @@ export default function FlashcardsView({
   );
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [answerCycle, setAnswerCycle] = useState(0);
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(
+    () => new Set(initialFavoriteIds)
+  );
+  const [visibleFlashcards, setVisibleFlashcards] = useState<Flashcard[]>(
+    () => initialFlashcards
+  );
   // Start with collapsed state, will be updated based on screen size
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
@@ -96,6 +110,41 @@ export default function FlashcardsView({
   }, [initialFlashcards, selectedCategory, categoryFromUrl]);
 
   useEffect(() => {
+    setFavoriteIds(new Set(initialFavoriteIds));
+  }, [initialFavoriteIds]);
+
+  useEffect(() => {
+    if (isFavoritesView) {
+      setVisibleFlashcards(initialFlashcards);
+    }
+  }, [initialFlashcards, isFavoritesView]);
+
+  useEffect(() => {
+    if (!isDemoMode) return;
+
+    const syncDemoFavorites = () => {
+      const demoIds = getDemoFavoriteIds();
+      setFavoriteIds(new Set(demoIds));
+
+      if (isFavoritesView) {
+        setVisibleFlashcards(
+          initialFlashcards.filter((card) => demoIds.includes(card.id))
+        );
+      }
+    };
+
+    syncDemoFavorites();
+
+    window.addEventListener("demoFavoritesUpdate", syncDemoFavorites);
+    window.addEventListener("storage", syncDemoFavorites);
+
+    return () => {
+      window.removeEventListener("demoFavoritesUpdate", syncDemoFavorites);
+      window.removeEventListener("storage", syncDemoFavorites);
+    };
+  }, [isDemoMode, isFavoritesView, initialFlashcards]);
+
+  useEffect(() => {
     setCurrentCardIndex(0);
   }, [selectedCategory]);
 
@@ -123,6 +172,7 @@ export default function FlashcardsView({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleNext = (known: boolean) => {
     setCurrentCardIndex((prev) => (prev + 1) % categoryCards.length);
+    setAnswerCycle((prev) => prev + 1);
   };
 
   const handleGenerateFlashcards = async (category: string) => {
@@ -218,11 +268,89 @@ export default function FlashcardsView({
     setShowLoginPrompt(true);
   };
 
+  const flashcardsSource = isFavoritesView ? visibleFlashcards : initialFlashcards;
   const categoryCards = selectedCategory
-    ? initialFlashcards.filter((card) => card.category === selectedCategory)
-    : initialFlashcards;
+    ? flashcardsSource.filter((card) => card.category === selectedCategory)
+    : flashcardsSource;
 
   const currentCard = categoryCards[currentCardIndex] ?? null;
+  const answerPoolFlashcards = answerFlashcards ?? initialFlashcards;
+
+  const handleToggleFavorite = async (flashcardId: number) => {
+    const isCurrentlyFavorited = favoriteIds.has(flashcardId);
+    const nextFavoriteIds = new Set(favoriteIds);
+
+    if (isDemoMode) {
+      if (isCurrentlyFavorited) {
+        removeDemoFavorite(flashcardId);
+        nextFavoriteIds.delete(flashcardId);
+      } else {
+        addDemoFavorite(flashcardId);
+        nextFavoriteIds.add(flashcardId);
+      }
+
+      setFavoriteIds(nextFavoriteIds);
+
+      if (isFavoritesView) {
+        setVisibleFlashcards((prev) => {
+          const updated = isCurrentlyFavorited
+            ? prev.filter((card) => card.id !== flashcardId)
+            : prev;
+
+          if (updated.length === 0) {
+            setSelectedCategory(null);
+            return updated;
+          }
+
+          if (selectedCategory) {
+            const categories = new Set(updated.map((card) => card.category));
+            if (!categories.has(selectedCategory)) {
+              setSelectedCategory(Array.from(categories)[0] ?? null);
+            }
+          }
+
+          return updated;
+        });
+      }
+
+      return;
+    }
+
+    if (isCurrentlyFavorited) {
+      const result = await removeFavoriteAction(flashcardId);
+      if (result.success) {
+        nextFavoriteIds.delete(flashcardId);
+        setFavoriteIds(nextFavoriteIds);
+
+        if (isFavoritesView) {
+          setVisibleFlashcards((prev) => {
+            const updated = prev.filter((card) => card.id !== flashcardId);
+
+            if (updated.length === 0) {
+              setSelectedCategory(null);
+              return updated;
+            }
+
+            if (selectedCategory) {
+              const categories = new Set(updated.map((card) => card.category));
+              if (!categories.has(selectedCategory)) {
+                setSelectedCategory(Array.from(categories)[0] ?? null);
+              }
+            }
+
+            return updated;
+          });
+        }
+      }
+      return;
+    }
+
+    const result = await addFavoriteAction(flashcardId);
+    if (result.success) {
+      nextFavoriteIds.add(flashcardId);
+      setFavoriteIds(nextFavoriteIds);
+    }
+  };
 
   return (
     <div className="min-h-screen h-screen bg-black text-white flex flex-col overflow-hidden">
@@ -260,7 +388,7 @@ export default function FlashcardsView({
             }}
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            flashcards={initialFlashcards}
+            flashcards={flashcardsSource}
             variant={isDemoMode ? "demo" : "authenticated"}
             masteredCategories={calculatedMasteredCategories}
             onNewFlashcardsClick={isDemoMode ? () => handleDemoModeAction("newFlashcards") : undefined}
@@ -332,7 +460,10 @@ export default function FlashcardsView({
                         <FlashcardView
                           card={currentCard}
                           onNext={handleNext}
-                          allFlashcards={initialFlashcards}
+                          allFlashcards={answerPoolFlashcards}
+                          isFavorited={favoriteIds.has(currentCard.id)}
+                          onToggleFavorite={handleToggleFavorite}
+                          answerCycle={answerCycle}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-[calc(100vh-12rem)]">

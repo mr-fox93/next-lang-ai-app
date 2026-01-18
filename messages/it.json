@@ -62,6 +62,10 @@
     "generating": "Generazione...",
     "logOut": "Disconnetti"
   },
+  "TopBar": {
+    "favorites": "Preferiti",
+    "flashcards": "Flashcard"
+  },
   "Hero": {
     "title": "Trasforma il tuo apprendimento con",
     "subtitle": "Inserisci qualsiasi testo o scenario e lascia che la nostra IA crei flashcard perfette per il tuo percorso di apprendimento.",

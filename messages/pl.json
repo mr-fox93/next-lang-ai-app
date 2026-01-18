@@ -63,6 +63,10 @@
     "generating": "Generowanie...",
     "logOut": "Wyloguj się"
   },
+  "TopBar": {
+    "favorites": "Ulubione",
+    "flashcards": "Fiszki"
+  },
   "Hero": {
     "title": "Zmień swój sposób nauki z",
     "subtitle": "Wprowadź dowolny tekst lub scenariusz, a nasza sztuczna inteligencja stworzy idealne fiszki dla Twojej nauki.",
