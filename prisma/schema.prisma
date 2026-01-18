@@ -21,6 +21,7 @@ model User {
   updatedAt         DateTime    @updatedAt
   flashcards        Flashcard[]
   progress          Progress[]
+  favorites         Favorite[]
   learningStreak    Int         @default(0)
   lastActivityDate  DateTime?
   preferredLanguage String      @default("en")
@@ -44,6 +45,7 @@ model Flashcard {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String
   progress          Progress[]
+  favorites         Favorite[]
 }
 
 model Progress {
@@ -59,4 +61,15 @@ model Progress {
   masteryLevel      Int       @default(0) // 0-5 mastery level
   
   @@unique([flashcardId, userId])
+}
+
+model Favorite {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  flashcardId Int
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, flashcardId])
 }

@@ -3,13 +3,17 @@
 import { useCallback, useMemo } from "react";
 import { useUser, useSupabase } from "@/hooks";
 import { Button } from "@/components/ui/button";
-import { PanelLeftOpen, LogOut, Save } from "lucide-react";
+import { PanelLeftOpen, LogOut, Save, Heart, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
+import { defaultLocale } from "@/i18n/routing";
+import { Locale } from "@/types/locale";
 import { ProgressPreview } from "@/components/progress-preview";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { useDemoMode } from "@/hooks";
 import { TopBarProps } from "@/types/component-props";
+import { useTranslations } from "next-intl";
 
 export function TopBar({
   variant,
@@ -23,7 +27,11 @@ export function TopBar({
   const { isSignedIn, user } = useUser();
   const { signOut } = useSupabase();
   const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams();
+  const currentLocale = (params?.locale as Locale) || defaultLocale;
   const { isDemoMode, exitDemoMode } = useDemoMode();
+  const t = useTranslations("TopBar");
 
   // Memoized handlers to prevent unnecessary re-renders
   const handleSignOut = useCallback(async () => {
@@ -45,6 +53,14 @@ export function TopBar({
     // Call external handler if provided
     onExitDemo?.();
   }, [router, onExitDemo, exitDemoMode]);
+
+  const isFavoritesRoute = pathname?.includes("/favorite");
+
+  const handleFavoritesClick = useCallback(() => {
+    router.push(isFavoritesRoute ? "/flashcards" : "/favorite", {
+      locale: currentLocale
+    });
+  }, [router, isFavoritesRoute, currentLocale]);
 
   // Memoized user section to prevent unnecessary re-renders
   const userSection = useMemo(() => {
@@ -174,8 +190,23 @@ export function TopBar({
         </div>
       </div>
 
-      {/* Desktop only: Language Switcher positioned next to Progress Preview */}
-      <div className="hidden md:block fixed top-2 right-[240px] z-10">
+      {/* Desktop only: Favorites shortcut + Language Switcher */}
+      <div className="hidden md:flex fixed top-2 right-[240px] z-10 items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="bg-gradient-to-br from-black/90 to-gray-900/90 backdrop-blur-md border border-white/10 hover:border-purple-500/50 text-gray-300 hover:text-white transition-all flex items-center gap-1 relative shadow-lg shadow-purple-500/5 rounded-xl h-[48px] px-3"
+          onClick={handleFavoritesClick}
+        >
+          {isFavoritesRoute ? (
+            <BookOpen className="h-4 w-4" />
+          ) : (
+            <Heart className="h-4 w-4 text-red-400" />
+          )}
+          <span className="text-xs font-medium">
+            {isFavoritesRoute ? t("flashcards") : t("favorites")}
+          </span>
+        </Button>
         <LanguageSwitcher />
       </div>
 

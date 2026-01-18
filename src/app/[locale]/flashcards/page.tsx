@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import {
   getFlashcardsForUser,
+  getFavoriteFlashcardIdsForUser,
   getProgressStatsForUser,
   getMasteredCategoriesForUser,
 } from "./actions";
@@ -26,10 +27,12 @@ export default async function FlashcardsPage({ params }: { params: Promise<{ loc
   // Równoległe wykonywanie zapytań dla lepszej wydajności
   const [
     { flashcards, error },
+    { favoriteIds },
     progressStats,
     masteredCategoriesResult
   ] = await Promise.all([
     getFlashcardsForUser(),
+    getFavoriteFlashcardIdsForUser(),
     getProgressStatsForUser(),
     getMasteredCategoriesForUser(),
   ]);
@@ -44,6 +47,7 @@ export default async function FlashcardsPage({ params }: { params: Promise<{ loc
     >
       <FlashcardsView
         initialFlashcards={flashcards}
+        initialFavoriteIds={favoriteIds}
         serverError={error}
         initialCategory={null}
         progressStats={progressStats}
