@@ -6,7 +6,7 @@ import { Flashcard } from "@/core/entities/Flashcard";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks";
 import { Grid, Maximize2, Sparkles } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { FlashcardsSidebar } from "@/components/flashcards-sidebar";
 import { FlashcardView } from "@/components/flaschard-view";
@@ -21,6 +21,8 @@ import { LoginPromptPopup } from "@/components/login-prompt-popup";
 import { WelcomeNewUserModal } from "@/components/welcome-new-user-modal";
 import { useDemoMode, getMasteredCategoriesFromDemo, getDemoFavoriteIds, addDemoFavorite, removeDemoFavorite } from "@/hooks";
 import { useTranslations } from "next-intl";
+import { defaultLocale } from "@/i18n/routing";
+import { Locale } from "@/types/locale";
 
 interface FlashcardsViewProps {
   initialFlashcards: Flashcard[];
@@ -74,6 +76,9 @@ export default function FlashcardsView({
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   const router = useRouter();
+  const params = useParams();
+  const currentLocale = (params?.locale as Locale) || defaultLocale;
+  const homePath = currentLocale === defaultLocale ? "/" : `/${currentLocale}`;
   const { isDemoMode, exitDemoMode } = useDemoMode();
   const { isSignedIn } = useUser();
   const t = useTranslations('Flashcards');
@@ -361,7 +366,8 @@ export default function FlashcardsView({
         onExitDemo={() => {
           // Use hook function to exit demo mode
           exitDemoMode();
-          router.push("/");
+          // Hard navigation to ensure redirect
+          window.location.assign(homePath);
         }}
       />
 
@@ -396,7 +402,8 @@ export default function FlashcardsView({
             onExitDemo={() => {
               // Use hook function to exit demo mode
               exitDemoMode();
-              router.push("/");
+              // Hard navigation to ensure redirect
+              window.location.assign(homePath);
             }}
           />
         </div>

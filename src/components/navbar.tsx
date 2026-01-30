@@ -97,7 +97,8 @@ export default function Navbar() {
     setMobileMenuOpen(false);
     
     // Przekieruj do strony głównej
-    router.push("/");
+    const homePath = currentLocale === 'en' ? "/" : `/${currentLocale}`;
+    window.location.assign(homePath);
   };
 
   // Close menu when clicking outside
