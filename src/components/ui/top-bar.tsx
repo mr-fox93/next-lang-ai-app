@@ -37,22 +37,23 @@ export function TopBar({
   const handleSignOut = useCallback(async () => {
     try {
       await signOut();
-      router.push("/");
+      router.push("/", { locale: currentLocale });
     } catch (error) {
       console.error("Sign out error:", error);
     }
-  }, [signOut, router]);
+  }, [signOut, router, currentLocale]);
 
   const handleExitDemo = useCallback(() => {
     // Use hook function to exit demo mode
     exitDemoMode();
     
-    // Redirect to home page
-    router.push("/");
+    // Redirect to home page (hard navigation for reliability)
+    const homePath = currentLocale === defaultLocale ? "/" : `/${currentLocale}`;
+    window.location.assign(homePath);
     
     // Call external handler if provided
     onExitDemo?.();
-  }, [router, onExitDemo, exitDemoMode]);
+  }, [onExitDemo, exitDemoMode, currentLocale]);
 
   const isFavoritesRoute = pathname?.includes("/favorite");
 
